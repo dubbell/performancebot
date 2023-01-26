@@ -6,6 +6,6 @@ package com.icetlab.performancebot;
 public class App {
 
   public static void main(String[] args) {
-    System.out.println("Hello sadf!");
+    System.out.println("Hello world!");
   }
 }
