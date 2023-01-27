@@ -1,34 +1,30 @@
 package com.icetlab.performancebot;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest extends TestCase {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 
-  /**
-   * Create the test case
-   *
-   * @param testName name of the test case
-   */
-  public AppTest(String testName) {
-    super(testName);
-  }
+import static org.assertj.core.api.Assertions.assertThat;
 
-  /**
-   * @return the suite of tests being tested
-   */
-  public static Test suite() {
-    return new TestSuite(AppTest.class);
-  }
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class AppTest {
+
+  @Value(value = "${local.server.port}")
+  private int port;
+
+  @Autowired
+  private TestRestTemplate restTemplate;
 
   /**
-   * Rigorous Test :-)
+   * Unit test for assuring the default message is loaded when starting the App.
    */
-  public void testApp() {
-    assertTrue(true);
+  @Test
+  public void greetingShouldReturnDefaultMessage() {
+    assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/",
+        String.class)).contains("Welcome to the performancebot.");
   }
 }
