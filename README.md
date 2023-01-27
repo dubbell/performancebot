@@ -16,6 +16,20 @@ analyse results and compare them historically.
 - Kasper Ljunggren [@Kablero](https://github.com/kablero)
 - Linus Lundgren [@dubbell](https://github.com/dubbell)
 
+## Running the bot
+
+Run the following command in a terminal (make sure to `cd` into this directory/folder):
+
+```shell
+$ ./mvnw spring-boot:run
+```
+
+To run the tests, use:
+
+```shell
+$ ./mvnw test
+```
+
 ## Setting the formatter
 
 For consistency's sake, let's all use the same formatter following the Google Java Style Guide.
