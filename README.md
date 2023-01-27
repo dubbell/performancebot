@@ -20,14 +20,14 @@ analyse results and compare them historically.
 
 Run the following command in a terminal (make sure to `cd` into this directory/folder):
 
-```shell
-$ ./mvnw spring-boot:run
+```zsh
+./mvnw spring-boot:run
 ```
 
 To run the tests, use:
 
-```shell
-$ ./mvnw test
+```zsh
+./mvnw test
 ```
 
 ## Setting the formatter
