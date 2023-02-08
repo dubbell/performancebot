@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @SpringBootApplication
 @RestController
-public class App {
+public class PerformanceBot {
 
   /**
    * The main entry of the application.
    */
   public static void main(String[] args) {
-    SpringApplication.run(App.class, args);
+    SpringApplication.run(PerformanceBot.class, args);
   }
 
   /**
@@ -27,5 +27,10 @@ public class App {
   @GetMapping("/")
   public String root() {
     return "Welcome to the performancebot.";
+  }
+
+  @GetMapping("/webhooks")
+  public String webhooks() {
+    return "Webhook received";
   }
 }

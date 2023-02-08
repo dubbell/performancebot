@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class AppTest {
+public class PerformanceBotTest {
 
   @Value(value = "${local.server.port}")
   private int port;
