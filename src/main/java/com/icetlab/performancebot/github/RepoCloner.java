@@ -1,11 +1,24 @@
 package com.icetlab.performancebot.github;
 
-class RepoCloner {
+/**
+ * Responsible for cloning the target repository that should be tested.
+ */
+public class RepoCloner {
+
+  private final Auth auth;
 
   public RepoCloner() {
+    auth = new Auth();
+    auth.authorize();
   }
 
-  void cloneRepo() {
-    System.out.println("Clone repo!");
+
+  public void cloneRepo(String url) {
+    try {
+      auth.authorize();
+      System.out.println("Clone repo!");
+    } catch (Exception e) {
+      System.out.println("Bad stuff");
+    }
   }
 }

@@ -1,11 +1,14 @@
 package com.icetlab.performancebot.github;
 
-class Issue {
+/**
+ * Responsible for creating issues which are sent to the GitHub repo sending the initial payload.
+ */
+public class Issue {
 
   public Issue() {
   }
 
-  void createIssue() {
+  public void createIssue() {
     System.out.println("Create issue!");
   }
 }

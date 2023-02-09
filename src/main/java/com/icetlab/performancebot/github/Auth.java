@@ -1,6 +1,10 @@
 package com.icetlab.performancebot.github;
 
-class Auth {
+/**
+ * Authorizes and authenticates the bot to access the target repository.
+ */
+public class Auth {
+
   public Auth() {
 
   }

@@ -1,11 +1,14 @@
 package com.icetlab.performancebot.stats;
 
-class Analyzer {
+/**
+ * Responsible for handling which analysis on the performance data is to be performed.
+ */
+public class Analyzer {
 
   public Analyzer() {
   }
 
-  void analyze() {
+  public void analyze() {
     System.out.println("Analyze data!");
   }
 }
