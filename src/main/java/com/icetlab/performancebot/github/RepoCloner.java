@@ -5,17 +5,17 @@ package com.icetlab.performancebot.github;
  */
 public class RepoCloner {
 
-  private final Auth auth;
+  // private final Auth auth;
 
   public RepoCloner() {
-    auth = new Auth();
-    auth.authorize();
+    // auth = new Auth();
+    // auth.authorize();
   }
 
 
   public void cloneRepo(String url) {
     try {
-      auth.authorize();
+      // auth.authorize();
       System.out.println("Clone repo!");
     } catch (Exception e) {
       System.out.println("Bad stuff");
