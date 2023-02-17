@@ -3,12 +3,13 @@ package com.icetlab.performancebot;
 import com.icetlab.performancebot.benchmark.IBenchmark;
 import com.icetlab.performancebot.benchmark.JMHBenchmark;
 import com.icetlab.performancebot.github.Issue;
+import com.icetlab.performancebot.github.Payload;
 import com.icetlab.performancebot.github.RepoCloner;
 import com.icetlab.performancebot.stats.Analyzer;
-import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.json.BasicJsonParser;
+import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.boot.json.JsonParser;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +26,9 @@ public class PerformanceBot {
   private static final IBenchmark benchmark = new JMHBenchmark();
   private static final RepoCloner repoCloner = new RepoCloner();
   private static final Issue issue = new Issue();
+  private static final Payload payloadHandler = new Payload();
   private static final Analyzer analyzer = new Analyzer();
-  private static final BasicJsonParser payloadParser = new BasicJsonParser();
+  public static final JsonParser payloadParser = new JacksonJsonParser();
 
   /**
    * The main entry of the application.
@@ -51,15 +53,13 @@ public class PerformanceBot {
    *
    * @param payload JSON string with payload
    */
-  @PostMapping(name = "/payload", value = "payload",
-      consumes = MediaType.APPLICATION_JSON_VALUE
-  )
+  @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestBody String payload) {
-    Map<String, Object> map = payloadParser.parseMap(payload);
-    if (map.containsKey("pull_request")) {
-      // TODO: Handle pull requests.
-    } else if (map.containsKey("installation")) {
-      // TODO: Handle bot installation.
-    }
+    payloadHandler.handlePayload(payload);
+  }
+
+  public static Issue getIssue() {
+    return issue;
   }
 }
+
