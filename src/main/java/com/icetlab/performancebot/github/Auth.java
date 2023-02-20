@@ -52,7 +52,12 @@ public class Auth {
         .getBean(GitHubConfig.class);
     appId = gitHubConfig.getAppId();
     privateKeyPath = gitHubConfig.getPrivateKeyPath();
-    fetchAndPopulateInstallationIds();
+    try { // TODO: Not sure if good practice
+      fetchAndPopulateInstallationIds();
+    }
+    catch (Throwable e){
+      System.out.println("Bad access key!");
+    }
     jwt = createWebToken();
   }
 
@@ -66,13 +71,14 @@ public class Auth {
     RestTemplate restTemplate = new RestTemplate();
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> response = restTemplate
-        .exchange("https://api.github.com/app/installations", HttpMethod.GET, request,
-            String.class);
+            .exchange("https://api.github.com/app/installations", HttpMethod.GET, request,
+                    String.class);
 
     validateResponse(response);
 
     JsonNode jsonNode = convertResponseToJSONNode(response.getBody());
     populateInstallationIds(jsonNode);
+
   }
 
   /**
