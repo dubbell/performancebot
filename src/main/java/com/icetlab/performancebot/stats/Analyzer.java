@@ -12,3 +12,4 @@ public class Analyzer {
     System.out.println("Analyze data!");
   }
 }
+
