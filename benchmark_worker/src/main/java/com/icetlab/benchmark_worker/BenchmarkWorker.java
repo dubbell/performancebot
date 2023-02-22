@@ -1,7 +1,5 @@
 package com.icetlab.benchmark_worker;
 
-
-import com.icetlab.performancebot.PerformanceBot;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -31,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class BenchmarkWorker {
 
   public static void main(String[] args) {
-    SpringApplication.run(PerformanceBot.class, args);
+    SpringApplication.run(BenchmarkWorker.class, args);
   }
 
   /**
