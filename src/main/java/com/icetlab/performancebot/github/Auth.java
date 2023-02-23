@@ -39,11 +39,13 @@ public class Auth {
   private String jwt;
   private Date expiresAt;
   private Map<String, String> installationIds;
+  public RestTemplate restTemplate;
 
   /**
    * Creates a new Auth object.
    */
   public Auth() {
+    restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
     java.security.Security.addProvider(
         new org.bouncycastle.jce.provider.BouncyCastleProvider()
@@ -68,7 +70,6 @@ public class Auth {
   private void fetchAndPopulateInstallationIds() {
     HttpHeaders headers = createHeaders();
 
-    RestTemplate restTemplate = new RestTemplate();
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> response = restTemplate
             .exchange("https://api.github.com/app/installations", HttpMethod.GET, request,
@@ -152,7 +153,6 @@ public class Auth {
     headers.set("Accept", "application/vnd.github+json");
     headers.set("Authorization", "Bearer " + getJwt());
 
-    RestTemplate restTemplate = new RestTemplate();
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> res = restTemplate
         .exchange(
