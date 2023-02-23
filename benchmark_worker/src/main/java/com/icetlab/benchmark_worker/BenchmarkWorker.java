@@ -9,17 +9,21 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -32,8 +36,11 @@ import org.apache.maven.shared.invoker.DefaultInvocationRequest;
  * 4. Performing statistical analysis.
  * 5. Sending the result of the analysis to the remote repository as a Github Issue.
  */
+@RestController
 @SpringBootApplication
 public class BenchmarkWorker {
+
+  Logger logger = LoggerFactory.getLogger(BenchmarkWorker.class);
 
   public static void main(String[] args) {
     SpringApplication.run(BenchmarkWorker.class, args);
@@ -53,13 +60,16 @@ public class BenchmarkWorker {
     try {
       clone(repoURL, accessToken);
       compile();
+      benchmark(); // saves result to json file
 
       // TODO run benchmark
       // TODO send to database
       // TODO analysis
       // TODO post issue
     }
-    catch (Exception e) {}
+    catch (Exception e) {
+      logger.error(e.toString());
+    }
 
     delete();
   }
@@ -108,8 +118,11 @@ public class BenchmarkWorker {
       throw new Exception("Build failed.");
   }
 
+  /**
+   * Runs benchmarks in compiled project and stores the result in a json file.
+   */
   private void benchmark() throws Exception {
-
+    Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json").waitFor();
   }
 
   /**
