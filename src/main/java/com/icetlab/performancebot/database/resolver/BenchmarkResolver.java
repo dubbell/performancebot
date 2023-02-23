@@ -30,10 +30,20 @@ public class BenchmarkResolver {
   public GraphQLSchema benchmarkSchema() {
     TypeDefinitionRegistry typeRegistry = new TypeDefinitionRegistry();
 
-    String schema = "type Benchmark {\n" + "  id: ID!\n" + "  runData: String!\n"
-        + "  projectId: String!\n" + "}\n" + "type Query {\n" + "  benchmark(id: ID!): Benchmark\n"
-        + "}\n" + "type Mutation {\n"
-        + "  addBenchmark(id: ID!, runData: String!, projectId: String!): Benchmark\n" + "}\n";
+    String schema = """
+            type Benchmark {
+              id: ID!
+              runData: String!
+              projectId: String!
+            }
+            type Query {
+              benchmark(id: ID!): Benchmark
+            }
+            type Mutation {
+              addBenchmark(id: ID!, runData: String!, projectId: String!): Benchmark
+            }
+        """;
+
     typeRegistry.merge(new SchemaParser().parse(schema));
 
     RuntimeWiring wiring = RuntimeWiring.newRuntimeWiring()

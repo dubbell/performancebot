@@ -6,18 +6,19 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.database.resolver.GitHubProjectResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.stereotype.Component;
 
-/**
- * Handles the payload received from GitHub.
- */
+@Component
 public class Payload {
 
-  private final JacksonJsonParser payloadParser;
+  private final JacksonJsonParser payloadParser = new JacksonJsonParser();
 
-  public Payload() {
-    payloadParser = new JacksonJsonParser();
-  }
+  @Autowired
+  private GitHubProjectResolver githubResolver;
+
 
   /**
    * Handles the payload received from GitHub.

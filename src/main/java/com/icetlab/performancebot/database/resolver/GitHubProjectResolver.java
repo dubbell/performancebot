@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 import com.icetlab.performancebot.database.model.Benchmark;
 import com.icetlab.performancebot.database.model.GitHubProject;
 import com.icetlab.performancebot.database.repository.GitHubProjectRepository;
@@ -15,7 +15,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
-@Controller
+@Component
 public class GitHubProjectResolver {
   String schema = """
       type Query {
@@ -36,6 +36,7 @@ public class GitHubProjectResolver {
       }
       """;
 
+
   @Autowired
   private GitHubProjectRepository gitHubProjectRepository;
 
@@ -45,10 +46,7 @@ public class GitHubProjectResolver {
 
   public GitHubProject getProjectById(String id) {
     Optional<GitHubProject> project = gitHubProjectRepository.findById(id);
-    if (project.isPresent()) {
-      return project.get();
-    }
-    return null;
+    return project.orElse(null);
   }
 
   public List<Benchmark> getRunsById(String id) {

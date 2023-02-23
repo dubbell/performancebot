@@ -6,10 +6,12 @@ import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
 import com.icetlab.performancebot.github.RepoCloner;
 import com.icetlab.performancebot.stats.Analyzer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.json.JsonParser;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @SpringBootApplication
 @RestController
+@EnableMongoRepositories
 public class PerformanceBot {
 
   private static final IBenchmark benchmark = new JMHBenchmark();
   private static final RepoCloner repoCloner = new RepoCloner();
   private static final Issue issue = new Issue();
-  private static final Payload payloadHandler = new Payload();
+  @Autowired
+  private Payload payloadHandler;
   private static final Analyzer analyzer = new Analyzer();
   public static final JsonParser payloadParser = new JacksonJsonParser();
 
