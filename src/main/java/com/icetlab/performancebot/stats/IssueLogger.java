@@ -1,24 +1,28 @@
 package com.icetlab.performancebot.stats;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 
-class TempMain {
-
-  public static void main(String[] args) {
-    try {
-      String issue = IssueLogger.createIssue();
-      IssueLogger.storeIssue(issue);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-  }
-}
-
 class IssueLogger {
+
+  /**
+   * Takes a json string and creates a simple issue. Returns the issue as a string.
+   *
+   * @param json a json string representing a jmh benchmark
+   * @return a simple issue of the benchmark data
+   * @throws JsonProcessingException if json string cannot be parsed into a BenchmarkJMH object
+   */
+  public static String createIssue(String json) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    BenchmarkJMH benchmarkJMH = objectMapper.readValue(json, BenchmarkJMH.class);
+    IssueFormatter issueFormatter = new SimpleIssue();
+    String issue = issueFormatter.formatBenchmarkIssue(benchmarkJMH);
+    return issue;
+  }
 
   /**
    * Reads the jmh-result.json file and creates a simple issue. Returns the issue as a string.
@@ -35,11 +39,9 @@ class IssueLogger {
     String path = userdir + "/src/main/java/com/icetlab/performancebot/stats/jmh-result.json";
 
     // Create ObjectMapper to parse json file to a BenchmarkJMH
-    // TODO: Make objectMapper read a string of json data instead of directly from the file
     ObjectMapper objectMapper = new ObjectMapper();
     BenchmarkJMH benchmarkJMH = objectMapper.readValue(
         new File(path),
-        // TODO: Change this to json string instead of file path
         BenchmarkJMH.class);
 
     // Create an issue of benchmark
