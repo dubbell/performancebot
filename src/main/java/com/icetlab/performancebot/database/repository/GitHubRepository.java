@@ -6,18 +6,18 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import com.icetlab.performancebot.database.model.Benchmark;
-import com.icetlab.performancebot.database.model.GitHubProject;
+import com.icetlab.performancebot.database.model.GitHub;
 
-public interface GitHubProjectRepository extends MongoRepository<GitHubProject, String> {
+public interface GitHubRepository extends MongoRepository<GitHub, String> {
   @Query("{ 'name' : ?0, 'owner' : ?1 }")
-  GitHubProject findByNameAndOwner(String name, String owner);
+  GitHub findByNameAndOwner(String name, String owner);
 
   @NotNull
   @Query("{ 'id' : ?0}")
-  Optional<GitHubProject> findById(@NotNull String id);
+  Optional<GitHub> findById(@NotNull String id);
 
   @Query("{ 'url' : ?0}")
-  GitHubProject findByUrl(String url);
+  GitHub findByUrl(String url);
 
   @Query("{ 'id' : ?0, 'runs' : { $exists : true } }")
   List<Benchmark> findAllRunsById(String id);
