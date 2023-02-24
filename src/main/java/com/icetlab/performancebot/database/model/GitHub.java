@@ -27,26 +27,56 @@ public class GitHub {
     this.runs = runs;
   }
 
+  /**
+   * Adds a benchmark run to the list of runs.
+   * 
+   * @param run
+   */
   public void addRun(Benchmark run) {
     runs.add(run);
   }
 
+  /**
+   * Gets the id of the GitHub repository.
+   * 
+   * @return the id of the GitHub repository.
+   */
   public String getId() {
     return id;
   }
 
+  /**
+   * Gets the name of the GitHub repository.
+   * 
+   * @return the name of the GitHub repository.
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * Gets the owner of the GitHub repository.
+   * 
+   * @return the owner of the GitHub repository.
+   */
   public String getOwner() {
     return owner;
   }
 
+  /**
+   * Gets the url of the GitHub repository.
+   * 
+   * @return the url of the GitHub repository.
+   */
   public String getUrl() {
     return url;
   }
 
+  /**
+   * Gets the list of benchmark runs associated with the GitHub repository.
+   * 
+   * @return the list of benchmark runs associated with the GitHub repository.
+   */
   public List<Benchmark> getRuns() {
     return runs;
   }
