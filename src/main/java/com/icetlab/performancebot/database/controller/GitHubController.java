@@ -56,13 +56,28 @@ public class GitHubController {
    * @param name the name of the project to add.
    * @param owner the owner of the project to add.
    * @param url the URL of the project to add.
+   * @return the GitHub object representing the added project.
    */
-  public void addProject(String id, String name, String owner, String url) {
+  public GitHub addProject(String id, String name, String owner, String url) {
     Optional<GitHub> project = gitHubProjectRepository.findById(id);
     if (project.isPresent()) {
-      return;
+      return project.get();
     }
-    gitHubProjectRepository.insert(new GitHub(id, name, owner, url, new ArrayList<>()));
+    return gitHubProjectRepository.insert(new GitHub(id, name, owner, url, new ArrayList<>()));
+  }
+
+  /**
+   * Adds a new GitHub project.
+   *
+   * @param project the GitHub project to add.
+   * @return the GitHub object representing the added project.
+   */
+  public GitHub addProject(GitHub project) {
+    Optional<GitHub> existingProject = gitHubProjectRepository.findById(project.getId());
+    if (existingProject.isPresent()) {
+      return existingProject.get();
+    }
+    return gitHubProjectRepository.insert(project);
   }
 
   /**
@@ -71,14 +86,15 @@ public class GitHubController {
    * @param projectId the id of the project to add the run to.
    * @param run the benchmark run data to add.
    */
-  public void addRun(String projectId, String run) {
+  public Benchmark addRun(String projectId, String run) {
     Optional<GitHub> project = gitHubProjectRepository.findById(projectId);
     if (project.isEmpty()) {
-      return;
+      return null;
     }
     List<Benchmark> runs = project.get().getRuns();
     Benchmark benchmark = new Benchmark(runs.size() + "", run, projectId);
     runs.add(benchmark);
     gitHubProjectRepository.save(project.get());
+    return benchmark;
   }
 }
