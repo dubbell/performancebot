@@ -34,7 +34,9 @@ public class BenchmarkController {
    * @param runData the JSON data associated with the benchmark run.
    * @param projectId the id of the project associated with the benchmark run.
    */
-  public void addBenchmark(String runData, String projectId) {
-    benchmarkRepository.insert(new Benchmark(benchmarkRepository.count() + "", runData, projectId));
-  }
+  public Benchmark addBenchmark(String runData, String projectId) {
+    Benchmark benchmark = new Benchmark(benchmarkRepository.count() + "", runData, projectId);
+    benchmarkRepository.save(benchmark);
+    return benchmark;
+  };
 }
