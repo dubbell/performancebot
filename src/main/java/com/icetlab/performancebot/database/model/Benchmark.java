@@ -8,7 +8,6 @@ public class Benchmark {
   @Id
   private final String id;
 
-  // FIXME: This could be a GraphQL object
   private final String runData;
 
   private final String projectId;

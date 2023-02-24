@@ -2,7 +2,6 @@ package com.icetlab.performancebot.database.repository;
 
 import java.util.List;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import com.icetlab.performancebot.database.model.Benchmark;
@@ -12,9 +11,8 @@ public interface GitHubRepository extends MongoRepository<GitHub, String> {
   @Query("{ 'name' : ?0, 'owner' : ?1 }")
   GitHub findByNameAndOwner(String name, String owner);
 
-  @NotNull
   @Query("{ 'id' : ?0}")
-  Optional<GitHub> findById(@NotNull String id);
+  Optional<GitHub> findById(String id);
 
   @Query("{ 'url' : ?0}")
   GitHub findByUrl(String url);
