@@ -6,7 +6,7 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icetlab.performancebot.database.resolver.GitHubProjectResolver;
+import com.icetlab.performancebot.database.controller.GitHubController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class Payload {
   private final JacksonJsonParser payloadParser = new JacksonJsonParser();
 
   @Autowired
-  private GitHubProjectResolver githubResolver;
+  private GitHubController githubController;
 
 
   /**
@@ -36,12 +36,35 @@ public class Payload {
   }
 
   /**
+   * Handles a benchmark result and adds it to the database.
+   * 
+   * @param payload
+   */
+  public void handleBenchmark(String payload) {
+    JsonNode node = getPayloadAsNode(payload);
+    String projectId = node.get("project_id").asText();
+    String runData = node.get("run_data").asText();
+    if (githubController.getProjectById(projectId) == null) {
+      String projectName = node.get("project_name").asText();
+      String projectOwner = node.get("project_owner").asText();
+      String projectUrl = node.get("project_url").asText();
+      githubController.addProject(projectId, projectName, projectOwner, projectUrl);
+    }
+    githubController.addRun(projectId, runData);
+  }
+
+  /**
    * Handles the payload received from GitHub when a new installation is created.
    *
    * @param payload the payload received from GitHub
    */
   private void handleNewInstall(String payload) {
-    System.out.println("New installation created. I do nothing, though.");
+    JsonNode node = getPayloadAsNode(payload);
+    String projectId = node.get("installation").get("id").asText();
+    String projectName = node.get("repository").asText();
+    String projectOwner = node.get("installation").get("account").get("login").asText();
+    String projectUrl = node.get("installation").get("clone_url").asText();
+    githubController.addProject(projectId, projectName, projectOwner, projectUrl);
   }
 
   /**
