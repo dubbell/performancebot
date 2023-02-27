@@ -87,7 +87,7 @@ public class BenchmarkWorker {
    * @param repoURL repository url
    * @param accessToken repository access token for authentication
    */
-  private void clone(String repoURL, String accessToken) throws Exception {
+  public void clone(String repoURL, String accessToken) throws Exception {
 
     // creates directory
     File dir = new File("benchmark_directory");
@@ -105,7 +105,7 @@ public class BenchmarkWorker {
   /**
    * Compiles the cloned repository by executing a new Maven build to the 'verify' phase.
    */
-  private void compile() throws Exception {
+  public void compile() throws Exception {
     // construct request to clean target directory
     InvocationRequest cleanRequest = new DefaultInvocationRequest();
     cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
@@ -129,16 +129,16 @@ public class BenchmarkWorker {
   /**
    * Runs benchmarks in compiled project and stores the result in a json file.
    */
-  private void benchmark() throws Exception {
+  public void benchmark() throws Exception {
     Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json").waitFor();
   }
 
-  private String readResults() throws IOException {
+  public String readResults() throws IOException {
     byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json"));
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  private void sendResult(String result, String senderURI) throws HttpClientErrorException {
+  public void sendResult(String result, String senderURI) throws HttpClientErrorException {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("body", result);
 
@@ -151,7 +151,7 @@ public class BenchmarkWorker {
   /**
    * Deletes local clone of repository with the given name.
    */
-  private void delete() {
+  public void delete() {
     try {
       FileUtils.deleteDirectory(new File("benchmark_directory"));
       new File("jmh-result.json").delete();
