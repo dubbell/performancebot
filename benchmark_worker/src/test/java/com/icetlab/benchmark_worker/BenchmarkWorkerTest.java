@@ -24,7 +24,7 @@ public class BenchmarkWorkerTest {
             fail("Cloning error : " + e);
         }
 
-        // compiling
+        // compilation
         File target = new File("benchmark_directory/target");
         try {
             worker.compile();
@@ -33,6 +33,20 @@ public class BenchmarkWorkerTest {
             fail("Compilation error : " + e);
         }
 
+        // benchmarking
+        try {
+            worker.benchmark();
+            File result = new File("jmh-result.json");
+            assertTrue(result.exists() && worker.readResults().length() != 0);
+        } catch (Exception e) {
+            System.out.println("Benchmarking error : " + e);
+        }
+
+
+    }
+
+    @AfterEach
+    public void deleteFiles() {
         worker.delete();
     }
 
