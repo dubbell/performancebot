@@ -7,7 +7,8 @@ package com.icetlab.performancebot.stats;
 public class SimpleBenchmarkIssue implements BenchmarkIssueFormatter {
 
   @Override
-  public String formatBenchmarkIssue(BenchmarkJMH benchmarkJMH) {
+  public String formatBenchmarkIssue(BenchmarkJMH[] benchmarksJMH) {
+    BenchmarkJMH benchmarkJMH = benchmarksJMH[0];                         // Take the first benchmark
     String benchmark = benchmarkJMH.getBenchmark().toString();
     String score = benchmarkJMH.getPrimaryMetric().getScore().toString();
     String issue = "Score of " + benchmark + ": " + score;

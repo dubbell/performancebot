@@ -6,5 +6,5 @@ package com.icetlab.performancebot.stats;
  */
 public interface BenchmarkIssueFormatter {
 
-  public String formatBenchmarkIssue(BenchmarkJMH benchmarkJMH);
+  public String formatBenchmarkIssue(BenchmarkJMH[] benchmarksJMH);
 }
