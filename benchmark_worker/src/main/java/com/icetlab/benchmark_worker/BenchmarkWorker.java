@@ -1,7 +1,13 @@
 package com.icetlab.benchmark_worker;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -15,15 +21,21 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 
 /**
@@ -50,7 +62,7 @@ public class BenchmarkWorker {
    * Listens for new tasks from the performancebot.
    */
   @PostMapping(name = "/task", value = "task", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void startTask(@RequestBody String task) {
+  public void startTask(@RequestBody String task, HttpServletRequest request) {
     JacksonJsonParser parser = new JacksonJsonParser();
 
     String repoURL = (String) parser.parseMap(task).get("url");
@@ -61,11 +73,7 @@ public class BenchmarkWorker {
       clone(repoURL, accessToken);
       compile();
       benchmark(); // saves result to json file
-
-      // TODO run benchmark
-      // TODO send to database
-      // TODO analysis
-      // TODO post issue
+      sendResult(readResults(), request.getRemoteAddr());
     }
     catch (Exception e) {
       logger.error(e.toString());
@@ -125,12 +133,28 @@ public class BenchmarkWorker {
     Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json").waitFor();
   }
 
+  private String readResults() throws IOException {
+    byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json"));
+    return new String(encoded, StandardCharsets.UTF_8);
+  }
+
+  private void sendResult(String result, String senderURI) throws HttpClientErrorException {
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("body", result);
+
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
+    RestTemplate restTemplate = new RestTemplate();
+
+    restTemplate.postForEntity(URI.create(senderURI), requestEntity, String.class);
+  }
+
   /**
    * Deletes local clone of repository with the given name.
    */
   private void delete() {
     try {
       FileUtils.deleteDirectory(new File("benchmark_directory"));
+      new File("jmh-result.json").delete();
     } catch (IOException ignored) {}
 
     // TODO error handling?
