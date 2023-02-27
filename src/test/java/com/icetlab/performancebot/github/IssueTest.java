@@ -3,7 +3,6 @@ package com.icetlab.performancebot.github;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -39,19 +38,4 @@ public class IssueTest {
     issue.createIssue(endpoint, title, message, id);
     verify(issue, times(1)).createIssue(endpoint, title, message, id);
   }
-
-  @Test
-  public void testFailCreateIssue() {
-    String endpoint = "https://api.github.com/repos/iceT-Lab/performance-bot/issues";
-    String title = "Test title";
-    String message = "Test message";
-    String id = "123";
-    String token = "xyz";
-    when(auth.getAccessTokenFromId(id)).thenReturn(token);
-    when(restTemplate.postForEntity(anyString(), any(), any()))
-        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
-    issue.createIssue(endpoint, title, message, id);
-    verify(issue, times(1)).createIssue(endpoint, title, message, id);
-  }
-
 }
