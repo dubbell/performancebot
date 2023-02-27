@@ -39,7 +39,7 @@ public class BenchmarkWorkerTest {
             File result = new File("jmh-result.json");
             assertTrue(result.exists() && worker.readResults().length() != 0);
         } catch (Exception e) {
-            System.out.println("Benchmarking error : " + e);
+            fail("Benchmarking error : " + e);
         }
 
 
