@@ -145,7 +145,7 @@ public class BenchmarkWorker {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create(senderURI), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create(senderURI + "/benchmark"), requestEntity, String.class);
   }
 
   /**
