@@ -1,7 +1,6 @@
 package com.icetlab.performancebot.github;
 
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -22,21 +21,19 @@ public class AuthTest {
     private Auth auth;
     @Mock
     RestTemplate restTemplate;
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
     @Test
     public void testGetAccessTokenFromId() {
-        this.res = new ResponseEntity<>("{token:" + "xyz" + "}", HttpStatus.OK);
+        this.res = new ResponseEntity<>("{\"token\": \"xyz\"}", HttpStatus.OK);
         when(restTemplate.exchange(
-                any(),
-                any(), any(),
-                eq(String.class))).thenReturn(this.res);
+                anyString(),
+                any(HttpMethod.class), any(),
+                any(Class.class))).thenReturn(this.res);
         String id = "123";
         String token = "xyz";
-        System.out.println(auth.restTemplate);
-        System.out.println(this.res.getBody());
         assertEquals(token, auth.getAccessTokenFromId(id));
     }
 }

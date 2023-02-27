@@ -39,7 +39,7 @@ public class Auth {
   private String jwt;
   private Date expiresAt;
   private Map<String, String> installationIds;
-  public RestTemplate restTemplate;
+  private RestTemplate restTemplate;
 
   /**
    * Creates a new Auth object.
