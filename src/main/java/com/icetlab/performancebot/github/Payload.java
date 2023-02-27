@@ -26,6 +26,10 @@ public class Payload {
    */
   public void handlePayload(String payload) {
     boolean isPullRequest = payloadParser.parseMap(payload).get("pull_request") != null;
+    /*
+     * FIXME: This is not a reliable way of checking if the payload is a new installation. We need
+     * to look in the database to see if the installation is already there.
+     */
     boolean isNewInstall = payloadParser.parseMap(payload).get("action").equals("created");
     if (isPullRequest) {
       handlePullRequest(payload);
@@ -39,7 +43,7 @@ public class Payload {
    *
    * @param payload the payload received from GitHub
    */
-  private void handleNewInstall(String payload) {
+  void handleNewInstall(String payload) {
     System.out.println("New installation created. I do nothing, though.");
   }
 
@@ -48,7 +52,7 @@ public class Payload {
    *
    * @param payload the payload received from GitHub
    */
-  private void handlePullRequest(String payload) {
+  void handlePullRequest(String payload) {
     JsonNode node = getPayloadAsNode(payload);
     String installationId = node.get("installation").get("id").asText();
     String issuesUrl = node.get("pull_request").get("issue_url").asText();
