@@ -190,9 +190,6 @@ public class Auth {
     String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
             .replaceAll("\\r?\\n", "")
             .replace("-----END RSA PRIVATE KEY-----", "");
-    System.out.println("---");
-    System.out.println(privateKey);
-    System.out.println("---");
     byte[] decoded = Base64.getDecoder().decode(privateKey);
     KeyFactory kf = null;
     try {
