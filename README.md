@@ -20,8 +20,6 @@ analyse results and compare them historically.
 
 Running this bot before we have one hosted requires some setup, but if you follow the steps below, you should be fine. Otherwise, just write on Discord and you will get help.
 
-- First of all, you need to create your own GitHub Application. Follow this [tutorial](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/creating-a-github-app).
-- Once a bot has been created, save the App ID and create a Private Key (save the file and put it in the root of the project, do not push it). You need these for authentication.
 - Download and install [ngrok](https://ngrok.com/download). This creates a tunnel for proxying webhooks events sent by GitHub to your locally hosted app.
 	- Specify your port in `application.properties`, (i.e. `1337`), this will later be used to start the tunnel which will redirect events to our java app which will listen on the same port.
 
@@ -32,7 +30,8 @@ ngrok http 1337
 ```
 
 - In the terminal window, look at the public https address and copy the link.
-- Enter the link in the Webhook URL in your GitHub Apps settings, this is the same place as the tutorial above. Now GitHub knows where to send webhook events that the bot is subscribed to.
+- Now you are ready to create the your own GitHub Application. Follow this [tutorial](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/creating-a-github-app) and enter the link you copied in Website URL. Also add it in Webhook URL with /payload at the end. Now GitHub knows where to send webhook events that the bot is subscribed to.
+- Once a bot has been created, save the App ID and create a Private Key (save the file and put it in the root of the project, do not push it). You need these for authentication.
 - Remember to add the app to your account so it can listen for changes you make in your repos (I use a dummy private repo for testing that stuff works).
 - You can also repeat payloads in the web interface for ngrok, so you don't need to spam your contribution graph
 
