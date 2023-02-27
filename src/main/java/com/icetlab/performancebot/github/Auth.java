@@ -187,18 +187,20 @@ public class Auth {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
     String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
-        .replaceAll(System.lineSeparator(), "").replace("-----END RSA PRIVATE KEY-----", "");
-
-    byte[] encoded = Base64.getDecoder().decode(privateKey);
+            .replaceAll("\\r?\\n", "")
+            .replace("-----END RSA PRIVATE KEY-----", "");
+    System.out.println("---");
+    System.out.println(privateKey);
+    System.out.println("---");
+    byte[] decoded = Base64.getDecoder().decode(privateKey);
     KeyFactory kf = null;
     try {
       kf = KeyFactory.getInstance("RSA");
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
-    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
     try {
       return kf.generatePrivate(keySpec);
