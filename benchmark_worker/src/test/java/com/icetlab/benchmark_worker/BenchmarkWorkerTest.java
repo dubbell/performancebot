@@ -33,14 +33,8 @@ public class BenchmarkWorkerTest {
             fail("Compilation error : " + e);
         }
 
-
-    }
-
-
-
-    @AfterAll
-    public static void deleteFiles() {
         worker.delete();
     }
+
 
 }

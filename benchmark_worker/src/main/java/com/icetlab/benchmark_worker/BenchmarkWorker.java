@@ -9,6 +9,7 @@ import java.util.Collections;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOExceptionList;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
@@ -22,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.json.JacksonJsonParser;
@@ -99,7 +101,7 @@ public class BenchmarkWorker {
       .setCredentialsProvider(credentials) // if the repository is private, the access token should authorize the request
       .setURI(repoURL)
       .setDirectory(dir)
-      .call();
+      .call().close();
   }
 
   /**
@@ -118,6 +120,7 @@ public class BenchmarkWorker {
 
     // cleans and then compiles project
     Invoker invoker = new DefaultInvoker();
+    invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
     InvocationResult cleanResult = invoker.execute(cleanRequest);
     InvocationResult verifyResult = invoker.execute(verifyRequest);
 
@@ -155,7 +158,9 @@ public class BenchmarkWorker {
     try {
       FileUtils.deleteDirectory(new File("benchmark_directory"));
       new File("jmh-result.json").delete();
-    } catch (IOException ignored) {}
+    } catch (IOException e) {
+      System.out.println(e);
+    }
 
     // TODO error handling?
   }
