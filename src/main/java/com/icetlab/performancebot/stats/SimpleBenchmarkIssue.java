@@ -4,7 +4,7 @@ package com.icetlab.performancebot.stats;
 /**
  * A very simple issue that shows the score of a benchmark
  */
-public class SimpleIssue implements IssueFormatter {
+public class SimpleBenchmarkIssue implements BenchmarkIssueFormatter {
 
   @Override
   public String formatBenchmarkIssue(BenchmarkJMH benchmarkJMH) {

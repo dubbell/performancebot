@@ -1,7 +1,6 @@
 package com.icetlab.performancebot.stats;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +18,8 @@ class IssueLogger {
   public static String createIssue(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     BenchmarkJMH benchmarkJMH = objectMapper.readValue(json, BenchmarkJMH.class);
-    IssueFormatter issueFormatter = new SimpleIssue();
-    String issue = issueFormatter.formatBenchmarkIssue(benchmarkJMH);
+    BenchmarkIssueFormatter benchmarkIssueFormatter = new SimpleBenchmarkIssue();
+    String issue = benchmarkIssueFormatter.formatBenchmarkIssue(benchmarkJMH);
     return issue;
   }
 
@@ -45,8 +44,8 @@ class IssueLogger {
         BenchmarkJMH.class);
 
     // Create an issue of benchmark
-    IssueFormatter issueFormatter = new SimpleIssue();
-    String issue = issueFormatter.formatBenchmarkIssue(benchmarkJMH);
+    BenchmarkIssueFormatter benchmarkIssueFormatter = new SimpleBenchmarkIssue();
+    String issue = benchmarkIssueFormatter.formatBenchmarkIssue(benchmarkJMH);
     return issue;
 
   }
