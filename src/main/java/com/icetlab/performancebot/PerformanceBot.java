@@ -56,9 +56,6 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
-    // serv.addRepoToInstallation("123", new GitHubRepo("test", new HashSet<>()));
-    // serv.addMethodToRepo("123", "test", new Method("testMethod", new ArrayList<>()));
-    serv.addRunResultToMethod("123", "test", "testMethod", "holy moly");
     return "Welcome to the performancebot.";
   }
 
