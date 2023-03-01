@@ -7,25 +7,26 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 
 /**
- * A model class that represents a collection in the database 
+ * A model class that represents an installation of the bot on GitHub. It contains each repository
+ * that the bot has access to.
  */
 @Document(collection = "installations")
 public class Installation {
-    @Id
-    private final String installationId;
-    @Field("repos")
-    private List<GitHubRepo> repos;
+  @Id
+  private final String installationId;
+  @Field("repos")
+  private List<GitHubRepo> repos;
 
-    public Installation(String installationId, List<GitHubRepo> repos) {
-        this.installationId = installationId;
-        this.repos = repos;
-    }
+  public Installation(String installationId, List<GitHubRepo> repos) {
+    this.installationId = installationId;
+    this.repos = repos;
+  }
 
-    public String getInstallationId() {
-        return installationId;
-    }
+  public String getInstallationId() {
+    return installationId;
+  }
 
-    public List<GitHubRepo> getRepos() {
-        return repos;
-    }
+  public List<GitHubRepo> getRepos() {
+    return repos;
+  }
 }
