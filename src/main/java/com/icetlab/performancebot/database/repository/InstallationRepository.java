@@ -27,5 +27,5 @@ public interface InstallationRepository extends MongoRepository<Installation, St
    */
   @Query(value = "{ 'installationId' : ?0, 'repos.repoId' : ?1 }", fields = "{'repos.$' : 1 }")
   GitHubRepo findGitHubRepo(String installationId, String repoId);
-  
+
 }
