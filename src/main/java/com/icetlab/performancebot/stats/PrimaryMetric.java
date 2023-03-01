@@ -70,12 +70,14 @@ public class PrimaryMetric {
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("score")
     public Double getScore() {
+        if (score == null)
+            throw new IllegalArgumentException("Score cannot be null");
         return score;
     }
 
