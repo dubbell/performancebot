@@ -9,7 +9,6 @@ import com.icetlab.performancebot.database.service.InstallationService;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

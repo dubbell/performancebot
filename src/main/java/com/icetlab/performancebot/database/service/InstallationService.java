@@ -5,6 +5,8 @@ import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.repository.InstallationRepository;
 import com.icetlab.performancebot.database.model.GitHubRepo;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -25,8 +27,9 @@ public class InstallationService {
 
 
   public List<GitHubRepo> getReposByInstallationId(String installationId) {
-    if (installationExists(installationId))
+    if (installationExists(installationId)) {
       return repo.findAllReposById(installationId);
+    }
 
     throw new RuntimeException("No such installation id");
   }
@@ -34,7 +37,7 @@ public class InstallationService {
 
   /**
    * Returns a GitHubRepo object by id, throws a NoSuchElementException if the repo doesn't exist
-   * 
+   *
    * @param installationId the id of the installation
    * @return a GitHubRepo
    */
@@ -44,7 +47,7 @@ public class InstallationService {
 
   /**
    * Adds an installation to the database
-   * 
+   *
    * @param installationId the id of the installation
    */
   public void addInstallation(String installationId) {
@@ -59,7 +62,7 @@ public class InstallationService {
 
   /**
    * Adds a GitHub repo (GitHubRepo object) to an installation in the database
-   * 
+   *
    * @param installationId the id of the installation where GitHub repo will be added
    * @param repo the repo to be added
    */
@@ -75,7 +78,7 @@ public class InstallationService {
 
   /**
    * Adds a method to a repo in an installation
-   * 
+   *
    * @param installationId the id of the installation
    * @param repoId the id of the repo
    * @param method the method to be added
@@ -94,7 +97,7 @@ public class InstallationService {
 
   /**
    * Adds a run result to a method
-   * 
+   *
    * @param installationId the id of the installation
    * @param repoId the id of the repo
    * @param methodName the name of the method
@@ -115,8 +118,26 @@ public class InstallationService {
   }
 
   /**
+   * Retrieves all (benchmark) methods from a repo
+   *
+   * @param installationId the id of the installation where repo exists
+   * @param repoId the id of the repo
+   * @return set of methods (Method objects)
+   */
+  public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
+    Installation inst = getInstallationById(installationId);
+    Optional<GitHubRepo> gitHubRepo =
+        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
+    if (gitHubRepo.isPresent()) {
+      return gitHubRepo.get().getMethods();
+    }
+
+    throw new NoSuchElementException("No such repo id");
+  }
+
+  /**
    * Checks if an installation exists
-   * 
+   *
    * @param installationId the id of the installation
    * @return true if the installation exists, false otherwise
    */
