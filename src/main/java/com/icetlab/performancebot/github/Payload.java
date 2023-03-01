@@ -19,16 +19,14 @@ public class Payload {
    *
    * @param payload the payload received from GitHub
    */
-  public void handlePayload(String payload) {
-  }
+  public void handlePayload(String payload) {}
 
   /**
    * Handles the payload received from GitHub when a new installation is created.
    *
    * @param payload the payload received from GitHub
    */
-  private void handleNewInstall(String payload) {
-  }
+  void handleNewInstall(String payload) {}
 
   /**
    * Handles the payload received from GitHub when a pull request is opened.
