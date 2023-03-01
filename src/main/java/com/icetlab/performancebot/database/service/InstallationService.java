@@ -51,6 +51,7 @@ public class InstallationService {
     if (!installationExists(installationId)) {
       Installation inst = new Installation(installationId, new ArrayList<>());
       repo.insert(inst);
+      return;
     }
 
     throw new IllegalArgumentException("The id already exists");
@@ -66,6 +67,7 @@ public class InstallationService {
     if (installationExists(installationId)) {
       mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(installationId)),
           new Update().push("repos", repo), Installation.class);
+      return;
     }
 
     throw new RuntimeException("No such installation id");

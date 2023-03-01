@@ -9,6 +9,7 @@ import com.icetlab.performancebot.database.service.InstallationService;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,25 +32,30 @@ public class InstallationServiceTest {
 
   @Test
   public void testGetInstallationById() {
-    installationService.addInstallation("123");
-    Mockito.when(installationRepository.findById("123")).thenReturn(Optional.of(new Installation("123", new ArrayList<>())));
+    String installationId = "123";
+    Mockito.when(installationRepository.findById(installationId))
+        .thenReturn(Optional.of(new Installation(installationId, new ArrayList<>())));
+    installationService.addInstallation(installationId);
     Installation installation = installationService.getInstallationById("123");
     assertEquals("123", installation.getInstallationId());
   }
 
   @Test
   public void testGetInstallationByIdException() {
+    String installationId = "1234";
     assertThrows(NoSuchElementException.class, () -> {
-      installationService.getInstallationById("123");
+      installationService.getInstallationById(installationId);
     });
   }
 
   @Test
-  public void testAddInstallationException(){
-    installationService.addInstallation("12345");
-    Mockito.when(installationRepository.findById("12345")).thenReturn(Optional.of(new Installation("123", new ArrayList<>())));
+  public void testAddInstallationException() {
+    String installationId = "12345";
+    Mockito.when(installationRepository.findById(installationId))
+        .thenReturn(Optional.of(new Installation(installationId, new ArrayList<>())));
+    installationService.addInstallation(installationId);
     try {
-      installationService.addInstallation("12345");
+      installationService.addInstallation(installationId);
     } catch (RuntimeException e) {
       assertEquals("The id already exists", e.getMessage());
     }
