@@ -2,10 +2,16 @@ package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.benchmark.IBenchmark;
 import com.icetlab.performancebot.benchmark.JMHBenchmark;
+import com.icetlab.performancebot.database.model.GitHubRepo;
+import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.database.model.Method;
+import com.icetlab.performancebot.database.service.InstallationService;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
 import com.icetlab.performancebot.github.RepoCloner;
 import com.icetlab.performancebot.stats.Analyzer;
+import java.util.ArrayList;
+import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,6 +39,8 @@ public class PerformanceBot {
   private Payload payloadHandler;
   private static final Analyzer analyzer = new Analyzer();
   public static final JsonParser payloadParser = new JacksonJsonParser();
+  @Autowired
+  private InstallationService serv;
 
   /**
    * The main entry of the application.
@@ -48,6 +56,9 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
+    // serv.addRepoToInstallation("123", new GitHubRepo("test", new HashSet<>()));
+    // serv.addMethodToRepo("123", "test", new Method("testMethod", new ArrayList<>()));
+    serv.addRunResultToMethod("123", "test", "testMethod", "holy moly");
     return "Welcome to the performancebot.";
   }
 
