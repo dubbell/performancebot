@@ -5,7 +5,13 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Handles the payload received from GitHub.
@@ -60,6 +66,20 @@ public class Payload {
     // TODO: Handle the repo to clone in a container, feel free to do whatever you
     // want, this just how to obtain it.
     String repoUrl = node.get("pull_request").get("head").get("repo").get("clone_url").asText();
+
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("url", repoUrl);
+    requestBody.put("token", "");
+
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
+    RestTemplate restTemplate = new RestTemplate();
+    // temporary
+    String containerIp = "http://10.4.0.3";
+
+    restTemplate.postForEntity(URI.create(containerIp + "/benchmark"), requestEntity, String.class);
+
+
 
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
     getIssue().createIssue(issuesUrl, "hello", "my name is performancebot", installationId);

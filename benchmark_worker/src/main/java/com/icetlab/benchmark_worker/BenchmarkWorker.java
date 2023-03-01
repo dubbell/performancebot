@@ -120,7 +120,8 @@ public class BenchmarkWorker {
 
     // cleans and then compiles project
     Invoker invoker = new DefaultInvoker();
-    invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+    if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
+      invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
     InvocationResult cleanResult = invoker.execute(cleanRequest);
     InvocationResult verifyResult = invoker.execute(verifyRequest);
 
