@@ -8,13 +8,13 @@
     <version>3.0.2</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>com.icetlab.performancebot</groupId>
-  <artifactId>performance-bot</artifactId>
+  <groupId>com.icetlab.benchmark_worker</groupId>
+  <artifactId>benchmark-worker</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
-  <name>performance-bot</name>
+  <name>benchmark-worker</name>
   <url>http://maven.apache.org</url>
-  <description>Bot to run your JMH benchmarks.</description>
+  <description>The worker process to run in containers for the performancebot.</description>
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -30,10 +30,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -54,6 +50,21 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.70</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>6.4.0.202211300538-r</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-invoker</artifactId>
+      <version>3.2.0</version>
     </dependency>
   </dependencies>
   <build>

@@ -39,11 +39,13 @@ public class Auth {
   private String jwt;
   private Date expiresAt;
   private Map<String, String> installationIds;
+  private RestTemplate restTemplate;
 
   /**
    * Creates a new Auth object.
    */
   public Auth() {
+    restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
     java.security.Security.addProvider(
         new org.bouncycastle.jce.provider.BouncyCastleProvider()
@@ -68,7 +70,6 @@ public class Auth {
   private void fetchAndPopulateInstallationIds() {
     HttpHeaders headers = createHeaders();
 
-    RestTemplate restTemplate = new RestTemplate();
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> response = restTemplate
             .exchange("https://api.github.com/app/installations", HttpMethod.GET, request,
@@ -152,7 +153,6 @@ public class Auth {
     headers.set("Accept", "application/vnd.github+json");
     headers.set("Authorization", "Bearer " + getJwt());
 
-    RestTemplate restTemplate = new RestTemplate();
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> res = restTemplate
         .exchange(
@@ -187,18 +187,17 @@ public class Auth {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
     String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
-        .replaceAll(System.lineSeparator(), "").replace("-----END RSA PRIVATE KEY-----", "");
-
-    byte[] encoded = Base64.getDecoder().decode(privateKey);
+            .replaceAll("\\r?\\n", "")
+            .replace("-----END RSA PRIVATE KEY-----", "");
+    byte[] decoded = Base64.getDecoder().decode(privateKey);
     KeyFactory kf = null;
     try {
       kf = KeyFactory.getInstance("RSA");
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
-    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
 
     try {
       return kf.generatePrivate(keySpec);

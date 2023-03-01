@@ -34,7 +34,7 @@ E.g: "Todo nr 2" becomes "todo-nr-2".
 ### Commits
 
 Try to make one commit per feature which let's you write a short commit message.
-Commit messages should be informative of the changes that has been made to make it easier to find possible problems. Avoid short general commit messages such as "bug fix". Also, try to remember to write them in **imperative form** (e.g "add feature" instead of "added feature"). 
+Commit messages should be informative of the changes that has been made to make it easier to find possible problems. The commit message should start with a capital letter. Avoid short general commit messages such as "bug fix". Also, try to remember to write them in **imperative form** (e.g "Add feature" instead of "Added feature"). 
 
 ### Pull request
 

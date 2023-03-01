@@ -5,7 +5,6 @@ import com.icetlab.performancebot.benchmark.JMHBenchmark;
 import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
-import com.icetlab.performancebot.github.RepoCloner;
 import com.icetlab.performancebot.stats.Analyzer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PerformanceBot {
 
   private static final IBenchmark benchmark = new JMHBenchmark();
-  private static final RepoCloner repoCloner = new RepoCloner();
   private static final Issue issue = new Issue();
   @Autowired
   private Payload payloadHandler;
