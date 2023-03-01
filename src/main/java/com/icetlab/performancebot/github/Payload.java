@@ -6,45 +6,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.stereotype.Component;
 
-/**
- * Handles the payload received from GitHub.
- */
+@Component
 public class Payload {
 
-  private final JacksonJsonParser payloadParser;
+  private final JacksonJsonParser payloadParser = new JacksonJsonParser();
 
-  public Payload() {
-    payloadParser = new JacksonJsonParser();
-  }
 
   /**
    * Handles the payload received from GitHub.
    *
    * @param payload the payload received from GitHub
    */
-  public void handlePayload(String payload) {
-    boolean isPullRequest = payloadParser.parseMap(payload).get("pull_request") != null;
-    /*
-     * FIXME: This is not a reliable way of checking if the payload is a new installation. We need
-     * to look in the database to see if the installation is already there.
-     */
-    boolean isNewInstall = payloadParser.parseMap(payload).get("action").equals("created");
-    if (isPullRequest) {
-      handlePullRequest(payload);
-    } else if (isNewInstall) {
-      handleNewInstall(payload);
-    }
-  }
+  public void handlePayload(String payload) {}
 
   /**
    * Handles the payload received from GitHub when a new installation is created.
    *
    * @param payload the payload received from GitHub
    */
-  void handleNewInstall(String payload) {
-    System.out.println("New installation created. I do nothing, though.");
-  }
+  void handleNewInstall(String payload) {}
 
   /**
    * Handles the payload received from GitHub when a pull request is opened.
@@ -62,7 +44,7 @@ public class Payload {
     String repoUrl = node.get("pull_request").get("head").get("repo").get("clone_url").asText();
 
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
-    getIssue().createIssue(issuesUrl, "hello", "my name is performancebot", installationId);
+    // TODO: Implement with the rest of the workflow
   }
 
   /**
