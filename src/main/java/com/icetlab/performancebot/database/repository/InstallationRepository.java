@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface InstallationRepository extends MongoRepository<Installation, String> {
 
-  List<String> findAllIds();
-
   /**
    * Finds all installations (GitHubRepo) by id
    * 
@@ -18,7 +16,7 @@ public interface InstallationRepository extends MongoRepository<Installation, St
    * @return a list of installations (GitHubReps objects)
    */
   @Query(value = "{ 'installationId' : ?0 }", fields = "{'repos' : 1 }")
-  List<GitHubRepo> findAllInstallationsById(String installationId);
+  List<GitHubRepo> findAllReposById(String installationId);
 
   /**
    * Finds a GitHub repo by id
@@ -29,5 +27,5 @@ public interface InstallationRepository extends MongoRepository<Installation, St
    */
   @Query(value = "{ 'installationId' : ?0, 'repos.repoId' : ?1 }", fields = "{'repos.$' : 1 }")
   GitHubRepo findGitHubRepo(String installationId, String repoId);
-
+  
 }

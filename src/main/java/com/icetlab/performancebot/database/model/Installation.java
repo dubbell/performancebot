@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * A model class that represents a collection in the database 
  */
-@Document(collation = "installations")
+@Document(collection = "installations")
 public class Installation {
     @Id
     private final String installationId;
-    @Field("installations")
+    @Field("repos")
     private List<GitHubRepo> repos;
 
-    public Installation(String installationId, List<GitHubRepo> installations) {
+    public Installation(String installationId, List<GitHubRepo> repos) {
         this.installationId = installationId;
-        this.repos = installations;
+        this.repos = repos;
     }
 
     public String getInstallationId() {
