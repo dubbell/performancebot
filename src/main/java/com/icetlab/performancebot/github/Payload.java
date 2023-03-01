@@ -21,14 +21,7 @@ public class Payload {
    * @param payload the payload received from GitHub
    */
   public void handlePayload(String payload) {
-  }
 
-  /**
-   * Handles a benchmark result and adds it to the database.
-   * 
-   * @param payload
-   */
-  public void handleBenchmark(String payload) {
   }
 
   /**

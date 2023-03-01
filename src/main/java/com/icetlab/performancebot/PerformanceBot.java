@@ -2,16 +2,11 @@ package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.benchmark.IBenchmark;
 import com.icetlab.performancebot.benchmark.JMHBenchmark;
-import com.icetlab.performancebot.database.model.GitHubRepo;
-import com.icetlab.performancebot.database.model.Installation;
-import com.icetlab.performancebot.database.model.Method;
-import com.icetlab.performancebot.database.service.InstallationService;
+import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
 import com.icetlab.performancebot.github.RepoCloner;
 import com.icetlab.performancebot.stats.Analyzer;
-import java.util.ArrayList;
-import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,7 +35,7 @@ public class PerformanceBot {
   private static final Analyzer analyzer = new Analyzer();
   public static final JsonParser payloadParser = new JacksonJsonParser();
   @Autowired
-  private InstallationService serv;
+  private InstallationController installationController;
 
   /**
    * The main entry of the application.
@@ -56,7 +51,7 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
-    return "Welcome to the performancebot.";
+    return "Welcome to the performancebot. ";
   }
 
   /**
@@ -68,6 +63,16 @@ public class PerformanceBot {
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestBody String payload) {
     payloadHandler.handlePayload(payload);
+  }
+
+  /**
+   * POST route that listens for finished benchmark runs and adds the results to the database.
+   *
+   * @param payload JSON string with payload
+   */
+  @PostMapping("/benchmark")
+  public void addRun(@RequestBody String payload) {
+    installationController.addRun(payload);
   }
 
   public static Issue getIssue() {
