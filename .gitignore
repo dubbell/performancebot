@@ -34,3 +34,5 @@ out/
 
 # OS X
 .DS_Store
+
+application.properties
