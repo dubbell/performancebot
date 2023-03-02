@@ -76,7 +76,9 @@ public class BenchmarkWorker {
       clone(repoURL, accessToken);
       compile();
       benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr(), (String)parser.parseMap(task).get("installation_id"));
+      sendResult(readResults(), request.getRemoteAddr(),
+          (String)parser.parseMap(task).get("installation_id"),
+          (String)parser.parseMap(task).get("repo_id"));
     }
     catch (Exception e) {
       logger.error(e.toString());
@@ -145,10 +147,10 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String results, String senderURI, String installationId) throws Exception {
+  public void sendResult(String results, String senderURI, String installationId, String repoId) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
-    requestBody.put("repo_id", "");
+    requestBody.put("repo_id", repoId);
 
     ObjectMapper mapper = new ObjectMapper();
     Object[] result_list = mapper.readValue(results.trim(), Object[].class);
