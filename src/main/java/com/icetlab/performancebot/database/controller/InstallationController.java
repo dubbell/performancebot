@@ -46,14 +46,17 @@ public class InstallationController {
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
       JsonNode results = node.get("results");
+
+
       if (results.isArray()) {
         for (JsonNode methodNode : results) {
           service.addRunResultToMethod(installationId, repoId, methodNode.get("benchmark").asText(),
-              methodNode.asText());
+              methodNode.toString());
         }
       }
       return true;
     } catch (JsonProcessingException e) {
+      System.out.println(e.toString());
       return false;
     }
   }

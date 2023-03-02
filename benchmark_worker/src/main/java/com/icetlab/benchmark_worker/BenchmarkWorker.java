@@ -78,7 +78,7 @@ public class BenchmarkWorker {
       benchmark(); // saves result to json file
       sendResult(readResults(), request.getRemoteAddr(),
           (String)parser.parseMap(task).get("installation_id"),
-          (String)parser.parseMap(task).get("repo_id"));
+          parser.parseMap(task).get("repo_id").toString());
     }
     catch (Exception e) {
       logger.error(e.toString());

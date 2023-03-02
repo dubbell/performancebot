@@ -4,6 +4,7 @@ import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.repository.InstallationRepository;
 import com.icetlab.performancebot.database.model.GitHubRepo;
+import com.mongodb.client.result.UpdateResult;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -107,10 +108,16 @@ public class InstallationService {
       String result) {
     Installation inst = getInstallationById(installationId);
     if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
-      mongoTemplate.updateFirst(
+      UpdateResult updateResult = mongoTemplate.updateFirst(
           Query.query(Criteria.where("_id").is(installationId).and("repos.repoId").is(repoId)
               .and("repos.methods.methodName").is(methodName)),
           new Update().push("repos.$.methods.$[].runResults", result), Installation.class);
+      if (updateResult.getModifiedCount() == 0) {
+        ArrayList<String> runResults = new ArrayList<>();
+        runResults.add(result);
+        addMethodToRepo(installationId, repoId, new Method(methodName, runResults));
+      }
+
       return;
     }
 
