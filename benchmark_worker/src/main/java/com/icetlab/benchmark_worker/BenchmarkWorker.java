@@ -125,7 +125,6 @@ public class BenchmarkWorker {
     if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
-    //throw new Exception("\n\n\n\n\n" + (new File("./lib/maven-3.9.0/bin/mvn").exists()));
     InvocationResult cleanResult = invoker.execute(cleanRequest);
     InvocationResult verifyResult = invoker.execute(verifyRequest);
 

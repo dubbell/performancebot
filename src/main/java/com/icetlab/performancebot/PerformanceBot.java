@@ -3,9 +3,11 @@ package com.icetlab.performancebot;
 import com.icetlab.performancebot.benchmark.IBenchmark;
 import com.icetlab.performancebot.benchmark.JMHBenchmark;
 import com.icetlab.performancebot.database.controller.InstallationController;
+import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
 import com.icetlab.performancebot.stats.Analyzer;
+import java.util.HashSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -49,6 +51,9 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
+    //installationController.addInstallation("33697560");
+    //installationController.addRepoToInstallation("33697560", new GitHubRepo("608560819", new HashSet<>(), "jmh"));
+
     return "Welcome to the performancebot. ";
   }
 
