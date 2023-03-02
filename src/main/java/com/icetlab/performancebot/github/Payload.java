@@ -75,9 +75,9 @@ public class Payload {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
     // temporary
-    String containerIp = "http://10.4.0.3";
+    String containerIp = "http://172.17.0.2";
 
-    restTemplate.postForEntity(URI.create(containerIp + "/benchmark"), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create(containerIp + ":8080/task"), requestEntity, String.class);
 
 
 

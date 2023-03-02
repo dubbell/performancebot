@@ -79,6 +79,7 @@ public class BenchmarkWorker {
     }
     catch (Exception e) {
       logger.error(e.toString());
+      logger.error(request.getRemoteAddr());
     }
 
     delete();
@@ -122,6 +123,8 @@ public class BenchmarkWorker {
     Invoker invoker = new DefaultInvoker();
     if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+
+    //throw new Exception("\n\n\n\n\n" + (new File("./lib/maven-3.9.0/bin/mvn").exists()));
     InvocationResult cleanResult = invoker.execute(cleanRequest);
     InvocationResult verifyResult = invoker.execute(verifyRequest);
 
@@ -149,7 +152,7 @@ public class BenchmarkWorker {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create(senderURI + "/benchmark"), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity, String.class);
   }
 
   /**
