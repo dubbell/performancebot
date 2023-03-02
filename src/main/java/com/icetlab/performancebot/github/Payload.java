@@ -67,6 +67,7 @@ public class Payload {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("url", repoUrl);
     requestBody.put("token", "");
+    requestBody.put("installation_id", installationId);
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();

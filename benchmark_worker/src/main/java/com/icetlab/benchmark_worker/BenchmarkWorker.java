@@ -1,5 +1,6 @@
 package com.icetlab.benchmark_worker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -75,7 +76,7 @@ public class BenchmarkWorker {
       clone(repoURL, accessToken);
       compile();
       benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr());
+      sendResult(readResults(), request.getRemoteAddr(), (String)parser.parseMap(task).get("installation_id"));
     }
     catch (Exception e) {
       logger.error(e.toString());
@@ -145,9 +146,14 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String result, String senderURI) throws HttpClientErrorException {
+  public void sendResult(String results, String senderURI, String installationId) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("body", result);
+    requestBody.put("installation_id", installationId);
+    requestBody.put("repo_id", "");
+
+    ObjectMapper mapper = new ObjectMapper();
+    Object[] result_list = mapper.readValue(results.trim(), Object[].class);
+    requestBody.put("results", result_list);
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
