@@ -12,17 +12,13 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
 
-/**
- * Handles the payload received from GitHub.
- */
+@Component
 public class Payload {
 
-  private final JacksonJsonParser payloadParser;
+  private final JacksonJsonParser payloadParser = new JacksonJsonParser();
 
-  public Payload() {
-    payloadParser = new JacksonJsonParser();
-  }
 
   /**
    * Handles the payload received from GitHub.
@@ -82,7 +78,7 @@ public class Payload {
 
 
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
-    getIssue().createIssue(issuesUrl, "hello", "my name is performancebot", installationId);
+    // TODO: Implement with the rest of the workflow
   }
 
   /**
