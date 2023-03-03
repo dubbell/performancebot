@@ -74,7 +74,7 @@ public class InstallationService {
       return;
     }
 
-    throw new RuntimeException("No such installation id");
+    throw new NoSuchElementException("No such installation id");
   }
 
   /**
@@ -148,7 +148,7 @@ public class InstallationService {
    * @param installationId the id of the installation
    * @return true if the installation exists, false otherwise
    */
-  private boolean installationExists(String installationId) {
+  public boolean installationExists(String installationId) {
     List<Installation> installations = repo.findAll();
     return installations.stream().anyMatch(inst -> inst.getInstallationId().equals(installationId));
   }
