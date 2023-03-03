@@ -1,13 +1,14 @@
 package com.icetlab.performancebot.stats;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;
 import java.util.List;
+
 public class BenchmarkJMHTest {
     private static String json;
     private static ObjectMapper objectMapper;
@@ -29,8 +30,7 @@ public class BenchmarkJMHTest {
                 + "\"95.0\":2.828797152723178E-5,\"99.0\":2.828797152723178E-5,"
                 + "\"99.9\":2.828797152723178E-5,\"99.99\":2.828797152723178E-5,"
                 + "\"99.999\":2.828797152723178E-5,\"99.9999\":2.828797152723178E-5,"
-                + "\"100.0\":2.828797152723178E-5},"
-                + "\"scoreUnit\":\"ms/op\","
+                + "\"100.0\":2.828797152723178E-5}," + "\"scoreUnit\":\"ms/op\","
                 + "\"rawData\":[[2.828797152723178E-5,2.828337099713185E-5],[2.8259540290990172E-5,2.8260676906276593E-5]]},"
                 + "\"secondaryMetrics\":{}}";
         objectMapper = new ObjectMapper();
@@ -38,8 +38,8 @@ public class BenchmarkJMHTest {
 
     }
 
-    //TODO: Tests (forks, jvm version, so on)
-    //TODO: Checking all scores
+    // TODO: Tests (forks, jvm version, so on)
+    // TODO: Checking all scores
 
     /**
      * Checks amount of forks
@@ -54,7 +54,7 @@ public class BenchmarkJMHTest {
      */
     @Test
     void checkJMHVersion() {
-        Assertions.assertEquals("1.12", benchmarkJMH.getJmhVersion());
+        Assertions.assertEquals("1.21", benchmarkJMH.getJmhVersion());
     }
 
     /**
@@ -70,7 +70,8 @@ public class BenchmarkJMHTest {
      */
     @Test
     void checkScoreError() {
-        Assertions.assertEquals(9.618587736247513E-8, benchmarkJMH.getPrimaryMetric().getScoreError());
+        Assertions.assertEquals(9.618587736247513E-8,
+                benchmarkJMH.getPrimaryMetric().getScoreError());
     }
 
     /**
@@ -85,4 +86,4 @@ public class BenchmarkJMHTest {
     }
 
 }
-    //TODO: More score checkers
+// TODO: More score checkers
