@@ -25,44 +25,44 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class PrimaryMetric {
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("score")
     private Double score;
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreError")
     private Double scoreError;
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreConfidence")
     private List<Object> scoreConfidence;
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scorePercentiles")
     private ScorePercentiles scorePercentiles;
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreUnit")
     private String scoreUnit;
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("rawData")
     private List<Object> rawData;
@@ -70,9 +70,9 @@ public class PrimaryMetric {
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("score")
     public Double getScore() {
@@ -80,9 +80,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("score")
     public void setScore(Double score) {
@@ -90,9 +90,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreError")
     public Double getScoreError() {
@@ -100,9 +100,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreError")
     public void setScoreError(Double scoreError) {
@@ -110,9 +110,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreConfidence")
     public List<Object> getScoreConfidence() {
@@ -120,9 +120,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreConfidence")
     public void setScoreConfidence(List<Object> scoreConfidence) {
@@ -130,9 +130,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scorePercentiles")
     public ScorePercentiles getScorePercentiles() {
@@ -140,9 +140,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scorePercentiles")
     public void setScorePercentiles(ScorePercentiles scorePercentiles) {
@@ -150,9 +150,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreUnit")
     public String getScoreUnit() {
@@ -160,9 +160,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("scoreUnit")
     public void setScoreUnit(String scoreUnit) {
@@ -170,9 +170,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("rawData")
     public List<Object> getRawData() {
@@ -180,9 +180,9 @@ public class PrimaryMetric {
     }
 
     /**
-     * 
+     *
      * (Required)
-     * 
+     *
      */
     @JsonProperty("rawData")
     public void setRawData(List<Object> rawData) {

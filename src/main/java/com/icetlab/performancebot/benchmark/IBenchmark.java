@@ -1,6 +1,10 @@
 package com.icetlab.performancebot.benchmark;
 
-interface IBenchmark {
+/**
+ * Represents a benchmark.
+ */
+public interface IBenchmark {
+
   void benchmark();
 
 }
