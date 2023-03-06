@@ -1,6 +1,9 @@
 package com.icetlab.benchmark_worker;
 
-import org.apache.commons.io.FileUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.icetlab.benchmark_worker.configuration.ConfigData;
+import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -12,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class BenchmarkWorkerTest {
 
     static BenchmarkWorker worker = new BenchmarkWorker();
+    static MavenConfiguration config = new MavenConfiguration();
 
     @Test
     public void workerTest() {
@@ -24,10 +28,22 @@ public class BenchmarkWorkerTest {
             fail("Cloning error : " + e);
         }
 
+        // check that it can find the config file
+        assertTrue(new File("benchmark_directory/perfbot.yaml").exists());
+
+        // configuration
+        try {
+            ConfigData configData = new ObjectMapper(new YAMLFactory()).readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
+            assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
+            assertTrue(configData.getBuildTool().equalsIgnoreCase("maven"));
+        } catch (Exception e) {
+            fail("Configuration error : " + e);
+        }
+
         // compilation
         File target = new File("benchmark_directory/target");
         try {
-            worker.compile();
+            config.compile();
             assertTrue(target.exists() && target.listFiles().length != 0);
         } catch (Exception e) {
             fail("Compilation error : " + e);
@@ -35,9 +51,8 @@ public class BenchmarkWorkerTest {
 
         // benchmarking
         try {
-            worker.benchmark();
-            File result = new File("jmh-result.json");
-            assertTrue(result.exists() && worker.readResults().length() != 0);
+            String result = config.benchmark();
+            assertTrue(result.length() != 0);
         } catch (Exception e) {
             fail("Benchmarking error : " + e);
         }

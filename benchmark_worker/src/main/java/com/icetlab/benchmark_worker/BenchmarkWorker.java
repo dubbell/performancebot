@@ -2,17 +2,15 @@ package com.icetlab.benchmark_worker;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.icetlab.benchmark_worker.configuration.ConfigData;
+import com.icetlab.benchmark_worker.configuration.Configuration;
+import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOExceptionList;
-import org.apache.maven.shared.invoker.DefaultInvoker;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.Invoker;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -23,7 +21,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.json.JacksonJsonParser;
@@ -33,8 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -48,7 +43,7 @@ import org.springframework.web.client.RestTemplate;
  * 2. Compiling and running all specified benchmarks in the cloned repository.
  * 3. Sending the results to the database.
  * 4. Performing statistical analysis.
- * 5. Sending the result of the analysis to the remote repository as a Github Issue.
+ * 5. Sending the result of the analysis to the remote repository as a GitHub Issue.
  */
 @RestController
 @SpringBootApplication
@@ -72,15 +67,24 @@ public class BenchmarkWorker {
 
     // if one thing fails, the benchmark is cancelled
     try {
+      // clone repo
       clone(repoURL, accessToken);
-      compile();
-      benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr());
+
+      // reads configuration from .yaml file
+      Configuration configuration = getConfiguration();
+
+      // compile and get result of benchmark
+      configuration.compile();
+      String result = configuration.benchmark(); // saves result to json file
+
+      // send result back to the performance bot
+      sendResult(result, request.getRemoteAddr());
     }
     catch (Exception e) {
       logger.error(e.toString());
     }
 
+    // delete local installation of repository
     delete();
   }
 
@@ -94,7 +98,7 @@ public class BenchmarkWorker {
     // creates directory
     File dir = new File("benchmark_directory");
     if (!dir.mkdir()) // attempts to create directory
-      return; // TODO error handling?
+      return;
 
     CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
     Git.cloneRepository()
@@ -105,42 +109,26 @@ public class BenchmarkWorker {
   }
 
   /**
-   * Compiles the cloned repository by executing a new Maven build to the 'verify' phase.
+   * Gets project configuration from .yaml file.
    */
-  public void compile() throws Exception {
-    // construct request to clean target directory
-    InvocationRequest cleanRequest = new DefaultInvocationRequest();
-    cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-    cleanRequest.setGoals(Collections.singletonList("clean"));
-
-    // construct request to compile project
-    InvocationRequest verifyRequest = new DefaultInvocationRequest();
-    verifyRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-    verifyRequest.setGoals(Collections.singletonList("verify"));
-
-    // cleans and then compiles project
-    Invoker invoker = new DefaultInvoker();
-    invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
-    InvocationResult cleanResult = invoker.execute(cleanRequest);
-    InvocationResult verifyResult = invoker.execute(verifyRequest);
-
-    // checks if either of the requests failed
-    if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
-      throw new Exception("Build failed.");
+  public Configuration getConfiguration() throws Exception {
+    ConfigData configData = new ObjectMapper(new YAMLFactory()).readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
+    if (configData.getLanguage().equalsIgnoreCase("java")) {
+      if (configData.getBuildTool().equalsIgnoreCase("maven")) {
+        return new MavenConfiguration();
+      }
+      else {
+        throw new Exception("Invalid project configuration for the performance bot: invalid build tool.");
+      }
+    }
+    else {
+      throw new Exception("Invalid project configuration for the performance bot: invalid language.");
+    }
   }
 
   /**
-   * Runs benchmarks in compiled project and stores the result in a json file.
+   * Sends result of benchmark back to the performance bot.
    */
-  public void benchmark() throws Exception {
-    Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json").waitFor();
-  }
-
-  public String readResults() throws IOException {
-    byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json"));
-    return new String(encoded, StandardCharsets.UTF_8);
-  }
-
   public void sendResult(String result, String senderURI) throws HttpClientErrorException {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("body", result);
@@ -157,11 +145,8 @@ public class BenchmarkWorker {
   public void delete() {
     try {
       FileUtils.deleteDirectory(new File("benchmark_directory"));
-      new File("jmh-result.json").delete();
     } catch (IOException e) {
       System.out.println(e);
     }
-
-    // TODO error handling?
   }
 }
