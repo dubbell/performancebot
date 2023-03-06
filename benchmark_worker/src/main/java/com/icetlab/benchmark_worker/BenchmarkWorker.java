@@ -74,7 +74,6 @@ public class BenchmarkWorker {
       Configuration configuration = getConfiguration();
 
       // compile and get result of benchmark
-      configuration.compile();
       String result = configuration.benchmark(); // saves result to json file
 
       // send result back to the performance bot

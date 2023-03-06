@@ -11,8 +11,7 @@ import java.util.Collections;
 public class MavenConfiguration implements Configuration
 {
 
-    @Override
-    public void compile() throws Exception
+    private void compile() throws Exception
     {
         // construct request to clean target directory
         InvocationRequest cleanRequest = new DefaultInvocationRequest();
@@ -38,6 +37,9 @@ public class MavenConfiguration implements Configuration
     @Override
     public String benchmark() throws Exception
     {
+        // compile project
+        compile();
+
         // runs benchmark and creates json file for results
         Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json").waitFor();
         byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json")); // reads from json file
