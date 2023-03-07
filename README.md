@@ -55,6 +55,18 @@ To run the tests, use:
 mvn.cmd test
 ```
 
+## Using the bot
+
+To use the bot, you first install the GitHub app on the target repository. Once this is done, 
+you also need to add a `perfbot.yaml` file in the root directory, with the following structure:
+
+```
+language: java
+buildTool: maven
+```
+
+At the moment, the only supported project type for this bot is Java with the build tool Maven.
+
 ## Setting the formatter
 
 For consistency's sake, let's all use the same formatter following the Google Java Style Guide.
