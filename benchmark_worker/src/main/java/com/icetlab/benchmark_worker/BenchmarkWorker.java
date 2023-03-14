@@ -3,11 +3,8 @@ package com.icetlab.benchmark_worker;
 import java.io.IOException;
 import java.net.URI;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.icetlab.benchmark_worker.configuration.ConfigData;
 import com.icetlab.benchmark_worker.configuration.Configuration;
-import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
+import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 
@@ -71,7 +68,7 @@ public class BenchmarkWorker {
       clone(repoURL, accessToken);
 
       // reads configuration from .yaml file
-      Configuration configuration = getConfiguration();
+      Configuration configuration = ConfigurationFactory.getConfiguration();
 
       // compile and get result of benchmark
       String result = configuration.benchmark(); // saves result to json file
@@ -105,24 +102,6 @@ public class BenchmarkWorker {
       .setURI(repoURL)
       .setDirectory(dir)
       .call().close();
-  }
-
-  /**
-   * Gets project configuration from .yaml file.
-   */
-  public Configuration getConfiguration() throws Exception {
-    ConfigData configData = new ObjectMapper(new YAMLFactory()).readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
-    if (configData.getLanguage().equalsIgnoreCase("java")) {
-      if (configData.getBuildTool().equalsIgnoreCase("maven")) {
-        return new MavenConfiguration();
-      }
-      else {
-        throw new Exception("Invalid project configuration for the performance bot: invalid build tool.");
-      }
-    }
-    else {
-      throw new Exception("Invalid project configuration for the performance bot: invalid language.");
-    }
   }
 
   /**

@@ -3,6 +3,8 @@ package com.icetlab.benchmark_worker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.icetlab.benchmark_worker.configuration.ConfigData;
+import com.icetlab.benchmark_worker.configuration.Configuration;
+import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
 import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
 import org.junit.jupiter.api.*;
 
@@ -15,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class BenchmarkWorkerTest {
 
     static BenchmarkWorker worker = new BenchmarkWorker();
-    static MavenConfiguration config = new MavenConfiguration();
 
     @Test
     public void workerTest() {
@@ -28,14 +29,19 @@ public class BenchmarkWorkerTest {
             fail("Cloning error : " + e);
         }
 
+        Configuration config = null;
+
         // check that it can find the config file
         assertTrue(new File("benchmark_directory/perfbot.yaml").exists());
+
 
         // configuration
         try {
             ConfigData configData = new ObjectMapper(new YAMLFactory()).readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
             assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
             assertTrue(configData.getBuildTool().equalsIgnoreCase("maven"));
+
+            config = ConfigurationFactory.getConfiguration();
         } catch (Exception e) {
             fail("Configuration error : " + e);
         }
@@ -44,6 +50,10 @@ public class BenchmarkWorkerTest {
         try {
             File target = new File("benchmark_directory/target");
             String result = config.benchmark();
+
+            assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
+
+
 
             // check if project was compiled correctly
             assertTrue(target.exists() && target.listFiles().length != 0);
