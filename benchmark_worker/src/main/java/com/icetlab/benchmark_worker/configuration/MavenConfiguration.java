@@ -28,14 +28,24 @@ public class MavenConfiguration implements Configuration
         ChainedOptionsBuilder builder = new OptionsBuilder();
 
         // include every specified regex from the configuration data
-        for (String incl : configData.getInclude())
-            builder = builder.include(incl);
+        if (configData.getInclude() != null)
+            for (String incl : configData.getInclude())
+                builder = builder.include(incl);
+
+        if (configData.getExclude() != null)
+            for (String excl : configData.getExclude())
+                builder = builder.exclude(excl);
+
+        // number of times to run benchmarks
+        if (configData.getForks() > 0)
+            builder = builder.forks(configData.getForks());
+        else
+            builder = builder.forks(1);
 
         // silent verbose mode so that it doesn't spam console
-        builder = builder.forks(1).verbosity(VerboseMode.SILENT);
+        builder = builder.verbosity(VerboseMode.SILENT);
 
         options = builder.build();
-
     }
 
     private void compile() throws Exception

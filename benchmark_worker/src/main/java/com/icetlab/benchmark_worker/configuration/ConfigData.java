@@ -8,6 +8,7 @@ public class ConfigData
     private String buildTool;
     private List<String> include;
     private List<String> exclude;
+    private int forks;
 
     public String getLanguage()
     {
@@ -47,5 +48,15 @@ public class ConfigData
     public void setExclude(List<String> exclude)
     {
         this.exclude = exclude;
+    }
+
+    public int getForks()
+    {
+        return forks;
+    }
+
+    public void setForks(int forks)
+    {
+        this.forks = forks;
     }
 }
