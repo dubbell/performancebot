@@ -12,10 +12,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.VerboseMode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Collection;
@@ -31,11 +28,11 @@ public class MavenConfiguration implements Configuration
         ChainedOptionsBuilder builder = new OptionsBuilder();
 
         // include every specified regex from the configuration data
-        for (String regex : configData.getRegex())
-            builder = builder.include(".*"+regex+".*");
+        for (String incl : configData.getInclude())
+            builder = builder.include(incl);
 
         // silent verbose mode so that it doesn't spam console
-        builder = builder.forks(1).verbosity(VerboseMode.NORMAL);
+        builder = builder.forks(1).verbosity(VerboseMode.SILENT);
 
         options = builder.build();
 
@@ -47,17 +44,25 @@ public class MavenConfiguration implements Configuration
         InvocationRequest cleanRequest = new DefaultInvocationRequest();
         cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
         cleanRequest.setGoals(Collections.singletonList("clean"));
+        cleanRequest.setQuiet(true);
+        cleanRequest.setInputStream(InputStream.nullInputStream());
 
         // construct request to compile project
         InvocationRequest verifyRequest = new DefaultInvocationRequest();
         verifyRequest.setPomFile(new File("benchmark_directory/pom.xml"));
         verifyRequest.setGoals(Collections.singletonList("verify"));
+        verifyRequest.setQuiet(true);
+        verifyRequest.setInputStream(InputStream.nullInputStream());
 
         // cleans and then compiles project
         Invoker invoker = new DefaultInvoker();
         invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+
         InvocationResult cleanResult = invoker.execute(cleanRequest);
+        System.out.println("Maven clean executed with exit code: " + cleanResult.getExitCode());
+
         InvocationResult verifyResult = invoker.execute(verifyRequest);
+        System.out.println("Maven verify executed with exit code: " + verifyResult.getExitCode());
 
         // checks if either of the requests failed
         if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
@@ -77,8 +82,12 @@ public class MavenConfiguration implements Configuration
 
         try
         {
+            System.out.println("Benchmarking started.");
+
             // performs benchmark
             Collection<RunResult> results = new Runner(options).run();
+
+            System.out.println("Benchmarking finished.");
 
             // for collecting benchmark output
             outputStream = new ByteArrayOutputStream();
@@ -88,13 +97,10 @@ public class MavenConfiguration implements Configuration
             // writes output to output stream
             resultFormat.writeOut(results);
         }
-        catch (Exception e) {
+        finally {
+            // reset class path
             removeClasses();
-            throw new Exception(e);
         }
-
-        // reset class path
-        removeClasses();
 
         // return result json string
         return outputStream.toString(StandardCharsets.UTF_8);
@@ -141,8 +147,7 @@ public class MavenConfiguration implements Configuration
     private void removeClasses() {
         System.setProperty("java.class.path", oldClasses);
 
-        try
-        {
+        try {
             FileUtils.deleteDirectory(new File("target/classes/META-INF"));
         } catch (Exception ignored) {}
     }

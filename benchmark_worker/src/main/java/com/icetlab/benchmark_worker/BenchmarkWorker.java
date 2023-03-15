@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.EmptyProgressMonitor;
+import org.eclipse.jgit.lib.NullProgressMonitor;
+import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;

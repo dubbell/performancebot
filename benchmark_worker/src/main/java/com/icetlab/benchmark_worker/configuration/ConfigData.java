@@ -6,7 +6,8 @@ public class ConfigData
 {
     private String language;
     private String buildTool;
-    private List<String> regex;
+    private List<String> include;
+    private List<String> exclude;
 
     public String getLanguage()
     {
@@ -28,13 +29,23 @@ public class ConfigData
         this.buildTool = buildTool;
     }
 
-    public List<String> getRegex()
+    public List<String> getInclude()
     {
-        return regex;
+        return include;
     }
 
-    public void setRegex(List<String> regex)
+    public void setInclude(List<String> include)
     {
-        this.regex = regex;
+        this.include = include;
+    }
+
+    public List<String> getExclude()
+    {
+        return exclude;
+    }
+
+    public void setExclude(List<String> exclude)
+    {
+        this.exclude = exclude;
     }
 }

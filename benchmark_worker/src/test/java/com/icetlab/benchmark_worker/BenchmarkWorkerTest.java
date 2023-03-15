@@ -53,8 +53,6 @@ public class BenchmarkWorkerTest {
 
             assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
 
-
-
             // check if project was compiled correctly
             assertTrue(target.exists() && target.listFiles().length != 0);
             // check if a result was returned from the benchmark
