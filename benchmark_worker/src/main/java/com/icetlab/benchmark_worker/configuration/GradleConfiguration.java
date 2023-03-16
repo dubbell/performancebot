@@ -1,7 +1,9 @@
 package com.icetlab.benchmark_worker.configuration;
 
+
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.shared.invoker.*;
+import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.ProjectConnection;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormat;
 import org.openjdk.jmh.results.format.ResultFormatFactory;
@@ -12,30 +14,25 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.VerboseMode;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-
 import java.util.Collection;
-import java.util.Collections;
 
-
-public class MavenConfiguration implements Configuration
+public class GradleConfiguration implements Configuration
 {
     final protected Options options;
-    public MavenConfiguration(ConfigData configData) {
 
+    public GradleConfiguration(ConfigData configData) {
         options = getOptions(configData);
     }
-
-
 
     @Override
     public String benchmark() throws Exception
     {
-        // compile project
         compile();
 
-        // add classes from compiled repository so that JMH can find them
         addClasses();
 
         ByteArrayOutputStream outputStream;
@@ -91,52 +88,24 @@ public class MavenConfiguration implements Configuration
         return builder.build();
     }
 
-    private void compile() throws Exception
-    {
-        // construct request to clean target directory
-        InvocationRequest cleanRequest = new DefaultInvocationRequest();
-        cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-        cleanRequest.setGoals(Collections.singletonList("clean"));
-        cleanRequest.setQuiet(true);
-        cleanRequest.setInputStream(InputStream.nullInputStream());
-
-        // construct request to compile project
-        InvocationRequest verifyRequest = new DefaultInvocationRequest();
-        verifyRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-        verifyRequest.setGoals(Collections.singletonList("verify"));
-        verifyRequest.setQuiet(true);
-        verifyRequest.setInputStream(InputStream.nullInputStream());
-
-        // cleans and then compiles project
-        Invoker invoker = new DefaultInvoker();
-        invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
-
-        InvocationResult cleanResult = invoker.execute(cleanRequest);
-        System.out.println("Maven clean executed with exit code: " + cleanResult.getExitCode());
-
-        InvocationResult verifyResult = invoker.execute(verifyRequest);
-        System.out.println("Maven verify executed with exit code: " + verifyResult.getExitCode());
-
-        // checks if either of the requests failed
-        if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
-            throw new Exception("Build failed.");
-    }
-
     /**
-     * Copies BenchmarkList and CompilerHints from repository so that JMH knows which tests to run.
+     * Compile gradle project.
      */
-    private void copyBenchmarkList() throws IOException
-    {
-        File META_INF = new File("benchmark_directory/target/classes/META-INF");
-        File to  = new File("target/classes/META-INF");
+    private void compile() {
+        ProjectConnection connection = GradleConnector
+                .newConnector()
+                .forProjectDirectory(new File("benchmark_directory"))
+                .connect();
 
-        FileUtils.copyDirectory(META_INF, to);
+        try {
+            connection.newBuild().forTasks("java").run();
+        }
+        finally {
+            connection.close();
+        }
     }
 
 
-    /**
-     * Previous class path.
-     */
     private String oldClasses = "";
 
     /**
@@ -151,10 +120,8 @@ public class MavenConfiguration implements Configuration
         oldClasses = System.getProperty("java.class.path");
 
         // adds classes from repository to class path
-        String newClasses = oldClasses + ";benchmark_directory/target/classes";
+        String newClasses = oldClasses + ";benchmark_directory/build/classes";
         System.setProperty("java.class.path", newClasses);
-
-        copyBenchmarkList();
     }
 
     /**

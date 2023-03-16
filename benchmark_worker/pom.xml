@@ -82,6 +82,11 @@
       <version>1.36</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>dev.gradleplugins</groupId>
+      <artifactId>gradle-api</artifactId>
+      <version>8.0.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
