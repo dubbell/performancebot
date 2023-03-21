@@ -5,6 +5,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 
+/**
+ * Factory class for parsing configurations from the .yaml config file.
+ */
 public class ConfigurationFactory
 {
     /**

@@ -2,6 +2,9 @@ package com.icetlab.benchmark_worker.configuration;
 
 import java.util.List;
 
+/**
+ * Class representing the contents of a .yaml configuration file.
+ */
 public class ConfigData
 {
     private String language;
