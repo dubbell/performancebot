@@ -45,6 +45,10 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
+    // installationController.addInstallation("33697560");
+    // installationController.addRepoToInstallation("33697560", new
+    // GitHubRepo("608560819", new HashSet<>(), "jmh"));
+
     return "Welcome to the performancebot. ";
   }
 

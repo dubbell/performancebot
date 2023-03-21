@@ -10,8 +10,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.stats.IssueLogger;
-
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -55,6 +60,19 @@ public class Payload {
     // TODO: Handle the repo to clone in a container, feel free to do whatever you
     // want, this just how to obtain it.
     String repoUrl = node.get("pull_request").get("head").get("repo").get("clone_url").asText();
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("url", repoUrl);
+    requestBody.put("token", "");
+    requestBody.put("installation_id", installationId);
+    requestBody.put("repo_id", node.get("repository").get("id"));
+
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
+    RestTemplate restTemplate = new RestTemplate();
+    // temporary
+    String containerIp = "http://172.17.0.2";
+
+    restTemplate.postForEntity(URI.create(containerIp + ":8080/task"), requestEntity, String.class);
 
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
 
