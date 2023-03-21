@@ -9,9 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.EmptyProgressMonitor;
-import org.eclipse.jgit.lib.NullProgressMonitor;
-import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
@@ -93,6 +90,7 @@ public class BenchmarkWorker {
    * @param accessToken repository access token for authentication
    */
   public void clone(String repoURL, String accessToken) throws Exception {
+    System.out.println("Cloning started.");
 
     // creates directory
     File dir = new File("benchmark_directory");
@@ -100,11 +98,14 @@ public class BenchmarkWorker {
       return;
 
     CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
+    System.out.println("STARTED");
     Git.cloneRepository()
       .setCredentialsProvider(credentials) // if the repository is private, the access token should authorize the request
       .setURI(repoURL)
       .setDirectory(dir)
       .call().close();
+
+    System.out.println("Cloning finished.");
   }
 
   /**

@@ -19,7 +19,10 @@ public class BenchmarkWorkerTest {
     static BenchmarkWorker worker = new BenchmarkWorker();
 
     @Test
-    public void workerTest() {
+    public void mavenTest() {
+
+        worker = new BenchmarkWorker();
+
         // cloning
         try{
             worker.clone("https://github.com/dubbell/JMHExample", "");
@@ -52,6 +55,52 @@ public class BenchmarkWorkerTest {
             String result = config.benchmark();
 
             assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
+
+            // check if project was compiled correctly
+            assertTrue(target.exists() && target.listFiles().length != 0);
+            // check if a result was returned from the benchmark
+            assertTrue(result.length() != 0);
+        } catch (Exception e) {
+            fail("Benchmarking error : " + e);
+        }
+    }
+
+    @Test
+    public void gradleTest() {
+
+        worker = new BenchmarkWorker();
+
+        // cloning
+        try{
+            worker.clone("https://github.com/dubbell/JMHExample_Gradle", "");
+            File repoDir = new File("benchmark_directory");
+            assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
+        } catch (Exception e) {
+            fail("Cloning error : " + e);
+        }
+
+        Configuration config = null;
+
+        // check that it can find the config file
+        assertTrue(new File("benchmark_directory/perfbot.yaml").exists());
+
+        // configuration
+        try {
+            ConfigData configData = new ObjectMapper(new YAMLFactory()).readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
+            assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
+            assertTrue(configData.getBuildTool().equalsIgnoreCase("gradle"));
+
+            config = ConfigurationFactory.getConfiguration();
+        } catch (Exception e) {
+            fail("Configuration error : " + e);
+        }
+
+        // benchmarking
+        try {
+            File target = new File("benchmark_directory/build");
+            String result = config.benchmark();
+
+            assertTrue(new File("benchmark_directory/build/classes/java/jmh/META-INF").exists());
 
             // check if project was compiled correctly
             assertTrue(target.exists() && target.listFiles().length != 0);

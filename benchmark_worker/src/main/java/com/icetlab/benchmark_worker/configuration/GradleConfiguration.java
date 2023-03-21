@@ -16,9 +16,12 @@ import org.openjdk.jmh.runner.options.VerboseMode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class GradleConfiguration implements Configuration
 {
@@ -92,16 +95,18 @@ public class GradleConfiguration implements Configuration
      * Compile gradle project.
      */
     private void compile() {
+        System.out.println("Compilation started.");
         ProjectConnection connection = GradleConnector
                 .newConnector()
                 .forProjectDirectory(new File("benchmark_directory"))
                 .connect();
 
         try {
-            connection.newBuild().forTasks("java").run();
+            connection.newBuild().forTasks("clean", "assemble").run();
         }
         finally {
             connection.close();
+            System.out.println("Compilation finished.");
         }
     }
 
@@ -120,8 +125,9 @@ public class GradleConfiguration implements Configuration
         oldClasses = System.getProperty("java.class.path");
 
         // adds classes from repository to class path
-        String newClasses = oldClasses + ";benchmark_directory/build/classes";
-        System.setProperty("java.class.path", newClasses);
+        System.setProperty("java.class.path", oldClasses + ";benchmark_directory/build/classes/java/jmh");
+
+        copyBenchmarkList();
     }
 
     /**
@@ -133,5 +139,16 @@ public class GradleConfiguration implements Configuration
         try {
             FileUtils.deleteDirectory(new File("target/classes/META-INF"));
         } catch (Exception ignored) {}
+    }
+
+    /**
+     * Copies BenchmarkList and CompilerHints from repository so that JMH knows which tests to run.
+     */
+    private void copyBenchmarkList() throws IOException
+    {
+        File META_INF = new File("benchmark_directory/build/classes/java/jmh/META-INF");
+        File to  = new File("target/classes/META-INF");
+
+        FileUtils.copyDirectory(META_INF, to);
     }
 }

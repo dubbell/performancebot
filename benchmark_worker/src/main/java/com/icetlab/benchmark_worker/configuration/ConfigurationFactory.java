@@ -19,6 +19,9 @@ public class ConfigurationFactory
             if (configData.getBuildTool().equalsIgnoreCase("maven")) {
                 return new MavenConfiguration(configData);
             }
+            else if(configData.getBuildTool().equalsIgnoreCase("gradle")) {
+                return new GradleConfiguration(configData);
+            }
             else {
                 throw new Exception("Invalid project configuration for the performance bot: invalid build tool.");
             }

@@ -93,6 +93,9 @@ public class MavenConfiguration implements Configuration
 
     private void compile() throws Exception
     {
+        System.out.println("Compilation started.");
+
+
         // construct request to clean target directory
         InvocationRequest cleanRequest = new DefaultInvocationRequest();
         cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
@@ -116,6 +119,8 @@ public class MavenConfiguration implements Configuration
 
         InvocationResult verifyResult = invoker.execute(verifyRequest);
         System.out.println("Maven verify executed with exit code: " + verifyResult.getExitCode());
+
+        System.out.println("Compilation finished.");
 
         // checks if either of the requests failed
         if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
