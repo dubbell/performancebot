@@ -98,7 +98,6 @@ public class BenchmarkWorker {
       return;
 
     CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
-    System.out.println("STARTED");
     Git.cloneRepository()
       .setCredentialsProvider(credentials) // if the repository is private, the access token should authorize the request
       .setURI(repoURL)

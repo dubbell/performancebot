@@ -69,7 +69,7 @@ public class GradleConfiguration implements Configuration
         }
 
         // return result json string
-        return outputStream.toString(StandardCharsets.UTF_8);
+        return outputStream.toString(StandardCharsets.UTF_8).trim();
     }
 
     Options getOptions(ConfigData configData) {
