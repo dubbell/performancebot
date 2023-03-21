@@ -62,11 +62,15 @@ you also need to add a `perfbot.yaml` file in the root directory. In this file, 
 configurations can be made:
 
 - `language` - Project programming language. Currently only supports `Java`. Required.
-- `buildTool` - Project build tool. Currently supports `Gradle` (Groovy) and `Maven` builds. Required.
-- `include` - List of regex strings, specifying which classes to take benchmarks from.
-- `exclude` - List of regex strings, specifying which classes to ignore.
+- `buildTool` - Project build tool. Supports `Gradle` (Groovy) and `Maven` builds. Required.
+- `include` - List of regex strings, specifying which classes to take benchmarks from. Optional.
+- `exclude` - List of regex strings, specifying which classes to ignore. Optional.
 - `gradleBuildTasks` - List of the names of the tasks that should be run to build the project. Not required, default values are `clean` and then `assemble`. Only applies to gradle builds.
 - `gradleClassPath` - The path to the compiled benchmarks. Not required, default value is `build/classes/java/jmh`. Only applies to gradle builds.
+
+For Maven builds, the `pom.xml` file must be in the root of the repository. For gradle builds, the 
+`build.gradle` file must be in the root of the repository.
+
 
 ## Setting the formatter
 
