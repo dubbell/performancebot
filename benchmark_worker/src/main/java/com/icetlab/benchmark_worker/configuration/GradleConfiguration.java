@@ -2,6 +2,7 @@ package com.icetlab.benchmark_worker.configuration;
 
 
 import org.apache.commons.io.FileUtils;
+import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.openjdk.jmh.results.RunResult;
@@ -26,9 +27,14 @@ import java.util.List;
 public class GradleConfiguration implements Configuration
 {
     final protected Options options;
+    final List<String> buildTasks;
+    final String classPath;
+
 
     public GradleConfiguration(ConfigData configData) {
         options = getOptions(configData);
+        buildTasks = configData.getGradleBuildTasks();
+        classPath = configData.getGradleClassPath();
     }
 
     @Override
@@ -102,7 +108,15 @@ public class GradleConfiguration implements Configuration
                 .connect();
 
         try {
-            connection.newBuild().forTasks("clean", "assemble").run();
+            if (buildTasks == null)
+                connection.newBuild().forTasks("clean", "assemble").run();
+            else
+            {
+                BuildLauncher bl = connection.newBuild();
+                for (String task : buildTasks)
+                    bl = bl.forTasks(task);
+                bl.run();
+            }
         }
         finally {
             connection.close();
@@ -125,7 +139,10 @@ public class GradleConfiguration implements Configuration
         oldClasses = System.getProperty("java.class.path");
 
         // adds classes from repository to class path
-        System.setProperty("java.class.path", oldClasses + ";benchmark_directory/build/classes/java/jmh");
+        if(classPath == null)
+            System.setProperty("java.class.path", oldClasses + ";benchmark_directory/build/classes/java/jmh");
+        else
+            System.setProperty("java.class.path", oldClasses + ";benchmark_directory/" + classPath);
 
         copyBenchmarkList();
     }

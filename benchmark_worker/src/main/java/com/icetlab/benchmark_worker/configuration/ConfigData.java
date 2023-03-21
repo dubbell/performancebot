@@ -9,6 +9,8 @@ public class ConfigData
     private List<String> include;
     private List<String> exclude;
     private int forks;
+    private List<String> gradleBuildTasks;
+    private String gradleClassPath;
 
     public String getLanguage()
     {
@@ -58,5 +60,25 @@ public class ConfigData
     public void setForks(int forks)
     {
         this.forks = forks;
+    }
+
+    public List<String> getGradleBuildTasks()
+    {
+        return gradleBuildTasks;
+    }
+
+    public void setGradleBuildTasks(List<String> gradleBuildTasks)
+    {
+        this.gradleBuildTasks = gradleBuildTasks;
+    }
+
+    public String getGradleClassPath()
+    {
+        return gradleClassPath;
+    }
+
+    public void setGradleClassPath(String gradleClassPath)
+    {
+        this.gradleClassPath = gradleClassPath;
     }
 }
