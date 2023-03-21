@@ -7,12 +7,12 @@ import com.icetlab.benchmark_worker.configuration.Configuration;
 import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
 import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
 import org.junit.jupiter.api.*;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
 
 public class BenchmarkWorkerTest {
 
@@ -53,6 +53,8 @@ public class BenchmarkWorkerTest {
         try {
             File target = new File("benchmark_directory/target");
             String result = config.benchmark();
+
+            System.out.println(result);
 
             assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
 
@@ -103,6 +105,8 @@ public class BenchmarkWorkerTest {
             String result = config.benchmark();
 
             assertTrue(new File("benchmark_directory/build/classes/java/jmh/META-INF").exists());
+
+            System.out.println(result);
 
             assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 
