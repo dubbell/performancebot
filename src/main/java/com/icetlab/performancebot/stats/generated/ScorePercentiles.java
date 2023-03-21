@@ -1,5 +1,5 @@
 
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.generated;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,18 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "0.0",
-    "50.0",
-    "90.0",
-    "95.0",
-    "99.0",
-    "99.9",
-    "99.99",
-    "99.999",
-    "99.9999",
-    "100.0"
-})
+@JsonPropertyOrder({"0.0", "50.0", "90.0", "95.0", "99.0", "99.9", "99.99", "99.999", "99.9999",
+        "100.0"})
 @Generated("jsonschema2pojo")
 public class ScorePercentiles {
 

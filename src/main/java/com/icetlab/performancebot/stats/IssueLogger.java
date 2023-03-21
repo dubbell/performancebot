@@ -4,16 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.stats.generated.BenchmarkJMH;
 import java.io.*;
 
 class IssueLogger {
 
   /**
-   * Takes a json string and creates a simple issue. Returns the issue as a string.
+   * Takes a json string and creates a simple issue. Returns the issue as a
+   * string.
    *
    * @param json a json string representing a jmh benchmark
    * @return a simple issue of the benchmark data
-   * @throws JsonProcessingException if json string cannot be parsed into a BenchmarkJMH object
+   * @throws JsonProcessingException if json string cannot be parsed into a
+   *                                 BenchmarkJMH object
    */
   public static String createSimpleIssue(String json) throws JsonProcessingException {
     BenchmarkJMH[] benchmarksJMH = new BenchmarkJMH[1];
@@ -26,7 +29,8 @@ class IssueLogger {
   }
 
   /**
-   * Reads the jmh-result.json file and creates a simple issue. Returns the issue as a string.
+   * Reads the jmh-result.json file and creates a simple issue. Returns the issue
+   * as a string.
    * <p>
    * Needs to be in root of directory for paths to work.
    *
@@ -42,9 +46,7 @@ class IssueLogger {
 
     // Create ObjectMapper to parse json file to a BenchmarkJMH
     ObjectMapper objectMapper = new ObjectMapper();
-    BenchmarkJMH benchmarkJMH = objectMapper.readValue(
-        new File(path),
-        BenchmarkJMH.class);
+    BenchmarkJMH benchmarkJMH = objectMapper.readValue(new File(path), BenchmarkJMH.class);
 
     // Create an issue of benchmark
     benchmarksJMH[0] = benchmarkJMH;
@@ -55,7 +57,8 @@ class IssueLogger {
   }
 
   /**
-   * Store issue in a text file in logs directory. Filename is identified by time the file is
+   * Store issue in a text file in logs directory. Filename is identified by time
+   * the file is
    * created.
    * <p>
    * Needs to be in root of directory for paths to work.
@@ -73,9 +76,7 @@ class IssueLogger {
     // TODO: Make path relative
     String userdir = System.getProperty("user.dir");
     String path = userdir + "/src/main/java/com/icetlab/performancebot/stats/";
-    String issuePath = path + "logs/"
-        + filename
-        + ".txt";
+    String issuePath = path + "logs/" + filename + ".txt";
     touch(issuePath);
     writeToFile(issuePath, issue);
 
@@ -83,7 +84,7 @@ class IssueLogger {
 
   private static void touch(String path) throws IOException {
     File file = new File(path);
-    file.createNewFile(); //Create new file.
+    file.createNewFile();
   }
 
   private static void writeToFile(String filePath, String content) {
@@ -98,4 +99,3 @@ class IssueLogger {
     }
   }
 }
-

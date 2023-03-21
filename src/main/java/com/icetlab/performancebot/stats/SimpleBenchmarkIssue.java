@@ -1,5 +1,6 @@
 package com.icetlab.performancebot.stats;
 
+import com.icetlab.performancebot.stats.generated.BenchmarkJMH;
 
 /**
  * A very simple issue that shows the score of a benchmark
@@ -7,7 +8,7 @@ package com.icetlab.performancebot.stats;
 public class SimpleBenchmarkIssue implements BenchmarkIssueFormatter {
 
   @Override
-  public String formatBenchmarkIssue (BenchmarkJMH[] benchmarksJMH) {
+  public String formatBenchmarkIssue(BenchmarkJMH[] benchmarksJMH) {
     BenchmarkJMH benchmarkJMH = benchmarksJMH[0];// Take the first benchmark
     if (benchmarkJMH.getPrimaryMetric().getScore() == null)
       return "No benchmarking score provided";

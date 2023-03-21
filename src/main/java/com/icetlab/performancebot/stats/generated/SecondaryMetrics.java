@@ -1,5 +1,5 @@
 
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.generated;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

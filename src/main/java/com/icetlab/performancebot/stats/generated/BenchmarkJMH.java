@@ -1,5 +1,5 @@
 
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.generated;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,27 +13,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "jmhVersion",
-    "benchmark",
-    "mode",
-    "threads",
-    "forks",
-    "jvm",
-    "jvmArgs",
-    "jdkVersion",
-    "vmName",
-    "vmVersion",
-    "warmupIterations",
-    "warmupTime",
-    "warmupBatchSize",
-    "measurementIterations",
-    "measurementTime",
-    "measurementBatchSize",
-    "params",
-    "primaryMetric",
-    "secondaryMetrics"
-})
+@JsonPropertyOrder({ "jmhVersion", "benchmark", "mode", "threads", "forks", "jvm", "jvmArgs",
+        "jdkVersion", "vmName", "vmVersion", "warmupIterations", "warmupTime", "warmupBatchSize",
+        "measurementIterations", "measurementTime", "measurementBatchSize", "params",
+        "primaryMetric", "secondaryMetrics" })
 
 @Generated("jsonschema2pojo")
 public class BenchmarkJMH {

@@ -1,5 +1,5 @@
 
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.generated;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,9 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "N"
-})
+@JsonPropertyOrder({"N"})
 @Generated("jsonschema2pojo")
 public class Params {
 

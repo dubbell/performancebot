@@ -2,6 +2,7 @@ package com.icetlab.performancebot.stats;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.stats.generated.BenchmarkJMH;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
