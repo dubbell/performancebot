@@ -38,7 +38,8 @@ public class MavenConfiguration extends JMHConfiguration
 
         // cleans and then compiles project
         Invoker invoker = new DefaultInvoker();
-        invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+        if(System.getProperty("os.name").toLowerCase().contains("win")) // if windows
+            invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
         InvocationResult cleanResult = invoker.execute(cleanRequest);
         System.out.println("Maven clean executed with exit code: " + cleanResult.getExitCode());

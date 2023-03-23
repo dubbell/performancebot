@@ -18,6 +18,11 @@ public class BenchmarkWorkerTest {
 
     static BenchmarkWorker worker = new BenchmarkWorker();
 
+    @BeforeAll
+    public static void jmhSetup() {
+        System.setProperty("jmh.ignoreLock", "true");
+    }
+
     @Test
     public void mavenTest() {
 
@@ -65,6 +70,7 @@ public class BenchmarkWorkerTest {
             // check if a result was returned from the benchmark
             assertTrue(result.length() != 0);
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Benchmarking error : " + e);
         }
     }

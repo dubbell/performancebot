@@ -129,8 +129,11 @@ public abstract class JMHConfiguration implements Configuration {
         // save old class path
         oldClasses = System.getProperty("java.class.path");
 
+        // windows uses ; as separator for class path, linux uses :
+        String separator = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
+
         // adds classes from repository to class path
-        String newClasses = oldClasses + ";" + getClassPath();
+        String newClasses = oldClasses + separator + getClassPath();
         System.setProperty("java.class.path", newClasses);
 
         copyBenchmarkList();
