@@ -1,0 +1,1 @@
+Score of com.mkyong.benchmark.BenchmarkLoop.loopFor: 2.82728899304076E-5

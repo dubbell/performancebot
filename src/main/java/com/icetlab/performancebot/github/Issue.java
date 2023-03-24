@@ -9,7 +9,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Responsible for creating issues which are sent to the GitHub repo sending the initial payload.
+ * Responsible for creating issues which are sent to the GitHub repo sending the
+ * initial payload.
  */
 @Component
 public class Issue {

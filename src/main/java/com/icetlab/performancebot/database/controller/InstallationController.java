@@ -13,7 +13,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-
 @Controller
 public class InstallationController {
 
@@ -22,7 +21,8 @@ public class InstallationController {
 
   /**
    * <p>
-   * Adds a benchmark run to the database if it exists and the payload is properly formatted.
+   * Adds a benchmark run to the database if it exists and the payload is properly
+   * formatted.
    * <p/>
    * It should have this format:
    * 
@@ -65,7 +65,8 @@ public class InstallationController {
    * Get all repos in an installation
    *
    * @param installationId the id of the installation
-   * @return list of github repos, or empty list if the installation id doesn't exist
+   * @return list of github repos, or empty list if the installation id doesn't
+   *         exist
    */
   public List<GitHubRepo> getReposByInstallationId(String installationId) {
     try {
@@ -90,7 +91,8 @@ public class InstallationController {
   }
 
   /**
-   * Adds a new installation to the database. If the id exists already in the database, the method
+   * Adds a new installation to the database. If the id exists already in the
+   * database, the method
    * will do nothing
    *
    * @param installationId the id to the installation to be added
@@ -106,11 +108,12 @@ public class InstallationController {
   }
 
   /**
-   * Adds a new github repo to an existing installtion in the database. If the installation id
+   * Adds a new github repo to an existing installtion in the database. If the
+   * installation id
    * doesn't exist in the database, this method will do nothing
    *
    * @param installationId the id of the installation
-   * @param repo the repo to be added
+   * @param repo           the repo to be added
    * @return true if successful, otherwise false
    */
   public boolean addRepoToInstallation(String installationId, GitHubRepo repo) {
@@ -123,7 +126,8 @@ public class InstallationController {
   }
 
   /**
-   * Adds a new method to an existing repo in an exsiting installation in the database If the
+   * Adds a new method to an existing repo in an exsiting installation in the
+   * database If the
    * installation or the repo doesn't exist, this method will do nothing
    *
    * @param installationId
@@ -144,7 +148,7 @@ public class InstallationController {
    * Gets all methods in a repo
    * 
    * @param installationId the id of the installation
-   * @param repoId the id of the repo
+   * @param repoId         the id of the repo
    * @return a set of methods, or null if the installation or repo doesn't exist
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
