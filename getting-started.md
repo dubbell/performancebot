@@ -27,6 +27,10 @@ If these steps are unclear, you can also follow this [tutorial](https://docs.git
      - [x] **Pull requests**: Access: Read and Write
 4. Under `Where can this GitHub App be installed?`, check `Only on this account`.
 
+### Installing the App
+
+Once the Bot is created, go to the settings of it, and press `Install App` in the menu on the left and allow it to access all your repositories.
+
 ### Configuring the App
 
 This step covers generating private keys to sign access token requests, as well as setting the right webhook url.
@@ -72,6 +76,12 @@ Web Interface                 http://127.0.0.1:4040
 2. Copy it to your clipboard.
 3. Paste it in the `Webhook URL` field and **ADD** `/payload` to the end of it. It should look like this: `https://b9b9-33-22-11-000.eu.ngrok.io/payload`.
 4. In `src/main/resources/application.properties`, add `server.port=7000`. It has to be the same as the one used in the ngrok command! This is because your computer is listening on that port and since ngrok is pointing the tunnel to that port, we need it to receive updates as webhooks from GitHub.
+
+### Using it
+
+Once all of the above steps are finished, you can create pull requests in your own repositiories and you will receive webhook payloads if you are running ngrok and the PerformanceBot with the right config.
+
+>**Tip**: if you don't want to spam new PRs all the time, use the replay button to resend a payload in ngrok's web interface! 
 
 ## 2. BenchmarkWorker 
 
