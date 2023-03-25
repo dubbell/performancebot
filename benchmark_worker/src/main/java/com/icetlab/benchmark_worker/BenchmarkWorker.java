@@ -159,15 +159,14 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String results, String senderURI, String installationId, String repoId)
-      throws Exception {
+  public void sendResult(String results, String senderURI, String installationId, String repoId) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
 
     ObjectMapper mapper = new ObjectMapper();
-    Object[] result_list = mapper.readValue(results.trim(), Object[].class);
-    requestBody.put("results", result_list);
+    Object[] resultList = mapper.readValue(results.trim(), Object[].class);
+    requestBody.put("results", resultList);
 
     HttpEntity<Map<String, Object>> requestEntity =
         new HttpEntity<>(requestBody, new HttpHeaders());
