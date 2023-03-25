@@ -7,8 +7,17 @@ import java.net.URI;
 import com.icetlab.benchmark_worker.configuration.Configuration;
 import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
 import org.apache.commons.io.FileUtils;
 
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -73,7 +82,6 @@ public class BenchmarkWorker {
       String result = configuration.benchmark(); // saves result to json file
 
       // send result back to the performance bot
-      sendResult(result, request.getRemoteAddr());
       compile();
       benchmark(); // saves result to json file
       sendResult(readResults(), request.getRemoteAddr(),
@@ -114,11 +122,6 @@ public class BenchmarkWorker {
   /**
    * Sends result of benchmark back to the performance bot.
    */
-  <<<<<<<HEAD
-
-  public void sendResult(String result, String senderURI) throws HttpClientErrorException {
-=======
-
   public void compile() throws Exception {
     // construct request to clean target directory
     InvocationRequest cleanRequest = new DefaultInvocationRequest();
@@ -156,8 +159,8 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String results, String senderURI, String installationId, String repoId) throws Exception {
->>>>>>> 00192490964cc4c4c9d58c9248f0142321e2395d
+  public void sendResult(String results, String senderURI, String installationId, String repoId)
+      throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
@@ -166,10 +169,12 @@ public class BenchmarkWorker {
     Object[] result_list = mapper.readValue(results.trim(), Object[].class);
     requestBody.put("results", result_list);
 
-    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
+    HttpEntity<Map<String, Object>> requestEntity =
+        new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity,
+        String.class);
   }
 
   /**
