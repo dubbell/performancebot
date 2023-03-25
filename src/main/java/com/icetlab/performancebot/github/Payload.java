@@ -2,10 +2,21 @@ package com.icetlab.performancebot.github;
 
 import static com.icetlab.performancebot.PerformanceBot.getIssue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.stats.IssueLogger;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,20 +24,27 @@ public class Payload {
 
   private final JacksonJsonParser payloadParser = new JacksonJsonParser();
 
-
   /**
    * Handles the payload received from GitHub.
    *
    * @param payload the payload received from GitHub
    */
-  public void handlePayload(String payload) {}
+  public void handlePayload(String payload) {
+    boolean isPullRequest = payloadParser.parseMap(payload).containsKey("pull_request")
+        && payloadParser.parseMap(payload).containsKey("action");
+
+    if (isPullRequest) {
+      handlePullRequest(payload);
+    }
+  }
 
   /**
    * Handles the payload received from GitHub when a new installation is created.
    *
    * @param payload the payload received from GitHub
    */
-  void handleNewInstall(String payload) {}
+  void handleNewInstall(String payload) {
+  }
 
   /**
    * Handles the payload received from GitHub when a pull request is opened.
@@ -43,8 +61,34 @@ public class Payload {
     // want, this just how to obtain it.
     String repoUrl = node.get("pull_request").get("head").get("repo").get("clone_url").asText();
 
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("url", repoUrl);
+    requestBody.put("token", "");
+    requestBody.put("installation_id", installationId);
+    requestBody.put("repo_id", node.get("repository").get("id"));
+
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
+    RestTemplate restTemplate = new RestTemplate();
+    // temporary
+    String containerIp = "http://172.17.0.2";
+
+    restTemplate.postForEntity(URI.create(containerIp + ":8080/task"), requestEntity, String.class);
+
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
-    // TODO: Implement with the rest of the workflow
+
+    try {
+      // FIXME: Path should not be hardcoded
+      String userdir = System.getProperty("user.dir");
+      String path = userdir + "/src/main/java/com/icetlab/performancebot/stats/jmh-result.json";
+      String json = new String(Files.readAllBytes(Paths.get(path)));
+      String issueText = IssueLogger.createSimpleIssue(json);
+
+      getIssue().createIssue(issuesUrl, "TODO: dummy title", issueText, installationId);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 
   /**

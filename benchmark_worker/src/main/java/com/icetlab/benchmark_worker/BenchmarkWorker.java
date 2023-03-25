@@ -1,5 +1,6 @@
 package com.icetlab.benchmark_worker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -75,10 +76,13 @@ public class BenchmarkWorker {
       clone(repoURL, accessToken);
       compile();
       benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr());
+      sendResult(readResults(), request.getRemoteAddr(),
+          (String)parser.parseMap(task).get("installation_id"),
+          parser.parseMap(task).get("repo_id").toString());
     }
     catch (Exception e) {
       logger.error(e.toString());
+      logger.error(request.getRemoteAddr());
     }
 
     delete();
@@ -120,7 +124,9 @@ public class BenchmarkWorker {
 
     // cleans and then compiles project
     Invoker invoker = new DefaultInvoker();
-    invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+    if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
+      invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+
     InvocationResult cleanResult = invoker.execute(cleanRequest);
     InvocationResult verifyResult = invoker.execute(verifyRequest);
 
@@ -141,14 +147,19 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String result, String senderURI) throws HttpClientErrorException {
+  public void sendResult(String results, String senderURI, String installationId, String repoId) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("body", result);
+    requestBody.put("installation_id", installationId);
+    requestBody.put("repo_id", repoId);
+
+    ObjectMapper mapper = new ObjectMapper();
+    Object[] result_list = mapper.readValue(results.trim(), Object[].class);
+    requestBody.put("results", result_list);
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create(senderURI + "/benchmark"), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity, String.class);
   }
 
   /**
