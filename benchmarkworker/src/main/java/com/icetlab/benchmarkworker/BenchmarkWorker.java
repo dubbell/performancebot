@@ -1,11 +1,10 @@
 package com.icetlab.benchmarkworker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.benchmarkworker.configuration.Configuration;
+import com.icetlab.benchmarkworker.configuration.ConfigurationFactory;
 import java.io.IOException;
 import java.net.URI;
-
-import com.icetlab.benchmark_worker.configuration.Configuration;
-import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

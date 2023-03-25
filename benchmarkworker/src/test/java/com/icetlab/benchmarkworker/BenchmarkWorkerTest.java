@@ -2,12 +2,10 @@ package com.icetlab.benchmarkworker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.icetlab.benchmark_worker.configuration.ConfigData;
-import com.icetlab.benchmark_worker.configuration.Configuration;
-import com.icetlab.benchmark_worker.configuration.ConfigurationFactory;
-import com.icetlab.benchmark_worker.configuration.MavenConfiguration;
+import com.icetlab.benchmarkworker.configuration.ConfigData;
+import com.icetlab.benchmarkworker.configuration.Configuration;
+import com.icetlab.benchmarkworker.configuration.ConfigurationFactory;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 
