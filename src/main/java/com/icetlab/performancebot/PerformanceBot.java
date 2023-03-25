@@ -5,7 +5,6 @@ import com.icetlab.performancebot.benchmark.JMHBenchmark;
 import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
-import com.icetlab.performancebot.stats.Analyzer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * App serves the purpose of being the main entry for performancebot and hosts its REST API.
+ * App serves the purpose of being the main entry for performancebot and hosts
+ * its REST API.
  */
 @SpringBootApplication
 @RestController
@@ -30,7 +30,6 @@ public class PerformanceBot {
   private static final Issue issue = new Issue();
   @Autowired
   private Payload payloadHandler;
-  private static final Analyzer analyzer = new Analyzer();
   public static final JsonParser payloadParser = new JacksonJsonParser();
   @Autowired
   private InstallationController installationController;
@@ -53,7 +52,8 @@ public class PerformanceBot {
   }
 
   /**
-   * POST route that listens for webhooks events sent by GitHub. Delegates work to other components
+   * POST route that listens for webhooks events sent by GitHub. Delegates work to
+   * other components
    * based on the received payload.
    *
    * @param payload JSON string with payload
@@ -64,7 +64,8 @@ public class PerformanceBot {
   }
 
   /**
-   * POST route that listens for finished benchmark runs and adds the results to the database.
+   * POST route that listens for finished benchmark runs and adds the results to
+   * the database.
    *
    * @param payload JSON string with payload
    */
@@ -77,4 +78,3 @@ public class PerformanceBot {
     return issue;
   }
 }
-
