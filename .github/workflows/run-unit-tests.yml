@@ -15,6 +15,6 @@ jobs:
           distribution: "temurin"
           cache: "maven"
       - name: Build and test PerformanceBot
-        run: mvn clean test
+        run: cd performancebot && mvn clean test && cd ..
       - name: Build and test BenchmarkWorker
-        run: cd benchmark_worker && mvn clean test && cd ..
+        run: cd benchmarkworker && mvn clean test && cd ..
