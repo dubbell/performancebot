@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.stats.generated.BenchmarkJMH;
 import java.io.*;
 
-class IssueLogger {
+public class IssueLogger {
 
   /**
    * Takes a json string and creates a simple issue. Returns the issue as a

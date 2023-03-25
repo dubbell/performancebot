@@ -1,5 +1,6 @@
 package com.icetlab.benchmark_worker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 
@@ -34,13 +35,11 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Spring boot application to be run in containers.
-
- * Is given tasks to complete by the performancebot, which consists of:
- * 1. Cloning the given repository into a local directory.
- * 2. Compiling and running all specified benchmarks in the cloned repository.
- * 3. Sending the results to the database.
- * 4. Performing statistical analysis.
- * 5. Sending the result of the analysis to the remote repository as a GitHub Issue.
+ * 
+ * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
+ * repository into a local directory. 2. Compiling and running all specified benchmarks in the
+ * cloned repository. 3. Sending the results to the database. 4. Performing statistical analysis. 5.
+ * Sending the result of the analysis to the remote repository as a GitHub Issue.
  */
 @RestController
 @SpringBootApplication
@@ -75,9 +74,14 @@ public class BenchmarkWorker {
 
       // send result back to the performance bot
       sendResult(result, request.getRemoteAddr());
-    }
-    catch (Exception e) {
+      compile();
+      benchmark(); // saves result to json file
+      sendResult(readResults(), request.getRemoteAddr(),
+          (String) parser.parseMap(task).get("installation_id"),
+          parser.parseMap(task).get("repo_id").toString());
+    } catch (Exception e) {
       logger.error(e.toString());
+      logger.error(request.getRemoteAddr());
     }
 
     // delete local installation of repository
@@ -86,6 +90,7 @@ public class BenchmarkWorker {
 
   /**
    * Creates directory and clones repository into it.
+   * 
    * @param repoURL repository url
    * @param accessToken repository access token for authentication
    */
@@ -98,11 +103,10 @@ public class BenchmarkWorker {
       return;
 
     CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
-    Git.cloneRepository()
-      .setCredentialsProvider(credentials) // if the repository is private, the access token should authorize the request
-      .setURI(repoURL)
-      .setDirectory(dir)
-      .call().close();
+    Git.cloneRepository().setCredentialsProvider(credentials) // if the repository is private, the
+                                                              // access token should authorize the
+                                                              // request
+        .setURI(repoURL).setDirectory(dir).call().close();
 
     System.out.println("Cloning finished.");
   }
@@ -110,14 +114,62 @@ public class BenchmarkWorker {
   /**
    * Sends result of benchmark back to the performance bot.
    */
+  <<<<<<<HEAD
+
   public void sendResult(String result, String senderURI) throws HttpClientErrorException {
+=======
+
+  public void compile() throws Exception {
+    // construct request to clean target directory
+    InvocationRequest cleanRequest = new DefaultInvocationRequest();
+    cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
+    cleanRequest.setGoals(Collections.singletonList("clean"));
+
+    // construct request to compile project
+    InvocationRequest verifyRequest = new DefaultInvocationRequest();
+    verifyRequest.setPomFile(new File("benchmark_directory/pom.xml"));
+    verifyRequest.setGoals(Collections.singletonList("verify"));
+
+    // cleans and then compiles project
+    Invoker invoker = new DefaultInvoker();
+    if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
+      invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+
+    InvocationResult cleanResult = invoker.execute(cleanRequest);
+    InvocationResult verifyResult = invoker.execute(verifyRequest);
+
+    // checks if either of the requests failed
+    if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
+      throw new Exception("Build failed.");
+  }
+
+  /**
+   * Runs benchmarks in compiled project and stores the result in a json file.
+   */
+  public void benchmark() throws Exception {
+    Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json")
+        .waitFor();
+  }
+
+  public String readResults() throws IOException {
+    byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json"));
+    return new String(encoded, StandardCharsets.UTF_8);
+  }
+
+  public void sendResult(String results, String senderURI, String installationId, String repoId) throws Exception {
+>>>>>>> 00192490964cc4c4c9d58c9248f0142321e2395d
     Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("body", result);
+    requestBody.put("installation_id", installationId);
+    requestBody.put("repo_id", repoId);
+
+    ObjectMapper mapper = new ObjectMapper();
+    Object[] result_list = mapper.readValue(results.trim(), Object[].class);
+    requestBody.put("results", result_list);
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create(senderURI + "/benchmark"), requestEntity, String.class);
+    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity, String.class);
   }
 
   /**

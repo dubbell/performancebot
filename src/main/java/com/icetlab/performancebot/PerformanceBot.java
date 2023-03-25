@@ -1,7 +1,5 @@
 package com.icetlab.performancebot;
 
-import com.icetlab.performancebot.benchmark.IBenchmark;
-import com.icetlab.performancebot.benchmark.JMHBenchmark;
 import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableMongoRepositories
 public class PerformanceBot {
 
-  private static final IBenchmark benchmark = new JMHBenchmark();
   private static final Issue issue = new Issue();
   @Autowired
   private Payload payloadHandler;
@@ -48,6 +45,10 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
+    // installationController.addInstallation("33697560");
+    // installationController.addRepoToInstallation("33697560", new
+    // GitHubRepo("608560819", new HashSet<>(), "jmh"));
+
     return "Welcome to the performancebot. ";
   }
 
