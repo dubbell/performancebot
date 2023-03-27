@@ -7,6 +7,7 @@ import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -46,6 +47,20 @@ public class InstallationController {
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
       JsonNode results = node.get("results");
+
+      if (getInstallationById(installationId) == null) {
+        addInstallation(installationId);
+      }
+
+      GitHubRepo repo = createGitHubRepoFromPayload(payload);
+      if (getReposByInstallationId(repoId) == null) {
+        addRepoToInstallation(installationId, repo);
+      }
+
+      if (!getReposByInstallationId(installationId).contains(repo)) {
+        addRepoToInstallation(installationId, createGitHubRepoFromPayload(payload));
+      }
+
       if (results.isArray()) {
         for (JsonNode methodNode : results) {
           service.addRunResultToMethod(installationId, repoId, methodNode.get("benchmark").asText(),
@@ -55,6 +70,18 @@ public class InstallationController {
       return true;
     } catch (JsonProcessingException e) {
       return false;
+    }
+  }
+
+  private GitHubRepo createGitHubRepoFromPayload(String payload) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(payload);
+      System.out.println(payload);
+      String repoId = node.get("repo_id").asText();
+      String name = node.get("name").asText();
+      return new GitHubRepo(repoId, new HashSet<>(), name);
+    } catch (JsonProcessingException e) {
+      return null;
     }
   }
 
