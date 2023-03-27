@@ -80,10 +80,10 @@ public class BenchmarkWorker {
       // compile and get result of benchmark
       String result = configuration.benchmark(); // saves result to json file
 
+      //System.out.println(result);
+
       // send result back to the performance bot
-      compile();
-      benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr(),
+      sendResult(result, request.getRemoteAddr(),
           (String) parser.parseMap(task).get("installation_id"),
           parser.parseMap(task).get("repo_id").toString());
     } catch (Exception e) {
@@ -116,46 +116,6 @@ public class BenchmarkWorker {
         .setURI(repoURL).setDirectory(dir).call().close();
 
     System.out.println("Cloning finished.");
-  }
-
-  /**
-   * Sends result of benchmark back to the performance bot.
-   */
-  public void compile() throws Exception {
-    // construct request to clean target directory
-    InvocationRequest cleanRequest = new DefaultInvocationRequest();
-    cleanRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-    cleanRequest.setGoals(Collections.singletonList("clean"));
-
-    // construct request to compile project
-    InvocationRequest verifyRequest = new DefaultInvocationRequest();
-    verifyRequest.setPomFile(new File("benchmark_directory/pom.xml"));
-    verifyRequest.setGoals(Collections.singletonList("verify"));
-
-    // cleans and then compiles project
-    Invoker invoker = new DefaultInvoker();
-    if (System.getProperty("os.name").contains("Windows")) // only set maven home if on windows
-      invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
-
-    InvocationResult cleanResult = invoker.execute(cleanRequest);
-    InvocationResult verifyResult = invoker.execute(verifyRequest);
-
-    // checks if either of the requests failed
-    if (cleanResult.getExitCode() != 0 || verifyResult.getExitCode() != 0)
-      throw new Exception("Build failed.");
-  }
-
-  /**
-   * Runs benchmarks in compiled project and stores the result in a json file.
-   */
-  public void benchmark() throws Exception {
-    Runtime.getRuntime().exec("java -jar ./benchmark_directory/target/benchmarks.jar -rf json")
-        .waitFor();
-  }
-
-  public String readResults() throws IOException {
-    byte[] encoded = Files.readAllBytes(Paths.get("jmh-result.json"));
-    return new String(encoded, StandardCharsets.UTF_8);
   }
 
   public void sendResult(String results, String senderURI, String installationId, String repoId)
