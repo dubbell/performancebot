@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 public class Issue {
 
   Auth auth;
-  String jwt;
 
   public Issue() {
     auth = new Auth();
