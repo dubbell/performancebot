@@ -6,13 +6,12 @@ import com.icetlab.performancebot.github.Payload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.boot.json.JsonParser;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,7 +25,6 @@ public class PerformanceBot {
   private static final Issue issue = new Issue();
   @Autowired
   private Payload payloadHandler;
-  public static final JsonParser payloadParser = new JacksonJsonParser();
   @Autowired
   private InstallationController installationController;
 
@@ -54,8 +52,9 @@ public class PerformanceBot {
    * @param payload JSON string with payload
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void payload(@RequestBody String payload) {
-    payloadHandler.handlePayload(payload);
+  public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
+      @RequestBody String payload) {
+    payloadHandler.handlePayload(eventType, payload);
   }
 
   /**
@@ -65,7 +64,10 @@ public class PerformanceBot {
    */
   @PostMapping("/benchmark")
   public void addRun(@RequestBody String payload) {
+    System.out.println("Adding run results to database...");
     installationController.addRun(payload);
+    System.out.println("Done.");
+    payloadHandler.handleResults(payload);
   }
 
   public static Issue getIssue() {

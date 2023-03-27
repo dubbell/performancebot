@@ -84,8 +84,10 @@ public class BenchmarkWorker {
       compile();
       benchmark(); // saves result to json file
       sendResult(readResults(), request.getRemoteAddr(),
-          (String) parser.parseMap(task).get("installation_id"),
-          parser.parseMap(task).get("repo_id").toString());
+          parser.parseMap(task).get("installation_id").toString(),
+          parser.parseMap(task).get("repo_id").toString(),
+          parser.parseMap(task).get("name").toString(),
+          parser.parseMap(task).get("issue_url").toString());
     } catch (Exception e) {
       logger.error(e.toString());
       logger.error(request.getRemoteAddr());
@@ -158,11 +160,13 @@ public class BenchmarkWorker {
     return new String(encoded, StandardCharsets.UTF_8);
   }
 
-  public void sendResult(String results, String senderURI, String installationId, String repoId)
-      throws Exception {
+  public void sendResult(String results, String senderURI, String installationId, String repoId,
+      String name, String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
+    requestBody.put("name", name);
+    requestBody.put("issue_url", endpoint);
 
     ObjectMapper mapper = new ObjectMapper();
     Object[] resultList = mapper.readValue(results.trim(), Object[].class);
@@ -172,7 +176,7 @@ public class BenchmarkWorker {
         new HttpEntity<>(requestBody, new HttpHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create("http://" + senderURI + ":8080/benchmark"), requestEntity,
+    restTemplate.postForEntity(URI.create("http://" + senderURI + ":1337/benchmark"), requestEntity,
         String.class);
   }
 
