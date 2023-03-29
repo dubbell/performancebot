@@ -40,7 +40,6 @@ public class BenchmarkWorkerTest {
     // check that it can find the config file
     assertTrue(new File("benchmark_directory/perfbot.yaml").exists());
 
-
     // configuration
     try {
       ConfigData configData = new ObjectMapper(new YAMLFactory())
@@ -110,9 +109,7 @@ public class BenchmarkWorkerTest {
       File target = new File("benchmark_directory/build");
       String result = config.benchmark();
 
-      assertTrue(new File("benchmark_directory/build/classes/java/jmh/META-INF").exists());
-
-      System.out.println(result);
+      //System.out.println(result);
 
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 

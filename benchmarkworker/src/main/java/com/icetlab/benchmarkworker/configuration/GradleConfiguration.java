@@ -12,13 +12,11 @@ import java.util.List;
  */
 public class GradleConfiguration extends JMHConfiguration {
   final List<String> buildTasks;
-  final String classPath;
 
   public GradleConfiguration(ConfigData configData) {
     super(configData);
 
     buildTasks = configData.getGradleBuildTasks();
-    classPath = configData.getGradleClassPath();
   }
 
   /**
@@ -31,7 +29,7 @@ public class GradleConfiguration extends JMHConfiguration {
 
     try {
       if (buildTasks == null)
-        connection.newBuild().forTasks("clean", "assemble").run();
+        connection.newBuild().forTasks("clean", "jmhJar").run();
       else {
         BuildLauncher bl = connection.newBuild();
         for (String task : buildTasks)
@@ -45,18 +43,14 @@ public class GradleConfiguration extends JMHConfiguration {
   }
 
   @Override
-  String getClassPath() {
-    if (classPath == null)
-      return "benchmark_directory/build/classes/java/jmh";
-    else
-      return "benchmark_directory/" + classPath;
+  String getJmhJar() {
+
+    File libsFolder = new File("benchmark_directory/build/libs");
+    for(File file : libsFolder.listFiles())
+      if(file.getName().toLowerCase().contains("jmh"))
+        return "benchmark_directory/build/libs/" + file.getName();
+
+    return "";
   }
-
-  @Override
-  String getBenchmarkListPath() {
-    return getClassPath() + "/META-INF";
-  }
-
-
 }
 

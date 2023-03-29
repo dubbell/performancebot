@@ -80,10 +80,10 @@ public class BenchmarkWorker {
       // compile and get result of benchmark
       String result = configuration.benchmark(); // saves result to json file
 
+      System.out.println(result);
+
       // send result back to the performance bot
-      compile();
-      benchmark(); // saves result to json file
-      sendResult(readResults(), request.getRemoteAddr(),
+      sendResult(result, request.getRemoteAddr(),
           parser.parseMap(task).get("installation_id").toString(),
           parser.parseMap(task).get("repo_id").toString(),
           parser.parseMap(task).get("name").toString(),
