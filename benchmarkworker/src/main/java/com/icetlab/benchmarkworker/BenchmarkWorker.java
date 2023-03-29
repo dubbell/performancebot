@@ -80,7 +80,7 @@ public class BenchmarkWorker {
       // compile and get result of benchmark
       String result = configuration.benchmark(); // saves result to json file
 
-      //System.out.println(result);
+      System.out.println(result);
 
       // send result back to the performance bot
       sendResult(result, request.getRemoteAddr(),
