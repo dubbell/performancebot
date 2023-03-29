@@ -26,7 +26,7 @@ public class PerformanceBot {
   @Autowired
   private Payload payloadHandler;
   @Autowired
-  private InstallationController installationController;
+  private InstallationController database;
 
   /**
    * The main entry of the application.
@@ -42,7 +42,7 @@ public class PerformanceBot {
    */
   @GetMapping("/")
   public String root() {
-    return "Welcome to the performancebot. ";
+    return "Welcome to the performancebot.";
   }
 
   /**
@@ -58,15 +58,14 @@ public class PerformanceBot {
   }
 
   /**
-   * POST route that listens for finished benchmark runs and adds the results to the database.
+   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the results to the database.
    *
-   * @param payload JSON string with payload
+   * @param payload JSON string with run results
    */
   @PostMapping("/benchmark")
   public void addRun(@RequestBody String payload) {
     System.out.println("Adding run results to database...");
-    installationController.addRun(payload);
-    System.out.println("Done.");
+    database.addRun(payload);
     payloadHandler.handleResults(payload);
   }
 

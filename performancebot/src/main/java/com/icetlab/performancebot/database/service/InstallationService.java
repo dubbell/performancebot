@@ -1,17 +1,24 @@
 package com.icetlab.performancebot.database.service;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
+import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.repository.InstallationRepository;
 import com.icetlab.performancebot.database.model.GitHubRepo;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -68,7 +75,7 @@ public class InstallationService {
    */
   public void addRepoToInstallation(String installationId, GitHubRepo repo) {
     if (installationExists(installationId)) {
-      mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(installationId)),
+      mongoTemplate.updateFirst(Query.query(where("_id").is(installationId)),
           new Update().push("repos", repo), Installation.class);
       return;
     }
@@ -87,7 +94,7 @@ public class InstallationService {
     Installation inst = getInstallationById(installationId);
     if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
       mongoTemplate.updateFirst(
-          Query.query(Criteria.where("_id").is(installationId).and("repos.repoId").is(repoId)),
+          Query.query(where("_id").is(installationId).and("repos.repoId").is(repoId)),
           new Update().push("repos.$.methods", method), Installation.class);
       return;
     }
@@ -104,17 +111,22 @@ public class InstallationService {
    * @param result the result to be added
    */
   public void addRunResultToMethod(String installationId, String repoId, String methodName,
-      String result) {
-    Installation inst = getInstallationById(installationId);
-    if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
-      mongoTemplate.updateFirst(
-          Query.query(Criteria.where("_id").is(installationId).and("repos.repoId").is(repoId)
-              .and("repos.methods.methodName").is(methodName)),
-          new Update().push("repos.$.methods.$[].runResults", result), Installation.class);
-      return;
+    String result) {
+    Installation inst = mongoTemplate.findById(installationId, Installation.class);
+    if (inst == null) {
+      throw new NoSuchElementException("No such installation id");
     }
 
-    throw new NoSuchElementException("No such method name");
+    Optional<GitHubRepo> gitHubRepo =
+        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
+    if (gitHubRepo.isPresent()) {
+      Method method = gitHubRepo.get().getMethods().stream()
+          .filter(m -> m.getMethodName().equals(methodName)).findFirst().orElseThrow(NoSuchElementException::new);
+      method.addResult(new Result(result));
+      mongoTemplate.save(inst);
+      return;
+    }
+    throw new NoSuchElementException("No such repo");
   }
 
   /**
