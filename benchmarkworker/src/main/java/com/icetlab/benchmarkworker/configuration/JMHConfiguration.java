@@ -58,7 +58,9 @@ public abstract class JMHConfiguration implements Configuration {
       System.out.println("Benchmarking started.");
 
       // runs benchmarks
-      Runtime.getRuntime().exec(getJmhCommand().split("[ \t]+")).waitFor();
+      Process benchmarkingProcess = Runtime.getRuntime().exec(getJmhCommand().split("[ \t]+"));
+      benchmarkingProcess.getInputStream().close(); // gets stuck at waitFor() otherwise.
+      benchmarkingProcess.waitFor();
 
       // reads everything from result file
       result = new String(Files.readAllBytes(Paths.get("jmh-result.json")));
