@@ -33,7 +33,7 @@ public class InstallationController {
    *        "installation_id" : "314159",
    *        "repo_id": "123452456",
    *        "name: "",
-   *        "results": [
+   *        "methods": [
    *          {"benchmark": "method name"},
    *          {"benchmark": "method name 2"}
    *        ]
@@ -67,19 +67,22 @@ public class InstallationController {
       }
 
       if (!repoExists) {
-        addRepoToInstallation(installationId, createGitHubRepoFromPayload(payloadFromBenchmarkWorker));
+        addRepoToInstallation(installationId,
+            createGitHubRepoFromPayload(payloadFromBenchmarkWorker));
       }
 
       boolean methodExists;
       if (results.isArray()) {
         for (JsonNode methodNode : results) {
           // check if method exists, otherwise add it.
-          methodExists = service.getMethodsFromRepo(installationId, repoId).stream().anyMatch(method -> method.getMethodName().equals(methodNode.get("benchmark").asText()));
+          methodExists = service.getMethodsFromRepo(installationId, repoId).stream().anyMatch(
+              method -> method.getMethodName().equals(methodNode.get("benchmark").asText()));
           if (!methodExists) {
-            addMethodToRepo(installationId, repoId, new Method(methodNode.get("benchmark").asText(), new ArrayList<>()));
+            addMethodToRepo(installationId, repoId,
+                new Method(methodNode.get("benchmark").asText(), new ArrayList<>()));
           }
           service.addRunResultToMethod(installationId, repoId, methodNode.get("benchmark").asText(),
-            repoId);
+              repoId);
         }
       }
       return true;
@@ -148,7 +151,7 @@ public class InstallationController {
    * doesn't exist in the database, this method will do nothing
    *
    * @param installationId the id of the installation
-   * @param repo           the repo to be added
+   * @param repo the repo to be added
    * @return true if successful, otherwise false
    */
   public boolean addRepoToInstallation(String installationId, GitHubRepo repo) {
@@ -182,7 +185,7 @@ public class InstallationController {
    * Gets all methods in a repo
    *
    * @param installationId the id of the installation
-   * @param repoId         the id of the repo
+   * @param repoId the id of the repo
    * @return a set of methods, or null if the installation or repo doesn't exist
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {

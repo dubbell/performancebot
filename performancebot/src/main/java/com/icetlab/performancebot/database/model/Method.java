@@ -13,6 +13,12 @@ public class Method {
   private final String methodName;
   private final List<Result> runResults;
 
+  /**
+   * Creates a new method entry in the database.
+   * 
+   * @param methodName
+   * @param runResults
+   */
   public Method(String methodName, List<Result> runResults) {
     this.methodName = methodName;
     this.runResults = runResults;
