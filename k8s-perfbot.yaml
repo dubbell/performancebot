@@ -136,5 +136,22 @@ spec:
           ports:
             - containerPort: 8080
 
+---
 
-## TODO: perfbot service, perfbot ingress
+# perfbot service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: perfbot-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: perfbot
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+
+
+## TODO: perfbot ingress
