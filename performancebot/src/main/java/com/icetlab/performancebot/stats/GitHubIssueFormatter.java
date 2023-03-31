@@ -34,7 +34,6 @@ public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
       Set<Method> methods = installationService.getMethodsFromRepo(installationId, repoId);
-
       Map<String, List<Method>> methodMap = FormatterUtils.groupMethodsByClassName(methods);
       List<String> markdownTables = new ArrayList<>();
       for (String className : methodMap.keySet()) {
@@ -69,7 +68,7 @@ public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
         Result res = method.getRunResults().get(i);
         date = res.getAddedAt();
         timestamp = new SimpleDateFormat("dd/MM/yyyy HH:MM |").format(date);
-        maxmin = FormatterUtils.getMaxMinFromPercentiles(res.getData());
+        maxmin = FormatterUtils.getMinMaxFromPercentiles(res.getData());
         scoreunit = FormatterUtils.getScoreAndUnitFromRunResult(res.getData());
         resultRows.add(String.format("| %s %s %s\n", timestamp, maxmin, scoreunit));
       }

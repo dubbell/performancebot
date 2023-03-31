@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -259,16 +259,16 @@ public class GitHubIssueFormatterTest {
 
         | Timestamp |  Min  | Max | Score | Unit |
         |-----------|-------|-----|-------|------|
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
 
         ## newWay
 
         | Timestamp |  Min  | Max | Score | Unit |
         |-----------|-------|-----|-------|------|
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-              """;
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+                """;
 
     String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT).strip();
     // Write to file
@@ -300,15 +300,15 @@ public class GitHubIssueFormatterTest {
 
         | Timestamp |  Min  | Max | Score | Unit |
         |-----------|-------|-----|-------|------|
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
 
         ## newWay
 
         | Timestamp |  Min  | Max | Score | Unit |
         |-----------|-------|-----|-------|------|
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
 
 
         # AnotherName
@@ -317,8 +317,8 @@ public class GitHubIssueFormatterTest {
 
         | Timestamp |  Min  | Max | Score | Unit |
         |-----------|-------|-----|-------|------|
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
-        | 31/03/2023 09:03 |  22.92 | 13.80 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
+        | 31/03/2023 09:03 |  13.80 | 22.92 |  18.36 | ms/op |
               """;
 
     String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT).strip();

@@ -50,13 +50,13 @@ public class FormatterUtils {
    * @param runResult the run result
    * @return the max and min as part of a markdown table <code> max | min |</code>
    */
-  public static String getMaxMinFromPercentiles(String runResult) {
+  public static String getMinMaxFromPercentiles(String runResult) {
     try {
       JsonNode node = new ObjectMapper().readTree(runResult);
       JsonNode percentiles = node.get("primaryMetric").get("scorePercentiles");
       double max = percentiles.get("100.0").asDouble();
       double min = percentiles.get("0.0").asDouble();
-      return String.format(" %.2f | %.2f |", max, min);
+      return String.format(" %.2f | %.2f |", min, max);
     } catch (JsonProcessingException e) {
       return " N/A | N/A |";
     }
