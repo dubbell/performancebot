@@ -135,3 +135,6 @@ spec:
           image: docker.io/linulun/perfbot:latest
           ports:
             - containerPort: 8080
+
+
+## TODO: perfbot service, perfbot ingress
