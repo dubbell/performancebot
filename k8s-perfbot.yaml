@@ -1,0 +1,137 @@
+
+# BENCHMARK WORKER ----------------------
+
+# worker deployment:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benchmark-worker
+  labels:
+    app: benchmark-worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: benchmark-worker
+  template:
+    metadata:
+      labels:
+        app: benchmark-worker
+    spec:
+      containers:
+        - name: benchmark-worker
+          image: docker.io/linulun/benchmark-worker:latest
+          ports:
+            - containerPort: 8080
+
+---
+
+# worker service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: benchmark-worker-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: benchmark-worker
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+
+
+
+# PERFORMANCE BOT ------------------------------------
+
+# service account for perfbot:
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: perfbot-sa
+  namespace: default
+
+---
+
+# clusterrole for perfbot-sa (gives perms):
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: perfbot-sa-role
+  namespace: default
+rules:
+  - apiGroups:
+      - ""
+      - apps
+      - autoscaling
+      - batch
+      - extensions
+      - policy
+      - rbac.authorization.k8s.io
+    resources:
+      - pods
+      - componentstatuses
+      - configmaps
+      - daemonsets
+      - deployments
+      - events
+      - endpoints
+      - horizontalpodautoscalers
+      - ingress
+      - jobs
+      - limitranges
+      - namespaces
+      - nodes
+      - pods
+      - persistentvolumes
+      - persistentvolumeclaims
+      - resourcequotas
+      - replicasets
+      - replicationcontrollers
+      - serviceaccounts
+      - services
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+
+# bind role to perfbot service account:
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: perfbot-role-binding
+subjects:
+  - namespace: default
+    kind: ServiceAccount
+    name: perfbot-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: perfbot-sa-role
+
+---
+
+# perfbot deployment:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perfbot
+  labels:
+    app: perfbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perfbot
+  template:
+    metadata:
+      labels:
+        app: perfbot
+    spec:
+      serviceAccountName: perfbot-sa  # sets service account
+      containers:
+        - name: perfbot
+          image: docker.io/linulun/perfbot:latest
+          ports:
+            - containerPort: 8080
