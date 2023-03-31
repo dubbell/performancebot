@@ -5,9 +5,11 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.stats.GitHubIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class Payload {
+
+  @Autowired
+  private GitHubIssueFormatter gitHubIssueFormatter;
 
   /**
    * Handles the payload received from GitHub. Depending on the payload, it either adds a new
@@ -78,11 +83,8 @@ public class Payload {
     String installationId = node.get("installation_id").asText();
     String issueUrl = node.get("issue_url").asText();
     String name = node.get("name").asText();
-    String results = node.get("results").isArray() ? node.get("results").toString() : "[]";
-
-    // TODO: Do analysis before sending to GitHub
-
-    getIssue().createIssue(issueUrl, "Results for " + name, results, installationId);
+    String formattedResults = gitHubIssueFormatter.formatBenchmarkIssue(payload);
+    getIssue().createIssue(issueUrl, "Results for " + name, formattedResults, installationId);
   }
 
   /**
