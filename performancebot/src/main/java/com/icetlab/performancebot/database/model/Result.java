@@ -1,8 +1,12 @@
 package com.icetlab.performancebot.database.model;
 
 import java.util.Date;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "results")
 public class Result {
+  @Field("data")
   String data;
   Date addedAt;
 

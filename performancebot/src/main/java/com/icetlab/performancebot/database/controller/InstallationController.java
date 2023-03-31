@@ -82,7 +82,7 @@ public class InstallationController {
                 new Method(methodNode.get("benchmark").asText(), new ArrayList<>()));
           }
           service.addRunResultToMethod(installationId, repoId, methodNode.get("benchmark").asText(),
-              repoId);
+              methodNode.toString());
         }
       }
       return true;
