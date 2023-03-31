@@ -18,6 +18,7 @@ spec:
       labels:
         app: benchmark-worker
     spec:
+      serviceAccountName: perfbot-sa  # sets service account
       containers:
         - name: benchmark-worker
           image: docker.io/linulun/benchmark-worker:latest
@@ -46,7 +47,57 @@ spec:
 
 # PERFORMANCE BOT ------------------------------------
 
-# service account for perfbot:
+# perfbot deployment:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perfbot
+  labels:
+    app: perfbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perfbot
+  template:
+    metadata:
+      labels:
+        app: perfbot
+    spec:
+      serviceAccountName: perfbot-sa
+      containers:
+        - name: perfbot
+          image: docker.io/linulun/perfbot:latest
+          ports:
+            - containerPort: 8080
+
+---
+
+# perfbot service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: perfbot-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: perfbot
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+
+
+## TODO: perfbot ingress
+
+---
+
+
+
+# SERVICE ACCOUNT ----------------------------------
+
+# service account:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -110,48 +161,3 @@ roleRef:
   kind: ClusterRole
   name: perfbot-sa-role
 
----
-
-# perfbot deployment:
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: perfbot
-  labels:
-    app: perfbot
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: perfbot
-  template:
-    metadata:
-      labels:
-        app: perfbot
-    spec:
-      serviceAccountName: perfbot-sa  # sets service account
-      containers:
-        - name: perfbot
-          image: docker.io/linulun/perfbot:latest
-          ports:
-            - containerPort: 8080
-
----
-
-# perfbot service:
-apiVersion: v1
-kind: Service
-metadata:
-  name: perfbot-svc
-spec:
-  type: LoadBalancer
-  selector:
-    app: perfbot
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-
-
-
-## TODO: perfbot ingress
