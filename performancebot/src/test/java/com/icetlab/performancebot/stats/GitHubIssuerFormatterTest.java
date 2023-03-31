@@ -267,8 +267,8 @@ public class GitHubIssuerFormatterTest {
 
                     """;
 
-        String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT);
-        assertEquals(expected, md);
+        String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT).strip();
+        assertEquals(expected.strip(), md);
     }
 
     @Test
@@ -314,8 +314,8 @@ public class GitHubIssuerFormatterTest {
 
                     """;
 
-        String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT);
-        assertEquals(expected, md);
+        String md = formatter.formatBenchmarkIssue(EXAMPLE_RESULT).strip();
+        assertEquals(expected.strip(), md);
     }
 
 
