@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,10 @@ public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
       node = new ObjectMapper().readTree(jmhResults);
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
-      Set<Method> methods = installationService.getMethodsFromRepo(installationId, repoId);
+      List<String> methodNames = getMethodsFromCurrentRun(jmhResults);
+      Set<Method> methods = installationService.getMethodsFromRepo(installationId, repoId).stream()
+          .filter(method -> methodNames.contains(method.getMethodName()))
+          .collect(Collectors.toSet());
       Map<String, List<Method>> methodMap = FormatterUtils.groupMethodsByClassName(methods);
       List<String> markdownTables = new ArrayList<>();
       for (String className : methodMap.keySet()) {
@@ -78,6 +82,18 @@ public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
       sb.append(headerTwo).append(topRow).append(resultRowsString).append("\n");
     }
     return sb.toString();
+  }
+
+  private List<String> getMethodsFromCurrentRun(String jmhResults) {
+    JsonNode node;
+    try {
+      node = new ObjectMapper().readTree(jmhResults);
+      List<String> methodNames = new ArrayList<>();
+      methodNames = node.get("results").findValuesAsText("benchmark", methodNames);
+      return methodNames;
+    } catch (JsonProcessingException e) {
+      return null;
+    }
   }
 
 
