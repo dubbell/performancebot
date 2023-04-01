@@ -41,7 +41,27 @@ spec:
       port: 8080
       targetPort: 8080
 
-## TODO: perfbot ingress
+---
+
+# perfbot ingress:
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: perfbot-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: perfbot-svc
+                port:
+                  number: 8080
 
 ---
 
