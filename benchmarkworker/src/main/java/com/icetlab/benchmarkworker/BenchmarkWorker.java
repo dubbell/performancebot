@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,8 +38,7 @@ import org.springframework.web.client.RestTemplate;
  * 
  * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
  * repository into a local directory. 2. Compiling and running all specified benchmarks in the
- * cloned repository. 3. Sending the results to the database. 4. Performing statistical analysis. 5.
- * Sending the result of the analysis to the remote repository as a GitHub Issue.
+ * cloned repository. 3. Sending the results back to the performancebot.
  */
 @RestController
 @SpringBootApplication
@@ -130,8 +128,7 @@ public class BenchmarkWorker {
     Object[] resultList = mapper.readValue(results.trim(), Object[].class);
     requestBody.put("results", resultList);
 
-    HttpEntity<Map<String, Object>> requestEntity =
-        new HttpEntity<>(requestBody, new HttpHeaders());
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
     restTemplate.postForEntity(URI.create("http://" + getPerfbotServiceAddress() + "/benchmark"), requestEntity,

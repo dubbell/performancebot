@@ -9,6 +9,10 @@ import com.icetlab.performancebot.stats.GitHubIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +24,8 @@ public class Payload {
 
   @Autowired
   private GitHubIssueFormatter gitHubIssueFormatter;
+
+  final private static KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
 
   /**
    * Handles the payload received from GitHub. Depending on the payload, it either adds a new
@@ -64,13 +70,22 @@ public class Payload {
     requestBody.put("issue_url", issuesUrl);
     requestBody.put("name", name);
 
-    HttpEntity<Map<String, Object>> requestEntity =
-        new HttpEntity<>(requestBody, new HttpHeaders());
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
-    // temporary
-    String containerIp = "http://localhost:8080";
+
+    String containerIp = "http://" + getWorkerServiceAddress();
     System.out.println("Sending request to " + containerIp + "/task");
     restTemplate.postForEntity(URI.create(containerIp + "/task"), requestEntity, String.class);
+  }
+
+  /**
+   * Finds the ip and port of the benchmark-worker kubernetes service.
+   */
+  private String getWorkerServiceAddress() {
+    Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
+    int port = service.getSpec().getPorts().get(0).getNodePort();
+    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0).getAddress();
+    return ip + ":" + port;
   }
 
   /**

@@ -1,50 +1,4 @@
 
-# BENCHMARK WORKER ----------------------
-
-# worker deployment:
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: benchmark-worker
-  labels:
-    app: benchmark-worker
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: benchmark-worker
-  template:
-    metadata:
-      labels:
-        app: benchmark-worker
-    spec:
-      serviceAccountName: perfbot-sa  # sets service account
-      containers:
-        - name: benchmark-worker
-          image: docker.io/linulun/benchmark-worker:latest
-          ports:
-            - containerPort: 8080
-
----
-
-# worker service:
-apiVersion: v1
-kind: Service
-metadata:
-  name: benchmark-worker-svc
-spec:
-  type: LoadBalancer
-  selector:
-    app: benchmark-worker
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-
----
-
-
-
 # PERFORMANCE BOT ------------------------------------
 
 # perfbot deployment:
@@ -87,9 +41,53 @@ spec:
       port: 8080
       targetPort: 8080
 
-
-
 ## TODO: perfbot ingress
+
+---
+
+
+
+# BENCHMARK WORKER ----------------------
+
+# worker deployment:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benchmark-worker
+  labels:
+    app: benchmark-worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: benchmark-worker
+  template:
+    metadata:
+      labels:
+        app: benchmark-worker
+    spec:
+      serviceAccountName: perfbot-sa
+      containers:
+        - name: benchmark-worker
+          image: docker.io/linulun/benchmark-worker:latest
+          ports:
+            - containerPort: 8080
+
+---
+
+# worker service:
+apiVersion: v1
+kind: Service
+metadata:
+  name: benchmark-worker-svc
+spec:
+  type: LoadBalancer
+  selector:
+    app: benchmark-worker
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
 
 ---
 
