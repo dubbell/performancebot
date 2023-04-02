@@ -23,7 +23,8 @@ spec:
         - name: perfbot
           image: docker.io/linulun/perfbot:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 1337
+
 
 ---
 
@@ -39,7 +40,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 8080
+      targetPort: 1337
 
 ---
 
@@ -50,7 +51,7 @@ metadata:
   name: perfbot-ingress
   namespace: default
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
     - http:
