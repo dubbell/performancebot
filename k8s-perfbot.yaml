@@ -39,7 +39,7 @@ spec:
     app: perfbot
   ports:
     - protocol: TCP
-      port: 8080
+      port: 80
       targetPort: 1337
 
 ---
@@ -62,7 +62,7 @@ spec:
               service:
                 name: perfbot-svc
                 port:
-                  number: 8080
+                  number: 80
 
 ---
 
