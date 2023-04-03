@@ -25,8 +25,6 @@ public class Payload {
   @Autowired
   private GitHubIssueFormatter gitHubIssueFormatter;
 
-  final private static KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
-
   /**
    * Handles the payload received from GitHub. Depending on the payload, it either adds a new
    * installation or reads information about a newly opened pull request.
@@ -78,10 +76,15 @@ public class Payload {
     restTemplate.postForEntity(URI.create(containerIp + "/task"), requestEntity, String.class);
   }
 
+  private KubernetesClient kubernetesClient;
+
   /**
    * Finds the ip and port of the benchmark-worker kubernetes service.
    */
   private String getWorkerServiceAddress() {
+    if (kubernetesClient == null)
+      kubernetesClient = new KubernetesClientBuilder().build();
+
     Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
     int port = service.getSpec().getPorts().get(0).getNodePort();
     String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0).getAddress();
