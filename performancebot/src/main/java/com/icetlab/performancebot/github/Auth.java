@@ -47,17 +47,14 @@ public class Auth {
   public Auth() {
     restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
-    java.security.Security.addProvider(
-        new org.bouncycastle.jce.provider.BouncyCastleProvider()
-    );
-    GitHubConfig gitHubConfig = new AnnotationConfigApplicationContext(GitHubConfig.class)
-        .getBean(GitHubConfig.class);
+    java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    GitHubConfig gitHubConfig =
+        new AnnotationConfigApplicationContext(GitHubConfig.class).getBean(GitHubConfig.class);
     appId = gitHubConfig.getAppId();
     privateKeyPath = gitHubConfig.getPrivateKeyPath();
     try { // TODO: Not sure if good practice
       fetchAndPopulateInstallationIds();
-    }
-    catch (Throwable e){
+    } catch (Throwable e) {
       System.out.println("Bad access key!");
     }
     jwt = createWebToken();
@@ -71,9 +68,8 @@ public class Auth {
     HttpHeaders headers = createHeaders();
 
     HttpEntity<String> request = new HttpEntity<>(headers);
-    ResponseEntity<String> response = restTemplate
-            .exchange("https://api.github.com/app/installations", HttpMethod.GET, request,
-                    String.class);
+    ResponseEntity<String> response = restTemplate.exchange(
+        "https://api.github.com/app/installations", HttpMethod.GET, request, String.class);
 
     validateResponse(response);
 
@@ -135,9 +131,7 @@ public class Auth {
   private String createWebToken() {
     Date now = new Date(System.currentTimeMillis());
     expiresAt = getTimeIn10Minutes();
-    return Jwts.builder().setIssuedAt(now)
-        .setExpiration(expiresAt)
-        .setIssuer(appId)
+    return Jwts.builder().setIssuedAt(now).setExpiration(expiresAt).setIssuer(appId)
         .signWith(generatePrivateKey(), SignatureAlgorithm.RS256).compact();
   }
 
@@ -154,11 +148,9 @@ public class Auth {
     headers.set("Authorization", "Bearer " + getJwt());
 
     HttpEntity<String> request = new HttpEntity<>(headers);
-    ResponseEntity<String> res = restTemplate
-        .exchange(
-            String.format("https://api.github.com/app/installations/%s/access_tokens", id.trim()),
-            HttpMethod.POST, request,
-            String.class);
+    ResponseEntity<String> res = restTemplate.exchange(
+        String.format("https://api.github.com/app/installations/%s/access_tokens", id.trim()),
+        HttpMethod.POST, request, String.class);
     return (String) new JacksonJsonParser().parseMap(res.getBody()).get("token");
   }
 
@@ -182,14 +174,12 @@ public class Auth {
   private PrivateKey generatePrivateKey() {
     String key = null;
     try {
-      key = Files.readString(Paths.get(privateKeyPath),
-          Charset.defaultCharset());
+      key = Files.readString(Paths.get(privateKeyPath), Charset.defaultCharset());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
-            .replaceAll("\\r?\\n", "")
-            .replace("-----END RSA PRIVATE KEY-----", "");
+    String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "").replaceAll("\\r?\\n", "")
+        .replace("-----END RSA PRIVATE KEY-----", "");
     byte[] decoded = Base64.getDecoder().decode(privateKey);
     KeyFactory kf = null;
     try {

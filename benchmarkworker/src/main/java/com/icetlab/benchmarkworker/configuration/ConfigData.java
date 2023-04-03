@@ -8,11 +8,9 @@ import java.util.List;
 public class ConfigData {
   private String language;
   private String buildTool;
-  private List<String> include;
-  private List<String> exclude;
-  private int forks;
+  private String options;
   private List<String> gradleBuildTasks;
-  private String gradleClassPath;
+  private String jmhJar;
 
   public String getLanguage() {
     return language;
@@ -30,30 +28,6 @@ public class ConfigData {
     this.buildTool = buildTool;
   }
 
-  public List<String> getInclude() {
-    return include;
-  }
-
-  public void setInclude(List<String> include) {
-    this.include = include;
-  }
-
-  public List<String> getExclude() {
-    return exclude;
-  }
-
-  public void setExclude(List<String> exclude) {
-    this.exclude = exclude;
-  }
-
-  public int getForks() {
-    return forks;
-  }
-
-  public void setForks(int forks) {
-    this.forks = forks;
-  }
-
   public List<String> getGradleBuildTasks() {
     return gradleBuildTasks;
   }
@@ -62,11 +36,19 @@ public class ConfigData {
     this.gradleBuildTasks = gradleBuildTasks;
   }
 
-  public String getGradleClassPath() {
-    return gradleClassPath;
+  public String getOptions() {
+    return options;
   }
 
-  public void setGradleClassPath(String gradleClassPath) {
-    this.gradleClassPath = gradleClassPath;
+  public void setOptions(String options) {
+    this.options = options;
+  }
+
+  public String getJmhJar() {
+    return jmhJar;
+  }
+
+  public void setJmhJar(String jmhJar) {
+    this.jmhJar = jmhJar;
   }
 }

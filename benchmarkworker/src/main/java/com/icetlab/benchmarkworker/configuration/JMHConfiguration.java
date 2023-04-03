@@ -1,5 +1,8 @@
 package com.icetlab.benchmarkworker.configuration;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormat;
@@ -26,10 +29,10 @@ public abstract class JMHConfiguration implements Configuration {
   /**
    * JMH Options, gets set by the values in the configuration file.
    */
-  final protected Options options;
+  final protected ConfigData configData;
 
   public JMHConfiguration(ConfigData configData) {
-    options = getOptions(configData);
+    this.configData = configData;
   }
 
   /**
@@ -38,125 +41,46 @@ public abstract class JMHConfiguration implements Configuration {
   abstract void compile() throws Exception;
 
   /**
-   * @return the path to the compiled .class files containing the JMH benchmarks.
+   * Path to compiled JMH jar file.
    */
-  abstract String getClassPath();
-
-  /**
-   * @return the path to the BenchmarkList and CompilerHints files, which are required for JMH to
-   *         find the tests.
-   */
-  abstract String getBenchmarkListPath();
-
+  abstract String getJmhJar();
 
   @Override
   public String benchmark() throws Exception {
+
     // compile project
     compile();
 
-    // add classes from compiled repository so that JMH can find them
-    addClasses();
-
-    ByteArrayOutputStream outputStream;
+    String result;
 
     try {
+
       System.out.println("Benchmarking started.");
 
-      // performs benchmark
-      Collection<RunResult> results = new Runner(options).run();
+      // runs benchmarks
+      Process benchmarkingProcess = Runtime.getRuntime().exec(getJmhCommand().split("[ \t]+"));
+      benchmarkingProcess.getInputStream().close(); // gets stuck at waitFor() otherwise.
+      benchmarkingProcess.waitFor();
+
+      // reads everything from result file
+      result = new String(Files.readAllBytes(Paths.get("jmh-result.json")));
 
       System.out.println("Benchmarking finished.");
 
-      // for collecting benchmark output
-      outputStream = new ByteArrayOutputStream();
-      PrintStream printStream = new PrintStream(outputStream);
-      ResultFormat resultFormat =
-          ResultFormatFactory.getInstance(ResultFormatType.JSON, printStream); // json output
-
-      // writes output to output stream
-      resultFormat.writeOut(results);
     } finally {
-      // reset class path
-      removeClasses();
+      new File("jmh-result.json").delete();
     }
 
-    // return result json string
-    return outputStream.toString(StandardCharsets.UTF_8).trim();
+    return result.trim();
   }
 
   /**
-   * Gets the contents from the ConfigData object and uses it to create a JMH Options object.
+   * Command to run benchmarks.
    */
-  Options getOptions(ConfigData configData) {
-    // for building options object
-    ChainedOptionsBuilder builder = new OptionsBuilder();
-
-    // include every specified regex from the configuration data
-    if (configData.getInclude() != null)
-      for (String incl : configData.getInclude())
-        builder = builder.include(incl);
-
-    if (configData.getExclude() != null)
-      for (String excl : configData.getExclude())
-        builder = builder.exclude(excl);
-
-    // number of times to run benchmarks
-    if (configData.getForks() > 0)
-      builder = builder.forks(configData.getForks());
-    else
-      builder = builder.forks(1);
-
-    // silent verbose mode so that it doesn't spam console
-    builder = builder.verbosity(VerboseMode.SILENT);
-
-    return builder.build();
+  private String getJmhCommand() {
+    String jar = configData.getJmhJar() == null ? getJmhJar() : configData.getJmhJar();
+    String options = configData.getOptions() == null ? "" : configData.getOptions();
+    return "java -jar " + jar + " " + options + "-rf json";
   }
 
-  /**
-   * Previous class path.
-   */
-  private String oldClasses = "";
-
-  /**
-   * Adds benchmark classes from repository to system class path so that JMH can find them.
-   */
-  private void addClasses() throws Exception {
-    // makes jmh use classes from class path
-    if (!Boolean.getBoolean("jmh.separateClassLoader"))
-      System.setProperty("jmh.separateClassLoader", "true");
-
-    // save old class path
-    oldClasses = System.getProperty("java.class.path");
-
-    // windows uses ; as separator for class path, linux uses :
-    String separator = System.getProperty("os.name").toLowerCase().contains("win") ? ";" : ":";
-
-    // adds classes from repository to class path
-    String newClasses = oldClasses + separator + getClassPath();
-    System.setProperty("java.class.path", newClasses);
-
-    copyBenchmarkList();
-  }
-
-  /**
-   * Copies BenchmarkList and CompilerHints from repository so that JMH knows which tests to run.
-   */
-  private void copyBenchmarkList() throws IOException {
-    File META_INF = new File(getBenchmarkListPath());
-    File to = new File("target/classes/META-INF");
-
-    FileUtils.copyDirectory(META_INF, to);
-  }
-
-  /**
-   * Resets class path to previous value.
-   */
-  private void removeClasses() {
-    System.setProperty("java.class.path", oldClasses);
-
-    try {
-      FileUtils.deleteDirectory(new File("target/classes/META-INF"));
-    } catch (Exception ignored) {
-    }
-  }
 }

@@ -55,13 +55,8 @@ public class MavenConfiguration extends JMHConfiguration {
   }
 
   @Override
-  String getClassPath() {
-    return "benchmark_directory/target/classes";
-  }
-
-  @Override
-  String getBenchmarkListPath() {
-    return "benchmark_directory/target/classes/META-INF";
+  String getJmhJar() {
+    return "benchmark_directory/target/benchmarks.jar";
   }
 
 
