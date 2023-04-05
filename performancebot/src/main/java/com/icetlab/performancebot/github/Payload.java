@@ -5,6 +5,7 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.stats.GitHubIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ public class Payload {
 
   @Autowired
   private GitHubIssueFormatter gitHubIssueFormatter;
+  @Autowired
+  private InstallationController database;
 
   /**
    * Handles the payload received from GitHub. Depending on the payload, it either adds a new
@@ -40,7 +43,15 @@ public class Payload {
    *
    * @param payload the payload received from GitHub
    */
-  void handleNewInstall(String payload) {}
+  void handleNewInstall(String payload) {
+    JsonNode node = getPayloadAsNode(payload);
+    boolean isNewInstall = node.get("action").asText().equals("created");
+    if (!isNewInstall) {
+      return;
+    }
+    String installationId = node.get("installation").get("id").asText();
+    database.addInstallation(installationId);
+  }
 
   /**
    * Handles the payload received from GitHub when a pull request is opened.
@@ -55,7 +66,6 @@ public class Payload {
     if (!pullRequestWasOpened && !pullRequestReceivedComment) {
       return;
     }
-
 
     if (pullRequestReceivedComment) {
       String comment = node.get("comment").get("body").asText();
