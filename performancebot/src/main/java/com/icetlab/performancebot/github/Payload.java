@@ -5,6 +5,7 @@ import static com.icetlab.performancebot.PerformanceBot.getIssue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.stats.GitHubIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ public class Payload {
 
   @Autowired
   private GitHubIssueFormatter gitHubIssueFormatter;
+  @Autowired
+  private InstallationController database;
 
   /**
    * Handles the payload received from GitHub. Depending on the payload, it either adds a new
@@ -34,7 +37,7 @@ public class Payload {
   public void handlePayload(String eventType, String payload) {
     switch (eventType) {
       case "installation" -> handleNewInstall(payload);
-      case "pull_request" -> handlePullRequest(payload);
+      case "pull_request", "issue_comment" -> handlePullRequest(payload);
       default -> System.out.println("Received unsupported event type: " + eventType);
     }
   }
@@ -44,7 +47,15 @@ public class Payload {
    *
    * @param payload the payload received from GitHub
    */
-  void handleNewInstall(String payload) {}
+  void handleNewInstall(String payload) {
+    JsonNode node = getPayloadAsNode(payload);
+    boolean isNewInstall = node.get("action").asText().equals("created");
+    if (!isNewInstall) {
+      return;
+    }
+    String installationId = node.get("installation").get("id").asText();
+    database.addInstallation(installationId);
+  }
 
   /**
    * Handles the payload received from GitHub when a pull request is opened.
@@ -52,13 +63,38 @@ public class Payload {
    * @param payload the payload received from GitHub
    */
   void handlePullRequest(String payload) {
+    String ping = "[performancebot]";
     JsonNode node = getPayloadAsNode(payload);
+    boolean pullRequestWasOpened = node.get("action").asText().equals("opened");
+    boolean pullRequestReceivedComment = !node.get("issue").isNull();
+    if (!pullRequestWasOpened && !pullRequestReceivedComment) {
+      return;
+    }
+
+    if (pullRequestReceivedComment) {
+      String comment = node.get("comment").get("body").asText();
+      if (!comment.toLowerCase().contains(ping)) {
+        return;
+      }
+
+    } else {
+      boolean pullRequestBodyContainsPing =
+          node.get("pull_request").get("body").asText().toLowerCase().contains(ping);
+      boolean pullRequestTitleContainsPing =
+          node.get("pull_request").get("title").asText().toLowerCase().contains(ping);
+      if (!pullRequestBodyContainsPing && !pullRequestTitleContainsPing) {
+        return;
+      }
+    }
+
     String installationId = node.get("installation").get("id").asText();
-    String issuesUrl = node.get("pull_request").get("issue_url").asText();
+    String issuesUrl = pullRequestReceivedComment ? node.get("issue").get("url").asText()
+        : node.get("pull_request").get("issue_url").asText();
     String repoId = node.get("repository").get("id").asText();
     String name = node.get("repository").get("name").asText();
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
-    String repoUrl = node.get("pull_request").get("head").get("repo").get("clone_url").asText();
+    String repoUrl = pullRequestReceivedComment ? node.get("repository").get("clone_url").asText()
+        : node.get("pull_request").get("head").get("repo").get("clone_url").asText();
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("url", repoUrl);
