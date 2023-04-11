@@ -1,11 +1,17 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
+import com.icetlab.performancebot.database.model.GitHubRepo;
+import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.github.Issue;
 import com.icetlab.performancebot.github.Payload;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @EnableMongoRepositories
+@EnableMongoAuditing
 public class PerformanceBot {
 
   private static final Issue issue = new Issue();
@@ -58,7 +65,8 @@ public class PerformanceBot {
   }
 
   /**
-   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the results to the database.
+   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the
+   * results to the database.
    *
    * @param payload JSON string with run results
    */
