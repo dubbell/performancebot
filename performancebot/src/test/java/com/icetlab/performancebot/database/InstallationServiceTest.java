@@ -273,6 +273,29 @@ public class InstallationServiceTest {
     Query q = Query.query(where("_id").in(ids));
     assertEquals(mongoTemplate.find(q, Installation.class).size(), 0);
   }
+  
+  @Test
+  public void testDeleteInstallationByIdNoSuchElementException() {
+    // Some invalid id
+    String installationId = "invalid id";
+
+    assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteInstallationById(installationId);
+    });
+  }
+
+  @Test
+  public void testDeleteInstallationByIdThrowsExceptionWhenGivenMultipleIdsWithOneInvalid() {
+    String validId = "valid id";
+    String invalidId = "invalid id";
+    installationService.addInstallation(validId);
+
+    // Delete both IDs at the same time
+    assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteInstallationById(validId);
+      installationService.deleteInstallationById(invalidId);
+    });
+  }
 
   @BeforeEach
   public void tearDown() {
