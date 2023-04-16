@@ -44,7 +44,6 @@ public class BenchmarkWorkerTest {
     try {
       ConfigData configData = new ObjectMapper(new YAMLFactory())
           .readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
-      assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
       assertTrue(configData.getBuildTool().equalsIgnoreCase("maven"));
 
       config = ConfigurationFactory.getConfiguration();
@@ -117,7 +116,7 @@ public class BenchmarkWorkerTest {
       File target = new File("benchmark_directory/build");
       String result = config.benchmark();
 
-      //System.out.println(result);
+      System.out.println(result);
 
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 

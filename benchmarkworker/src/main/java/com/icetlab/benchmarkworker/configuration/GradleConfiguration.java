@@ -37,7 +37,9 @@ public class GradleConfiguration extends JMHConfiguration {
               .forProjectDirectory(new File("benchmark_directory" + task.getPath())).connect();
 
           BuildLauncher buildLauncher = connection.newBuild();
-          for (String t : task.getTasks()) buildLauncher = buildLauncher.forTasks(t);
+          for (String t : task.getTasks()) {
+            buildLauncher = buildLauncher.forTasks(t);
+          }
 
           buildLauncher.run();
           connection.close();
