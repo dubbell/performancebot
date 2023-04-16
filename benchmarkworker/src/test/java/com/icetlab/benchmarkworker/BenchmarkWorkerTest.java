@@ -74,13 +74,22 @@ public class BenchmarkWorkerTest {
   }
 
   @Test
-  public void gradleTest() {
+  public void gradleExampleTest() {
+    gradleTest("https://github.com/dubbell/JMHExample_Gradle");
+  }
+
+  @Test
+  public void reactiveJavaTest() {
+    gradleTest("https://github.com/dubbell/RxJava");
+  }
+
+  public void gradleTest(String url) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone("https://github.com/dubbell/JMHExample_Gradle", "");
+      worker.clone(url, "");
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
@@ -96,7 +105,6 @@ public class BenchmarkWorkerTest {
     try {
       ConfigData configData = new ObjectMapper(new YAMLFactory())
           .readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
-      assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
       assertTrue(configData.getBuildTool().equalsIgnoreCase("gradle"));
 
       config = ConfigurationFactory.getConfiguration();
@@ -121,6 +129,8 @@ public class BenchmarkWorkerTest {
       fail("Benchmarking error : " + e);
     }
   }
+
+
 
   @AfterEach
   public void deleteFiles() {

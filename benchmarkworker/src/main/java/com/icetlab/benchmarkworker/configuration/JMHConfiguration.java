@@ -80,7 +80,7 @@ public abstract class JMHConfiguration implements Configuration {
   private String getJmhCommand() {
     String jar = configData.getJmhJar() == null ? getJmhJar() : configData.getJmhJar();
     String options = configData.getOptions() == null ? "" : configData.getOptions();
-    return "java -jar " + jar + " " + options + "-rf json";
+    return "java -jar " + jar + " " + options + " -rf json";
   }
 
 }
