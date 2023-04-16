@@ -11,12 +11,9 @@ import java.util.List;
  * framework.
  */
 public class GradleConfiguration extends JMHConfiguration {
-  final List<String> buildTasks;
 
   public GradleConfiguration(ConfigData configData) {
     super(configData);
-
-    buildTasks = configData.getGradleBuildTasks();
   }
 
   /**
@@ -24,20 +21,31 @@ public class GradleConfiguration extends JMHConfiguration {
    */
   protected void compile() {
     System.out.println("Compilation started.");
-    ProjectConnection connection = GradleConnector.newConnector()
-        .forProjectDirectory(new File("benchmark_directory")).connect();
+
+    ProjectConnection connection = null;
 
     try {
-      if (buildTasks == null)
-        connection.newBuild().forTasks("clean", "jmhJar").run();
+      if (configData.getBuildTasks() == null) {
+        connection = GradleConnector.newConnector()
+            .forProjectDirectory(new File("benchmark_directory")).connect();
+
+        connection.newBuild().forTasks("jmhJar").run();
+      }
       else {
-        BuildLauncher bl = connection.newBuild();
-        for (String task : buildTasks)
-          bl = bl.forTasks(task);
-        bl.run();
+        for(BuildTask task : configData.getBuildTasks()) {
+          connection = GradleConnector.newConnector()
+              .forProjectDirectory(new File("benchmark_directory" + task.getPath())).connect();
+
+          BuildLauncher buildLauncher = connection.newBuild();
+          for (String t : task.getTasks()) buildLauncher = buildLauncher.forTasks(t);
+
+          buildLauncher.run();
+          connection.close();
+        }
       }
     } finally {
-      connection.close();
+      if (connection != null)
+        connection.close();
       System.out.println("Compilation finished.");
     }
   }
