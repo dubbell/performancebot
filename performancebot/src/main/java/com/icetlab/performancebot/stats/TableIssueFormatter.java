@@ -34,7 +34,7 @@ public class TableIssueFormatter implements BenchmarkIssueFormatter {
       node = new ObjectMapper().readTree(jmhResults);
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
-      List<String> methodNames = getMethodsFromCurrentRun(jmhResults);
+      List<String> methodNames = FormatterUtils.getMethodsFromCurrentRun(jmhResults);
       Set<Method> methods = installationService.getMethodsFromRepo(installationId, repoId).stream()
           .filter(method -> methodNames.contains(method.getMethodName()))
           .collect(Collectors.toSet());
@@ -87,19 +87,6 @@ public class TableIssueFormatter implements BenchmarkIssueFormatter {
     }
     return sb.toString();
   }
-
-  private List<String> getMethodsFromCurrentRun(String jmhResults) {
-    JsonNode node;
-    try {
-      node = new ObjectMapper().readTree(jmhResults);
-      List<String> methodNames = new ArrayList<>();
-      methodNames = node.get("results").findValuesAsText("benchmark", methodNames);
-      return methodNames;
-    } catch (JsonProcessingException e) {
-      return null;
-    }
-  }
-
 
 
 }

@@ -85,4 +85,16 @@ public class FormatterUtils {
       return "N/A";
     }
   }
+
+  public static List<String> getMethodsFromCurrentRun(String jmhResults) {
+    JsonNode node;
+    try {
+      node = new ObjectMapper().readTree(jmhResults);
+      List<String> methodNames = new ArrayList<>();
+      methodNames = node.get("results").findValuesAsText("benchmark", methodNames);
+      return methodNames;
+    } catch (JsonProcessingException e) {
+      return null;
+    }
+  }
 }
