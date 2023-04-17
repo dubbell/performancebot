@@ -23,36 +23,36 @@ public class BenchmarkWorkerTest {
 
   @Test
   public void mavenExampleTest() {
-    mavenTest("https://github.com/dubbell/JMHExample");
+    mavenTest("https://github.com/dubbell/JMHExample", "test");
   }
 
   @Test
   public void gradleExampleTest() {
-    gradleTest("https://github.com/dubbell/JMHExample_Gradle");
+    gradleTest("https://github.com/dubbell/JMHExample_Gradle", "main");
   }
 
 
   // commented because they take too long to run
 
   //@Test
-  //public void eclipseCollectionsTest() { mavenTest("https://github.com/dubbell/eclipse-collections"); }
+  //public void eclipseCollectionsTest() { mavenTest("https://github.com/dubbell/eclipse-collections", "master"); }
 
   //@Test
-  //public void jcToolsTest() { mavenTest("https://github.com/dubbell/JCTools"); }
+  //public void jcToolsTest() { mavenTest("https://github.com/dubbell/JCTools", "master"); }
 
   //@Test
-  //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava"); }
+  //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava", "3.x"); }
 
 
 
 
-  public void mavenTest(String url) {
+  public void mavenTest(String url, String branch) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone(url, "");
+      worker.clone(url, "", branch);
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
@@ -90,13 +90,13 @@ public class BenchmarkWorkerTest {
     }
   }
 
-  public void gradleTest(String url) {
+  public void gradleTest(String url, String branch) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone(url, "");
+      worker.clone(url, "", branch);
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
