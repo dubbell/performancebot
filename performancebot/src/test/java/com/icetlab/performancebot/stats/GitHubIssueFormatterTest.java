@@ -94,8 +94,7 @@ public class GitHubIssueFormatterTest {
   }
 
   /**
-   * Test that two classes containing a method with the same name outputs the method results for
-   * both classes
+   * Test that two classes containing a method with the same name formats correctly
    */
   @Test
   public void testFormatResultsMultipleClasses() {
@@ -103,6 +102,7 @@ public class GitHubIssueFormatterTest {
     List<Result> results = new ArrayList<>();
     results.add(new Result(Constants.res_oldWay));
     results.add(new Result(Constants.res_newWay));
+    results.add(new Result(Constants.res_newWay_AnotherClassName));
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", results));
     installationService.addMethodToRepo("an id", "a repo id",
