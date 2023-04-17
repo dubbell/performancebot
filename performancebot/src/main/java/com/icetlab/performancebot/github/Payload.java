@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.stats.GitHubIssueFormatter;
+import com.icetlab.performancebot.stats.TableIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 public class Payload {
 
   @Autowired
-  private GitHubIssueFormatter gitHubIssueFormatter;
+  private TableIssueFormatter gitHubIssueFormatter;
   @Autowired
   private InstallationController database;
 
@@ -123,7 +123,8 @@ public class Payload {
 
     Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
     int port = service.getSpec().getPorts().get(0).getNodePort();
-    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0).getAddress();
+    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0)
+        .getAddress();
     return ip + ":" + port;
   }
 

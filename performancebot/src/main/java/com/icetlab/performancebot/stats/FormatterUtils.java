@@ -44,38 +44,45 @@ public class FormatterUtils {
     return stringParts[Math.max(stringParts.length - 1, 0)];
   }
 
-  /**
-   * Gets the max and min from a run result as part of a markdown table.
-   * 
-   * @param runResult the run result
-   * @return the max and min as part of a markdown table <code> max | min |</code>
-   */
-  public static String getMinMaxFromPercentiles(String runResult) {
+  public static String getMinFromPercentiles(String runResult) {
     try {
       JsonNode node = new ObjectMapper().readTree(runResult);
       JsonNode percentiles = node.get("primaryMetric").get("scorePercentiles");
-      double max = percentiles.get("100.0").asDouble();
-      double min = percentiles.get("0.0").asDouble();
-      return String.format(" %.2f | %.2f |", min, max);
+      Double min = percentiles.get("0.0").asDouble();
+      return min.toString();
     } catch (JsonProcessingException e) {
-      return " N/A | N/A |";
+      return "N/A";
     }
   }
 
-  /**
-   * Gets the score and unit from a run result as part of a markdown table.
-   * 
-   * @param runResult the run result
-   * @return the score and unit as part of a markdown table <code> score | unit |</code>
-   */
-  public static String getScoreAndUnitFromRunResult(String runResult) {
+  public static String getMaxFromPercentiles(String runResult) {
     try {
       JsonNode node = new ObjectMapper().readTree(runResult);
-      double score = node.get("primaryMetric").get("score").asDouble();
-      String unit = node.get("primaryMetric").get("scoreUnit").asText();
-      return String.format(" %.2f | %s |", score, unit);
+      JsonNode percentiles = node.get("primaryMetric").get("scorePercentiles");
+      Double min = percentiles.get("100.0").asDouble();
+      return min.toString();
     } catch (JsonProcessingException e) {
-      return " N/A | N/A |";
+      return "N/A";
+    }
+  }
+
+  public static String getScoreFromPrimaryMetric(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      Double score = node.get("primaryMetric").get("score").asDouble();
+      return score.toString();
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getUnitFromPrimaryMetric(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      String unit = node.get("primaryMetric").get("scoreUnit").asText();
+      return unit.toString();
+    } catch (JsonProcessingException e) {
+      return "N/A";
     }
   }
 }

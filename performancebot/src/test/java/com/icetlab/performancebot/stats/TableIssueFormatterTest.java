@@ -29,7 +29,7 @@ import com.icetlab.performancebot.database.service.InstallationService;
 import com.icetlab.performancebot.github.Payload;
 
 @SpringBootTest
-public class GitHubIssueFormatterTest {
+public class TableIssueFormatterTest {
 
   @InjectMocks
   private Payload payloadHandler;
@@ -51,7 +51,7 @@ public class GitHubIssueFormatterTest {
   MongoTemplate mongoTemplate;
 
   @Autowired
-  GitHubIssueFormatter formatter;
+  TableIssueFormatter formatter;
 
   @BeforeEach
   public void resetDatabase() {

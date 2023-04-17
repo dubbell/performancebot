@@ -1,11 +1,5 @@
 package com.icetlab.performancebot.stats;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icetlab.performancebot.database.model.Method;
-import com.icetlab.performancebot.database.model.Result;
-import com.icetlab.performancebot.database.service.InstallationService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,9 +9,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.database.model.Method;
+import com.icetlab.performancebot.database.model.Result;
+import com.icetlab.performancebot.database.service.InstallationService;
 
 @Component
-public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
+public class TableIssueFormatter implements BenchmarkIssueFormatter {
   @Autowired
   InstallationService installationService;
 
@@ -65,16 +65,20 @@ public class GitHubIssueFormatter implements BenchmarkIssueFormatter {
           |-----------|-------|-----|-------|------|
           """;
       List<String> resultRows = new ArrayList<>();
-      String timestamp, maxmin, scoreunit;
+
+      String timestamp;
       Date date;
 
       for (int i = 0; i < Math.min(10, method.getRunResults().size()); i++) {
         Result res = method.getRunResults().get(i);
         date = res.getAddedAt();
-        timestamp = new SimpleDateFormat("dd/MM/yyyy HH:MM |").format(date);
-        maxmin = FormatterUtils.getMinMaxFromPercentiles(res.getData());
-        scoreunit = FormatterUtils.getScoreAndUnitFromRunResult(res.getData());
-        resultRows.add(String.format("| %s %s %s\n", timestamp, maxmin, scoreunit));
+        timestamp = new SimpleDateFormat("dd/MM/yyyy HH:MM").format(date);
+        String min = FormatterUtils.getMinFromPercentiles(res.getData());
+        String max = FormatterUtils.getMaxFromPercentiles(res.getData());
+        String score = FormatterUtils.getScoreFromPrimaryMetric(res.getData());
+        String unit = FormatterUtils.getUnitFromPrimaryMetric(res.getData());
+        resultRows
+            .add(String.format("| %s | %s | %s | %s | %s |\n", timestamp, max, min, score, unit));
       }
 
       String resultRowsString = String.join("", resultRows).replace("[", "").replace("]", "");
