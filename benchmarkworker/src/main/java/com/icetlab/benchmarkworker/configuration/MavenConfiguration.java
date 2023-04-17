@@ -1,10 +1,10 @@
 package com.icetlab.benchmarkworker.configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.apache.maven.shared.invoker.*;
 import java.io.*;
-import java.util.Collections;
 
 /**
  * Class representing repositories that uses Maven as the build tool, and JMH as the benchmarking
@@ -26,13 +26,23 @@ public class MavenConfiguration extends JMHConfiguration {
 
     List<InvocationRequest> mavenInvocations = new ArrayList<>();
 
-    for (BuildTask task : configData.getBuildTasks()) {
+    if(configData.getBuildTasks() == null) {
       InvocationRequest request = new DefaultInvocationRequest();
-      request.setPomFile(new File("benchmark_directory/" + task.getPath()));
-      request.setGoals(task.getTasks());
+      request.setPomFile(new File("benchmark_directory/pom.xml"));
+      request.setGoals(Collections.singletonList("install"));
       request.setQuiet(true);
       request.setInputStream(InputStream.nullInputStream());
       mavenInvocations.add(request);
+    }
+    else {
+      for (BuildTask task : configData.getBuildTasks()) {
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile(new File("benchmark_directory/" + task.getPath()));
+        request.setGoals(task.getTasks());
+        request.setQuiet(true);
+        request.setInputStream(InputStream.nullInputStream());
+        mavenInvocations.add(request);
+      }
     }
 
     // cleans and then compiles project
