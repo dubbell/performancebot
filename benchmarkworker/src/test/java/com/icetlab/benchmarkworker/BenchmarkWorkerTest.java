@@ -38,6 +38,9 @@ public class BenchmarkWorkerTest {
   //public void eclipseCollectionsTest() { mavenTest("https://github.com/dubbell/eclipse-collections"); }
 
   //@Test
+  //public void jcToolsTest() { mavenTest("https://github.com/dubbell/JCTools"); }
+
+  //@Test
   //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava"); }
 
 

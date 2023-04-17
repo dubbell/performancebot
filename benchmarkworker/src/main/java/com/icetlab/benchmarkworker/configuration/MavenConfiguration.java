@@ -3,6 +3,7 @@ package com.icetlab.benchmarkworker.configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import org.apache.maven.shared.invoker.*;
 import java.io.*;
 
@@ -30,7 +31,7 @@ public class MavenConfiguration extends JMHConfiguration {
     if(configData.getBuildTasks() == null) {
       InvocationRequest request = new DefaultInvocationRequest();
       request.setPomFile(new File("benchmark_directory/pom.xml"));
-      request.setGoals(Collections.singletonList("install"));
+      request.setGoals(Collections.singletonList("package"));
       request.setQuiet(true);
       request.setInputStream(InputStream.nullInputStream());
       mavenInvocations.add(request);
@@ -42,6 +43,11 @@ public class MavenConfiguration extends JMHConfiguration {
         request.setGoals(task.getTasks());
         request.setQuiet(true);
         request.setInputStream(InputStream.nullInputStream());
+
+        Properties properties = new Properties();
+        properties.setProperty("skipTests", "true"); // skip tests as they take too much time
+        request.setProperties(properties);
+
         mavenInvocations.add(request);
       }
     }
