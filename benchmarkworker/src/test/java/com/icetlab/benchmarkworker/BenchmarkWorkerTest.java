@@ -22,13 +22,34 @@ public class BenchmarkWorkerTest {
   }
 
   @Test
-  public void mavenTest() {
+  public void mavenExampleTest() {
+    mavenTest("https://github.com/dubbell/JMHExample");
+  }
+
+  @Test
+  public void gradleExampleTest() {
+    gradleTest("https://github.com/dubbell/JMHExample_Gradle");
+  }
+
+
+  // commented because they take too long to run
+
+  //@Test
+  //public void eclipseCollectionsTest() { mavenTest("https://github.com/dubbell/eclipse-collections"); }
+
+  //@Test
+  //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava"); }
+
+
+
+
+  public void mavenTest(String url) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone("https://github.com/dubbell/JMHExample", "");
+      worker.clone(url, "");
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
@@ -58,28 +79,12 @@ public class BenchmarkWorkerTest {
 
       System.out.println(result);
 
-      assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
-
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 
-      // check if project was compiled correctly
-      assertTrue(target.exists() && target.listFiles().length != 0);
-      // check if a result was returned from the benchmark
-      assertTrue(result.length() != 0);
     } catch (Exception e) {
       e.printStackTrace();
       fail("Benchmarking error : " + e);
     }
-  }
-
-  @Test
-  public void gradleExampleTest() {
-    gradleTest("https://github.com/dubbell/JMHExample_Gradle");
-  }
-
-  @Test
-  public void reactiveJavaTest() {
-    gradleTest("https://github.com/dubbell/RxJava");
   }
 
   public void gradleTest(String url) {

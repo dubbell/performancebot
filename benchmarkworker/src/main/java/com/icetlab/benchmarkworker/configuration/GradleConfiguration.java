@@ -34,7 +34,7 @@ public class GradleConfiguration extends JMHConfiguration {
       else {
         for(BuildTask task : configData.getBuildTasks()) {
           connection = GradleConnector.newConnector()
-              .forProjectDirectory(new File("benchmark_directory" + task.getPath())).connect();
+              .forProjectDirectory(new File("benchmark_directory/" + task.getPath())).connect();
 
           BuildLauncher buildLauncher = connection.newBuild();
           for (String t : task.getTasks()) {
