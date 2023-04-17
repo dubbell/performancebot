@@ -17,7 +17,8 @@ public class GradleConfiguration extends JMHConfiguration {
   }
 
   /**
-   * Compiles gradle project using the Gradle API.
+   * Compiles gradle project using the Gradle API. Runs the jmhJar gradle task by default if no buildTasks are specified
+   * in the perfbot.yaml file.
    */
   protected void compile() {
     System.out.println("Compilation started.");

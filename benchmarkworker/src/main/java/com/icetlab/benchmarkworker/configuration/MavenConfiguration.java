@@ -16,7 +16,8 @@ public class MavenConfiguration extends JMHConfiguration {
   }
 
   /**
-   * Compiles the Maven project using the Maven invoker. Executes "clean" and then "verify".
+   * Compiles the Maven project using the Maven invoker. Executes "install" goal using pom file in the repository's
+   * root directory if no buildTasks are specified in the perfbot.yaml file. Otherwise executes the goals in the file.
    * 
    * @throws Exception
    */

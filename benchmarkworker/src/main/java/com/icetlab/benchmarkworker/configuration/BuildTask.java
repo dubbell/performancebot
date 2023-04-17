@@ -2,10 +2,14 @@ package com.icetlab.benchmarkworker.configuration;
 
 import java.util.List;
 
+/**
+ * Representation of a gradle or maven project with a path (from the root of the repository), and at least
+ * one task (tasks represent gradle tasks or maven goals).
+ */
 public class BuildTask {
 
   private String path; // maven or gradle project path
-  private List<String> tasks; // maven or gradle task
+  private List<String> tasks; // maven goals or gradle tasks
 
   public String getPath() {
     return path;
