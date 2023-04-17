@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-//import org.junit.Test;
+// import org.junit.Test;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,11 +82,11 @@ public class GitHubIssueFormatterTest {
     System.out.println(md);
 
     // Write to file
-    try {
-      Files.writeString(Path.of("test.md"), md);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    // try {
+    // Files.writeString(Path.of("test.md"), md);
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
 
     Pattern pattern = Pattern.compile(classNameHeader);
     Matcher matcher = pattern.matcher(md);
@@ -98,17 +98,21 @@ public class GitHubIssueFormatterTest {
    */
   @Test
   public void testFormatResultsMultipleClasses() {
-    // Populate database
-    List<Result> results = new ArrayList<>();
-    results.add(new Result(Constants.res_oldWay));
-    results.add(new Result(Constants.res_newWay));
-    results.add(new Result(Constants.res_newWay_AnotherClassName));
+    List<Result> old, neew, another;
+    old = new ArrayList<>();
+    neew = new ArrayList<>();
+    another = new ArrayList<>();
+    old.add(new Result(Constants.res_oldWay));
+    old.add(new Result(Constants.res_oldWay));
+    neew.add(new Result(Constants.res_newWay));
+    another.add(new Result(Constants.res_newWay_AnotherClassName));
+
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", results));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", old));
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", neew));
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.AnotherClassName.newWay", results));
+        new Method("com.szatmary.peter.AnotherClassName.newWay", another));
 
     String firstClassNameHeader = "# SampleBenchmarkTest";
     String lastClassNameHeader = "# AnotherClassName";
@@ -116,17 +120,23 @@ public class GitHubIssueFormatterTest {
 
     String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT).strip();
     System.out.println("Actual result");
-    System.out.println(md);
+
+    // Write to file
+    try {
+      Files.writeString(Path.of("test.md"), md);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     int firstMethodPos = md.indexOf(methodDuplicate);
-    int lastMethodPos = md.indexOf(methodDuplicate);
+    int lastMethodPos = md.indexOf(methodDuplicate, firstMethodPos + 1);
     int firstClassPos = md.indexOf(firstClassNameHeader);
     int lastClassPos = md.indexOf(lastClassNameHeader);
 
     // check that duplicate method is in markdown exactly two times
     assertTrue(firstMethodPos < lastMethodPos);
     assertNotEquals(lastMethodPos, -1);
-    assertEquals(md.indexOf(methodDuplicate), -1);
+    assertEquals(md.indexOf(methodDuplicate, lastMethodPos + 1), -1);
 
     // check that the first one is sub header of first class
     assertTrue((firstMethodPos > firstClassPos) && (firstMethodPos < lastClassPos));
