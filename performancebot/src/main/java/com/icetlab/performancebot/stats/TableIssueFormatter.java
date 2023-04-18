@@ -34,7 +34,7 @@ public class TableIssueFormatter implements BenchmarkIssueFormatter {
       node = new ObjectMapper().readTree(jmhResults);
       String installationId = node.get("installation_id").asText();
       String repoId = node.get("repo_id").asText();
-      List<String> methodNames = FormatterUtils.getMethodsFromCurrentRun(jmhResults);
+      List<String> methodNames = FormatterUtils.getMethodNamesFromCurrentRun(jmhResults);
       Set<Method> methods = installationService.getMethodsFromRepo(installationId, repoId).stream()
           .filter(method -> methodNames.contains(method.getMethodName()))
           .collect(Collectors.toSet());

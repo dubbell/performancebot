@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.model.Method;
+import java.util.stream.Collectors;
 
 public class FormatterUtils {
   /**
@@ -86,7 +87,7 @@ public class FormatterUtils {
     }
   }
 
-  public static List<String> getMethodsFromCurrentRun(String jmhResults) {
+  public static List<String> getMethodNamesFromCurrentRun(String jmhResults) {
     JsonNode node;
     try {
       node = new ObjectMapper().readTree(jmhResults);
@@ -96,5 +97,11 @@ public class FormatterUtils {
     } catch (JsonProcessingException e) {
       return null;
     }
+  }
+
+  public static Set<Method> filterMethodsFromCurrentRun(Set<Method> allMethods, List<String> methodNamesToFilterBy) {
+    return allMethods.stream()
+      .filter(method -> methodNamesToFilterBy.contains(method.getMethodName()))
+      .collect(Collectors.toSet());
   }
 }
