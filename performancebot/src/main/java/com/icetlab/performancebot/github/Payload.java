@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.controller.InstallationController;
+import com.icetlab.performancebot.stats.BenchmarkIssueFormatter;
 import com.icetlab.performancebot.stats.TableIssueFormatter;
 import java.net.URI;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 public class Payload {
 
   @Autowired
-  private TableIssueFormatter gitHubIssueFormatter;
+  private GitHubIssueFormatter gitHubIssueFormatter;
   @Autowired
   private InstallationController database;
   private KubernetesClient kubernetesClient;
