@@ -18,18 +18,13 @@ public class ConfigurationFactory {
     ConfigData configData = new ObjectMapper(new YAMLFactory())
         .readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
 
-    if (configData.getLanguage().equalsIgnoreCase("java")) {
-      if (configData.getBuildTool().equalsIgnoreCase("maven")) {
-        return new MavenConfiguration(configData);
-      } else if (configData.getBuildTool().equalsIgnoreCase("gradle")) {
-        return new GradleConfiguration(configData);
-      } else {
-        throw new Exception(
-            "Invalid project configuration for the performance bot: invalid build tool.");
-      }
+    if (configData.getBuildTool().equalsIgnoreCase("maven")) {
+      return new MavenConfiguration(configData);
+    } else if (configData.getBuildTool().equalsIgnoreCase("gradle")) {
+      return new GradleConfiguration(configData);
     } else {
       throw new Exception(
-          "Invalid project configuration for the performance bot: invalid language.");
+          "Invalid project configuration for the performance bot: invalid build tool.");
     }
   }
 }
