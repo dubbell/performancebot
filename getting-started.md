@@ -38,7 +38,7 @@ This step covers generating private keys to sign access token requests, as well 
 ### The App ID
 
 1. Go to your bot settings and copy the App ID under the About section.
-2. Go to `src/main/resources/application.properties` and replace `<your app id>` with your app ID.
+2. Go to `performancebot/src/main/resources/application.properties` and replace `<your app id>` with your app ID.
 
 ### Generating a private key
 
@@ -47,9 +47,9 @@ When you have finished creating your app, it is time to generate a private key i
 1. On GitHub, go to `Settings / Developer Settings` and select `Edit` on your GitHub App.
 2. Scroll down to `Private keys`, and press generate.
 3. You will get a file looking like `<username.date>.private-key.pem` in your downloads folder. 
-4. Move it to this repo, and *do not* push or commit it, it contains sensitive information! 
+4. Move it to this to the `performancebot/src/main/resources` directory, and *do not* push or commit it, it contains sensitive information! 
    - If you happen to do it, simply remove it and go back to your account settings and press `Delete`.
-5. Go to `src/main/resources/application.properties` and replace `dummy.pem` with what your file is called.
+5. Go to `performancebot/src/main/resources/application.properties` and replace `dummy.pem` with what your file is called.
 
 ### The webhook URL
 
@@ -76,6 +76,33 @@ Web Interface                 http://127.0.0.1:4040
 2. Copy it to your clipboard.
 3. Paste it in the `Webhook URL` field and **ADD** `/payload` to the end of it. It should look like this: `https://b9b9-33-22-11-000.eu.ngrok.io/payload`.
 4. In `src/main/resources/application.properties`, add `server.port=7000`. It has to be the same as the one used in the ngrok command! This is because your computer is listening on that port and since ngrok is pointing the tunnel to that port, we need it to receive updates as webhooks from GitHub.
+
+### Connecting to MongoDB
+
+For the PerformanceBot to connect to the MongoDB instance running on your computer, 
+the following entries needs to be added to `performancebot/src/main/resources/application.properties`:
+- `spring.data.mongodb.database=perfbot`
+- `spring.data.mongodb.host=<mongodb-ip-address>`
+- `spring.data.mongodb.port=27017 # default port
+
+### Deploying to Kubernetes
+For the application to be deployed to Kubernetes, first images have to be created of the 
+PerformanceBot and the BenchmarkWorker and uploaded to DockerHub. 
+If you have created a DockerHub account, then the next step is to edit `k8s-perfbot.yaml` 
+and change the image URLS in the `perfbot` and `benchmark-worker` deployments to `docker.io/<your-dockerhub-username>/perfbot:latest` 
+and `docker.io/<your-dockerhub-username>/benchmark-worker:latest`. Also make sure that the port number in the `perfbot-ingress` is set to the same port
+specified in `application.properties`.
+
+Once this is done, you can then run the `build_images.sh` shell script which will ask for your
+DockerHub username, after which it will compile the `performancebot` and 
+`benchmarkworker` modules, build images, and finally push the images to 
+your DockerHub account.
+
+The final step is to create a Kubernetes cluster (you can use Minikube for testing) and install kubectl, which is a 
+command-line tool used to execute this command: `kubectl apply -f k8s-perfbot.yaml`. This
+command will create the pods, services, etc., specified in the `k8s-perfbot.yaml`.
+To change the number of `benchmark-worker` or `perfbot` pods running in the cluster,
+you can simply change the value `spec.replicas` in their deployments in `k8s-perfbot.yaml`.
 
 ### Using it
 
