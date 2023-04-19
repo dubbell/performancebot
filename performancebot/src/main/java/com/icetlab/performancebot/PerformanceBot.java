@@ -1,8 +1,8 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.Issue;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.GitHubIssueManager;
+import com.icetlab.performancebot.github.GitHubWebhookHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableMongoRepositories
 public class PerformanceBot {
 
-  private static final Issue issue = new Issue();
   @Autowired
-  private Payload payloadHandler;
+  private GitHubWebhookHandler webhookHandler;
   @Autowired
   private InstallationController database;
 
@@ -54,11 +53,12 @@ public class PerformanceBot {
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
       @RequestBody String payload) {
-    payloadHandler.handlePayload(eventType, payload);
+    webhookHandler.handlePayload(eventType, payload);
   }
 
   /**
-   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the results to the database.
+   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the
+   * results to the database.
    *
    * @param payload JSON string with run results
    */
@@ -66,10 +66,6 @@ public class PerformanceBot {
   public void addRun(@RequestBody String payload) {
     System.out.println("Adding run results to database...");
     database.addRun(payload);
-    payloadHandler.handleResults(payload);
-  }
-
-  public static Issue getIssue() {
-    return issue;
+    webhookHandler.handleResults(payload);
   }
 }

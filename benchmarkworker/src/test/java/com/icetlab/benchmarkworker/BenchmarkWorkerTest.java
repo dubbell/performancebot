@@ -126,6 +126,7 @@ public class BenchmarkWorkerTest {
 
       System.out.println(result);
 
+
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 
       // check if project was compiled correctly

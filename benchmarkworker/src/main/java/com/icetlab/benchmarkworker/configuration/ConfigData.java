@@ -6,6 +6,7 @@ import java.util.List;
  * Class representing the contents of a .yaml configuration file.
  */
 public class ConfigData {
+
   private String buildTool; // maven or gradle
   private String options; // jmh options
   private List<BuildTask> buildTasks; // tasks executed to build project, each containing a project path and task name
