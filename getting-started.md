@@ -83,7 +83,7 @@ For the PerformanceBot to connect to the MongoDB instance running on your comput
 the following entries needs to be added to `performancebot/src/main/resources/application.properties`:
 - `spring.data.mongodb.database=perfbot`
 - `spring.data.mongodb.host=<mongodb-ip-address>`
-- `spring.data.mongodb.port=27017 # default port
+- `spring.data.mongodb.port=27017 # default port`
 
 ### Deploying to Kubernetes
 For the application to be deployed to Kubernetes, first images have to be created of the 
