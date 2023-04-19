@@ -89,7 +89,7 @@ the following entries needs to be added to `performancebot/src/main/resources/ap
 For the application to be deployed to Kubernetes, first images have to be created of the 
 PerformanceBot and the BenchmarkWorker and uploaded to DockerHub. 
 If you have created a DockerHub account, then the next step is to edit `k8s-perfbot.yaml` 
-and change the image URLS in the `perfbot` and `benchmark-worker` deployments to `docker.io/<your-dockerhub-username>/perfbot:latest` 
+and change the image URLs in the `perfbot` and `benchmark-worker` deployments to `docker.io/<your-dockerhub-username>/perfbot:latest` 
 and `docker.io/<your-dockerhub-username>/benchmark-worker:latest`. Also make sure that the port number in the `perfbot-ingress` is set to the same port
 specified in `application.properties`.
 
@@ -100,7 +100,7 @@ your DockerHub account.
 
 The final step is to create a Kubernetes cluster (you can use Minikube for testing) and install kubectl, which is a 
 command-line tool used to execute this command: `kubectl apply -f k8s-perfbot.yaml`. This
-command will create the pods, services, etc., specified in the `k8s-perfbot.yaml`.
+command will create the pods, services, etc., specified in the `k8s-perfbot.yaml` file.
 To change the number of `benchmark-worker` or `perfbot` pods running in the cluster,
 you can simply change the value `spec.replicas` in their deployments in `k8s-perfbot.yaml`.
 
@@ -114,7 +114,7 @@ The only required configuration that needs to be in `perfbot.yaml` is the
 `buildTool` of the project, which can be either Maven or Gradle. Other than that, there are 
 an additional three optional configurations: `options`, `buildTasks` and `jmhJar`.
 - `options`
-  - Should look like this: `[regexp*] [additional JMH options]`, where the
+  - Is a string that should look like this: `[regexp*] [additional JMH options]`, where the
   regular expressions specify which benchmarks to run, and the additional options can be any
   configuration allowed by the [JMH CLI](https://github.com/guozheng/jmh-tutorial/blob/master/README.md).
   Is empty by default.
@@ -129,7 +129,7 @@ an additional three optional configurations: `options`, `buildTasks` and `jmhJar
   `buildTasks` are completed. By default this is set to `target/benchmarks.jar` for Maven projects
   and `build/libs/<file-name-containing-jmh>.jar` for Gradle projects.
 
-Example perfbot.yaml file:
+Example `perfbot.yaml` file:
 ```
 buildTool: maven
 options: "JMHTestClass.test1 AnotherJMHTestClass.test3 -i 1"
@@ -142,8 +142,8 @@ buildTasks:
   - package
 jmhJar: jmh-tests/target/benchmarks.jar
 ```
-
-Once this file is added to a branch, then the benchmarks should be run as soon as a 
+----
+Once a `perfbot.yaml` file is added to a branch, then the benchmarks should be run as soon as a 
 pull request is opened with the title `[performancebot]`. And then, once the benchmarks
 have been executed, the results will be sent back to the repository as a GitHub issue.
 
