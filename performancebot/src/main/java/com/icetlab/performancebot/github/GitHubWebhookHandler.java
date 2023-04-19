@@ -41,11 +41,26 @@ public class GitHubWebhookHandler {
   }
 
   /**
+   * Handles the payload received from GitHub when the results of a performance test are ready.
+   * 
+   * @param payload the payload received from BenchmarkWorker
+   */
+  public void handleResults(String payload) {
+    JsonNode node = getPayloadAsNode(payload);
+    String installationId = node.get("installation_id").asText();
+    String issueUrl = node.get("issue_url").asText();
+    String name = node.get("name").asText();
+    String formattedResults = gitHubIssueFormatter.formatBenchmarkIssue(payload);
+    GitHubIssueManager.getInstance().createIssue(issueUrl, "Results for " + name, formattedResults,
+        installationId);
+  }
+
+  /**
    * Handles the payload received from GitHub when a new installation is created.
    *
    * @param payload the payload received from GitHub
    */
-  void handleInstall(String payload) {
+  private void handleInstall(String payload) {
     JsonNode node = getPayloadAsNode(payload);
     boolean isNewInstall = node.get("action").asText().equals("created");
     String installationId = node.get("installation").get("id").asText();
@@ -64,29 +79,71 @@ public class GitHubWebhookHandler {
    *
    * @param payload the payload received from GitHub
    */
-  void handlePullRequest(String payload) {
-    String ping = "[performancebot]";
+
+  private void handlePullRequest(String payload) {
     JsonNode node = getPayloadAsNode(payload);
     boolean pullRequestWasOpened = node.get("action").asText().equals("opened");
     boolean pullRequestReceivedComment = !node.get("issue").isNull();
     if (!pullRequestWasOpened && !pullRequestReceivedComment) {
       return;
     }
+
+    if (!containsPing(node, pullRequestReceivedComment)) {
+      return;
+    }
+
+    Map<String, Object> requestBody =
+        createRequestBodyForBenchmarkWorker(node, pullRequestReceivedComment);
+
+    sendRequestToBenchmarkWorker(requestBody);
+  }
+
+
+  /**
+   * Converts the payload received from GitHub to a JsonNode.
+   *
+   * @param payload the payload received from GitHub
+   * @return the payload as a JsonNode
+   */
+  private JsonNode getPayloadAsNode(String payload) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return mapper.readTree(payload);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("Invalid JSON payload: " + payload, e);
+    }
+  }
+
+  /**
+   * Finds the ip and port of the benchmark-worker kubernetes service.
+   */
+  private String getWorkerServiceAddress() {
+    if (kubernetesClient == null)
+      kubernetesClient = new KubernetesClientBuilder().build();
+
+    Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
+    int port = service.getSpec().getPorts().get(0).getNodePort();
+    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0)
+        .getAddress();
+    return ip + ":" + port;
+  }
+
+  private boolean containsPing(JsonNode node, boolean pullRequestReceivedComment) {
+    String ping = "[performancebot]";
     if (pullRequestReceivedComment) {
       String comment = node.get("comment").get("body").asText();
-      if (!comment.toLowerCase().contains(ping)) {
-        return;
-      }
+      return comment.toLowerCase().contains(ping);
     } else {
       boolean pullRequestBodyContainsPing =
           node.get("pull_request").get("body").asText().toLowerCase().contains(ping);
       boolean pullRequestTitleContainsPing =
           node.get("pull_request").get("title").asText().toLowerCase().contains(ping);
-      if (!pullRequestBodyContainsPing && !pullRequestTitleContainsPing) {
-        return;
-      }
+      return pullRequestBodyContainsPing || pullRequestTitleContainsPing;
     }
+  }
 
+  private Map<String, Object> createRequestBodyForBenchmarkWorker(JsonNode node,
+      boolean pullRequestReceivedComment) {
     String installationId = node.get("installation").get("id").asText();
     String issuesUrl = pullRequestReceivedComment ? node.get("issue").get("url").asText()
         : node.get("pull_request").get("issue_url").asText();
@@ -104,6 +161,10 @@ public class GitHubWebhookHandler {
     requestBody.put("issue_url", issuesUrl);
     requestBody.put("name", name);
 
+    return requestBody;
+  }
+
+  private void sendRequestToBenchmarkWorker(Map<String, Object> requestBody) {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
@@ -112,47 +173,4 @@ public class GitHubWebhookHandler {
     restTemplate.postForEntity(URI.create(containerIp + "/task"), requestEntity, String.class);
   }
 
-  /**
-   * Finds the ip and port of the benchmark-worker kubernetes service.
-   */
-  private String getWorkerServiceAddress() {
-    if (kubernetesClient == null)
-      kubernetesClient = new KubernetesClientBuilder().build();
-
-    Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
-    int port = service.getSpec().getPorts().get(0).getNodePort();
-    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0)
-        .getAddress();
-    return ip + ":" + port;
-  }
-
-  /**
-   * Handles the payload received from GitHub when the results of a performance test are ready.
-   * 
-   * @param payload the payload received from BenchmarkWorker
-   */
-  public void handleResults(String payload) {
-    JsonNode node = getPayloadAsNode(payload);
-    String installationId = node.get("installation_id").asText();
-    String issueUrl = node.get("issue_url").asText();
-    String name = node.get("name").asText();
-    String formattedResults = gitHubIssueFormatter.formatBenchmarkIssue(payload);
-    GitHubIssueManager.getInstance().createIssue(issueUrl, "Results for " + name, formattedResults,
-        installationId);
-  }
-
-  /**
-   * Converts the payload received from GitHub to a JsonNode.
-   *
-   * @param payload the payload received from GitHub
-   * @return the payload as a JsonNode
-   */
-  private JsonNode getPayloadAsNode(String payload) {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.readTree(payload);
-    } catch (JsonProcessingException e) {
-      throw new IllegalArgumentException("Invalid JSON payload: " + payload, e);
-    }
-  }
 }
