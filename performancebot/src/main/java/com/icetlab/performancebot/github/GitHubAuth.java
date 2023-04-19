@@ -48,10 +48,12 @@ public class GitHubAuth {
     restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
     java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-    GitHubConfig gitHubConfig =
-        new AnnotationConfigApplicationContext(GitHubConfig.class).getBean(GitHubConfig.class);
-    appId = gitHubConfig.getAppId();
-    privateKeyPath = gitHubConfig.getPrivateKeyPath();
+    try (AnnotationConfigApplicationContext context =
+        new AnnotationConfigApplicationContext(GitHubConfig.class)) {
+      GitHubConfig gitHubConfig = context.getBean(GitHubConfig.class);
+      appId = gitHubConfig.getAppId();
+      privateKeyPath = gitHubConfig.getPrivateKeyPath();
+    }
     try { // TODO: Not sure if good practice
       fetchAndPopulateInstallationIds();
     } catch (Throwable e) {
