@@ -1,6 +1,6 @@
 package com.icetlab.performancebot.github;
 
-import static com.icetlab.performancebot.PerformanceBot.getIssue;
+import static com.icetlab.performancebot.PerformanceBot.getIssueManager;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -138,7 +138,8 @@ public class Payload {
     String issueUrl = node.get("issue_url").asText();
     String name = node.get("name").asText();
     String formattedResults = gitHubIssueFormatter.formatBenchmarkIssue(payload);
-    getIssue().createIssue(issueUrl, "Results for " + name, formattedResults, installationId);
+    getIssueManager().createIssue(issueUrl, "Results for " + name, formattedResults,
+        installationId);
   }
 
   /**

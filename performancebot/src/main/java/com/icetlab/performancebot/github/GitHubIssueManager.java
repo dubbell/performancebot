@@ -12,11 +12,11 @@ import org.springframework.web.client.RestTemplate;
  * Responsible for creating issues which are sent to the GitHub repo sending the initial payload.
  */
 @Component
-public class Issue {
+public class GitHubIssueManager {
 
   Auth auth;
 
-  public Issue() {
+  public GitHubIssueManager() {
     auth = new Auth();
   }
 
@@ -24,8 +24,8 @@ public class Issue {
    * Creates an issue on the GitHub repo.
    *
    * @param endpoint the endpoint to send the issue to
-   * @param title    the title of the issue
-   * @param message  the body of the issue
+   * @param title the title of the issue
+   * @param message the body of the issue
    */
   public void createIssue(String endpoint, String title, String message, String id) {
     String token = auth.getAccessTokenFromId(id);

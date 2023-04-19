@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 public class IssueTest {
 
-  private Issue issue;
+  private GitHubIssueManager issue;
   private Auth auth;
   private RestTemplate restTemplate;
 
   @BeforeEach
   public void setUp() {
-    issue = spy(new Issue());
+    issue = spy(new GitHubIssueManager());
     auth = mock(Auth.class);
     issue.auth = auth;
     restTemplate = mock(RestTemplate.class);
