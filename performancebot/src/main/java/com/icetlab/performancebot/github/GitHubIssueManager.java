@@ -15,9 +15,17 @@ import org.springframework.web.client.RestTemplate;
 public class GitHubIssueManager {
 
   Auth auth;
+  private static GitHubIssueManager instance;
 
-  public GitHubIssueManager() {
+  private GitHubIssueManager() {
     auth = new Auth();
+  }
+
+  public static GitHubIssueManager getInstance() {
+    if (instance == null) {
+      instance = new GitHubIssueManager();
+    }
+    return instance;
   }
 
   /**
@@ -26,6 +34,7 @@ public class GitHubIssueManager {
    * @param endpoint the endpoint to send the issue to
    * @param title the title of the issue
    * @param message the body of the issue
+   * @param id the installation id from GitHub
    */
   public void createIssue(String endpoint, String title, String message, String id) {
     String token = auth.getAccessTokenFromId(id);

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableMongoRepositories
 public class PerformanceBot {
 
-  private static final GitHubIssueManager issueManager = new GitHubIssueManager();
   @Autowired
   private Payload payloadHandler;
   @Autowired
@@ -68,9 +67,5 @@ public class PerformanceBot {
     System.out.println("Adding run results to database...");
     database.addRun(payload);
     payloadHandler.handleResults(payload);
-  }
-
-  public static GitHubIssueManager getIssueManager() {
-    return issueManager;
   }
 }

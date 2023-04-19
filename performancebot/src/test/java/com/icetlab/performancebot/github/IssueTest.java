@@ -19,7 +19,7 @@ public class IssueTest {
 
   @BeforeEach
   public void setUp() {
-    issue = spy(new GitHubIssueManager());
+    issue = spy(GitHubIssueManager.getInstance());
     auth = mock(Auth.class);
     issue.auth = auth;
     restTemplate = mock(RestTemplate.class);
