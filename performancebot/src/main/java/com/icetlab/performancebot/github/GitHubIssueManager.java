@@ -14,11 +14,11 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GitHubIssueManager {
 
-  Auth auth;
+  GitHubAuth auth;
   private static GitHubIssueManager instance;
 
   private GitHubIssueManager() {
-    auth = new Auth();
+    auth = new GitHubAuth();
   }
 
   public static GitHubIssueManager getInstance() {

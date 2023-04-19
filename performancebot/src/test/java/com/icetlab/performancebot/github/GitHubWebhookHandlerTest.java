@@ -7,13 +7,13 @@ import org.mockito.InjectMocks;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class PayloadTest {
+public class GitHubWebhookHandlerTest {
   @InjectMocks
-  private Payload payloadHandler;
+  private GitHubWebhookHandler payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new Payload());
+    payloadHandler = spy(new GitHubWebhookHandler());
   }
 
   @Test

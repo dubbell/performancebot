@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class Payload {
+public class GitHubWebhookHandler {
 
   @Autowired
   private GitHubIssueFormatter gitHubIssueFormatter;
@@ -58,7 +58,9 @@ public class Payload {
   }
 
   /**
-   * Handles the payload received from GitHub when a pull request is opened.
+   * Handles the payload received from GitHub when a pull request event is received. If it does not
+   * contain the ping <code>[performancebot]</code> in the message body or title, the request is
+   * ignored.
    *
    * @param payload the payload received from GitHub
    */
@@ -70,7 +72,6 @@ public class Payload {
     if (!pullRequestWasOpened && !pullRequestReceivedComment) {
       return;
     }
-
     if (pullRequestReceivedComment) {
       String comment = node.get("comment").get("body").asText();
       if (!comment.toLowerCase().contains(ping)) {
