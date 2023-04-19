@@ -164,6 +164,19 @@ public class InstallationService {
 
     throw new NoSuchElementException("No such repo id");
   }
+  
+  /**
+   * Deletes an installation and all its related data from the database.
+   * Throws NoSuchElementException if the installation does not exist in the database.
+   * @param installationId the id of the installation to be deleted
+   */
+  public void deleteInstallationById(String installationId) {
+    if (!installationExists(installationId)) {
+      throw new NoSuchElementException("No such installation id");
+    }
+    // remove it otherwise
+    repo.deleteById(installationId);
+  }
 
   /**
    * Checks if an installation exists
