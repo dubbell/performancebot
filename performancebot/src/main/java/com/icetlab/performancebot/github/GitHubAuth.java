@@ -32,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Authorizes and authenticates the bot to access the target repository.
  */
-public class Auth {
+public class GitHubAuth {
 
   private final String appId;
   private final String privateKeyPath;
@@ -44,14 +44,16 @@ public class Auth {
   /**
    * Creates a new Auth object.
    */
-  public Auth() {
+  public GitHubAuth() {
     restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
     java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-    GitHubConfig gitHubConfig =
-        new AnnotationConfigApplicationContext(GitHubConfig.class).getBean(GitHubConfig.class);
-    appId = gitHubConfig.getAppId();
-    privateKeyPath = gitHubConfig.getPrivateKeyPath();
+    try (AnnotationConfigApplicationContext context =
+        new AnnotationConfigApplicationContext(GitHubConfig.class)) {
+      GitHubConfig gitHubConfig = context.getBean(GitHubConfig.class);
+      appId = gitHubConfig.getAppId();
+      privateKeyPath = gitHubConfig.getPrivateKeyPath();
+    }
     try { // TODO: Not sure if good practice
       fetchAndPopulateInstallationIds();
     } catch (Throwable e) {

@@ -8,7 +8,7 @@ import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.GitHubWebhookHandler;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -60,11 +60,11 @@ public class InstallationServiceTest {
           """;
 
   @InjectMocks
-  private Payload payloadHandler;
+  private GitHubWebhookHandler payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new Payload());
+    payloadHandler = spy(new GitHubWebhookHandler());
   }
 
   @InjectMocks
@@ -238,7 +238,7 @@ public class InstallationServiceTest {
     assertEquals(methods.size(), 2);
     assertEquals(methods.iterator().next().getRunResults().size(), 1);
   }
-  
+
   @Test
   public void testDeleteInstallationById() {
     // Add an installation
@@ -262,7 +262,7 @@ public class InstallationServiceTest {
     installationService.addInstallation(id2);
     installationService.addInstallation(id3);
 
-    //Add all the ids to be able to include them in the query
+    // Add all the ids to be able to include them in the query
     List<String> ids = Arrays.asList(id1, id2, id3);
 
     // Delete all installations using the deleteInstallationById()
@@ -273,7 +273,7 @@ public class InstallationServiceTest {
     Query q = Query.query(where("_id").in(ids));
     assertEquals(mongoTemplate.find(q, Installation.class).size(), 0);
   }
-  
+
   @Test
   public void testDeleteInstallationByIdNoSuchElementException() {
     // Some invalid id
