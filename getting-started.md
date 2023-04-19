@@ -106,10 +106,46 @@ you can simply change the value `spec.replicas` in their deployments in `k8s-per
 
 ### Using it
 
-Once all of the above steps are finished, you can create pull requests in your own repositiories and you will receive webhook payloads if you are running ngrok and the PerformanceBot with the right config.
+To use the Performance Bot, you first need to install the GitHub app in your 
+repository. Once this is done, you need to add a file called `perfbot.yaml` in
+the root of your repository. This file will tell the bot how to run the benchmarks.
+
+The only required configuration that needs to be in `perfbot.yaml` is the 
+`buildTool` of the project, which can be either Maven or Gradle. Other than that, there are 
+an additional three optional configurations: `options`, `buildTasks` and `jmhJar`.
+- `options`
+  - Should look like this: `[regexp*] [additional JMH options]`, where the
+  regular expressions specify which benchmarks to run, and the additional options can be any
+  configuration allowed by the [JMH CLI](https://github.com/guozheng/jmh-tutorial/blob/master/README.md).
+  Is empty by default.
+- `buildTasks`
+  - A list of tasks that needs to be executed to compile the project into a 
+  jar file which can execute the benchmarks. Each item should contain a `path`, which is the path to the `pom.xml`file for Maven 
+  projects or the `build.gradle` file for Gradle projects. It should also contain a list of
+  `tasks`, where each item is a string, representing either a Maven goal or a Gradle task
+  to be executed. By default this is set to the root of the repository, with either the Gradle task `jmhJar` or the Maven goal `package`. 
+- `jmhJar`
+  - The path to the JMH jar file which should be created after all the tasks in 
+  `buildTasks` are completed. By default this is set to `target/benchmarks.jar` for Maven projects
+  and `build/libs/<file-name-containing-jmh>.jar` for Gradle projects.
+
+Example perfbot.yaml file:
+```
+buildTool: maven
+options: "JMHTestClass.test1 AnotherJMHTestClass.test3 -i 1"
+buildTasks:
+- path: pom.xml
+  tasks:
+  - package
+- path: jmh-tests/pom.xml
+  tasks:
+  - package
+jmhJar: jmh-tests/target/benchmarks.jar
+```
+
+Once this file is added to a branch, then the benchmarks should be run as soon as a 
+pull request is opened with the title `[performancebot]`. And then, once the benchmarks
+have been executed, the results will be sent back to the repository as a GitHub issue.
 
 >**Tip**: if you don't want to spam new PRs all the time, use the replay button to resend a payload in ngrok's web interface! 
 
-## 2. BenchmarkWorker 
-
-Remember to start the worker by running it in your IDE or from the command line so you can run jobs. Nothing else to be done here, don't close the window once started.
