@@ -4,14 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * Responsible for creating issues which are sent to the GitHub repo sending the initial payload.
  */
-@Component
 public class GitHubIssueManager {
 
   GitHubAuth auth;
