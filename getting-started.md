@@ -91,7 +91,7 @@ PerformanceBot and the BenchmarkWorker and uploaded to DockerHub.
 If you have created a DockerHub account, then the next step is to edit `k8s-perfbot.yaml` 
 and change the image URLs in the `perfbot` and `benchmark-worker` deployments to `docker.io/<your-dockerhub-username>/perfbot:latest` 
 and `docker.io/<your-dockerhub-username>/benchmark-worker:latest`. Also make sure that the port number in the `perfbot-ingress` is set to the same port
-specified in `application.properties`.
+specified in `performancebot/src/main/resources/application.properties`.
 
 Once this is done, you can then run the `build_images.sh` shell script which will ask for your
 DockerHub username, after which it will compile the `performancebot` and 
