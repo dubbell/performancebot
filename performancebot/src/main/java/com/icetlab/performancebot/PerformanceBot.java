@@ -1,8 +1,7 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.GitHubIssueManager;
-import com.icetlab.performancebot.github.GitHubWebhookHandler;
+import com.icetlab.performancebot.github.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PerformanceBot {
 
   @Autowired
-  private GitHubWebhookHandler webhookHandler;
+  private PayloadManager payloadHandler;
   @Autowired
   private InstallationController database;
 
@@ -53,7 +52,11 @@ public class PerformanceBot {
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
       @RequestBody String payload) {
-    webhookHandler.handlePayload(eventType, payload);
+    switch (eventType) {
+      case "installation" -> payloadHandler.handleInstall(payload);
+      case "pull_request", "issue_comment" -> payloadHandler.handlePullRequest(payload);
+      default -> System.out.println("Received unsupported event type: " + eventType);
+    }
   }
 
   /**
@@ -64,8 +67,7 @@ public class PerformanceBot {
    */
   @PostMapping("/benchmark")
   public void addRun(@RequestBody String payload) {
-    System.out.println("Adding run results to database...");
     database.addRun(payload);
-    webhookHandler.handleResults(payload);
+    payloadHandler.handleResults(payload);
   }
 }
