@@ -5,6 +5,7 @@ import com.icetlab.performancebot.github.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @EnableMongoRepositories
+@EnableMongoAuditing
 public class PerformanceBot {
 
   @Autowired
@@ -51,14 +53,15 @@ public class PerformanceBot {
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
-      @RequestBody String payload) {
+    @RequestBody String payload) {
     boolean handled;
     switch (eventType) {
       case "installation" -> handled = payloadHandler.handleInstall(payload);
       case "pull_request", "issue_comment" -> handled = payloadHandler.handlePullRequest(payload);
       default -> handled = false;
     }
-    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled", eventType);
+    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled",
+      eventType);
     System.out.println(statusMessage);
   }
 
