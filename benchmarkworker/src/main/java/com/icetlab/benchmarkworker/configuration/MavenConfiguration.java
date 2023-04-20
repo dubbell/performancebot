@@ -52,7 +52,6 @@ public class MavenConfiguration extends JMHConfiguration {
       }
     }
 
-    // cleans and then compiles project
     Invoker invoker = new DefaultInvoker();
     if (System.getProperty("os.name").toLowerCase().contains("win")) // if windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
