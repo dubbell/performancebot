@@ -6,10 +6,12 @@ import java.util.List;
  * Class representing the contents of a .yaml configuration file.
  */
 public class ConfigData {
-  private String buildTool;
-  private String options;
-  private List<String> gradleBuildTasks;
-  private String jmhJar;
+
+  private String buildTool; // maven or gradle
+  private String options; // jmh options
+  private List<BuildTask> buildTasks; // tasks executed to build project, each containing a project path and task name
+  private String jmhJar; // path to jar once project has been built using the buildTasks
+
 
   public String getBuildTool() {
     return buildTool;
@@ -19,12 +21,12 @@ public class ConfigData {
     this.buildTool = buildTool;
   }
 
-  public List<String> getGradleBuildTasks() {
-    return gradleBuildTasks;
+  public List<BuildTask> getBuildTasks() {
+    return buildTasks;
   }
 
-  public void setGradleBuildTasks(List<String> gradleBuildTasks) {
-    this.gradleBuildTasks = gradleBuildTasks;
+  public void setBuildTasks(List<BuildTask> buildTasks) {
+    this.buildTasks = buildTasks;
   }
 
   public String getOptions() {

@@ -78,9 +78,9 @@ public abstract class JMHConfiguration implements Configuration {
    * Command to run benchmarks.
    */
   private String getJmhCommand() {
-    String jar = configData.getJmhJar() == null ? getJmhJar() : configData.getJmhJar();
+    String jar = configData.getJmhJar() == null ? getJmhJar() : "benchmark_directory/" + configData.getJmhJar();
     String options = configData.getOptions() == null ? "" : configData.getOptions();
-    return "java -jar " + jar + " " + options + "-rf json";
+    return "java -jar " + jar + " " + options + " -rf json";
   }
 
 }
