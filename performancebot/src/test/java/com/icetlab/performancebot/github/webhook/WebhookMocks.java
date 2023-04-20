@@ -40,53 +40,53 @@ class WebhookMocks {
 
   final static String PR_WITHOUT_PING = """
         {
-          "action": "reopened",
-          "number": 3,
-          "pull_request": {
-              "url": "https://api.github.com/repos/samkaj/bouncing_balls/pulls/3",
-              "id": 1319613051,
-              "html_url": "https://github.com/samkaj/bouncing_balls/pull/3",
-              "diff_url": "https://github.com/samkaj/bouncing_balls/pull/3.diff",
-              "patch_url": "https://github.com/samkaj/bouncing_balls/pull/3.patch",
-              "issue_url": "https://api.github.com/repos/samkaj/bouncing_balls/issues/3",
-              "state": "open",
-              "locked": false,
-              "title": "Samuels implementation",
-              "user": {
-                  "login": "samkaj",
-                  "id": 23452345,
-              },
-              "body": null,
-              "head": {
-                  "label": "samkaj:samuel",
-                  "ref": "samuel",
-                  "sha": "3fe70638a129bd47c71d0211f2e82a44ba71e50e",
-                  "user": {
-                      "login": "samkaj",
-                      "id": 23452345,
+            "action":"reopened",
+            "number":3,
+            "pull_request":{
+               "url":"https://api.github.com/repos/samkaj/bouncing_balls/pulls/3",
+               "id":1319613051,
+               "html_url":"https://github.com/samkaj/bouncing_balls/pull/3",
+               "diff_url":"https://github.com/samkaj/bouncing_balls/pull/3.diff",
+               "patch_url":"https://github.com/samkaj/bouncing_balls/pull/3.patch",
+               "issue_url":"https://api.github.com/repos/samkaj/bouncing_balls/issues/3",
+               "state":"open",
+               "locked":false,
+               "title":"Samuels implementation",
+               "user":{
+                  "login":"samkaj",
+                  "id":23452345
+               },
+               "body":null,
+               "head":{
+                  "label":"samkaj:samuel",
+                  "ref":"samuel",
+                  "sha":"3fe70638a129bd47c71d0211f2e82a44ba71e50e",
+                  "user":{
+                     "login":"samkaj",
+                     "id":23452345
                   },
-                  "repo": {
-                      "id": 23452345,
-                      "node_id": "R_kgDOIBhzOw",
-                      "name": "bouncing_balls",
-                      "full_name": "samkaj/bouncing_balls",
-                      "private": true,
+                  "repo":{
+                     "id":23452345,
+                     "node_id":"R_kgDOIBhzOw",
+                     "name":"bouncing_balls",
+                     "full_name":"samkaj/bouncing_balls",
+                     "private":true
                   }
-              },
-          },
-          "repository": {
-              "id": 23452345,
-              "node_id": "R_kgDOIBhzOw",
-              "name": "bouncing_balls",
-              "full_name": "samkaj/bouncing_balls",
-              "private": true,
-              "clone_url": "example.com"
-          },
-          "installation": {
-              "id": 36609505,
-              "node_id": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uMzY2MDk1MDU="
-          }
-        }
+               }
+            },
+            "repository":{
+               "id":23452345,
+               "node_id":"R_kgDOIBhzOw",
+               "name":"bouncing_balls",
+               "full_name":"samkaj/bouncing_balls",
+               "private":true,
+               "clone_url":"example.com"
+            },
+            "installation":{
+               "id":36609505,
+               "node_id":"MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uMzY2MDk1MDU="
+            }
+         }
     """;
 
   final static String PR_WITH_PING = """
