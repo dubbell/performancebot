@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class WebhookHandler {
-  abstract void handle(String payload);
+  abstract boolean handle(String payload);
 
   /**
    * Converts the payload received from GitHub to a JsonNode.

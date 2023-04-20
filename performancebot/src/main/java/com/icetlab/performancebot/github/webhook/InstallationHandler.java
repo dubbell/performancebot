@@ -16,16 +16,19 @@ public class InstallationHandler extends WebhookHandler {
    * @param payload the payload received from GitHub
    */
   @Override
-  public void handle(String payload) {
+  public boolean handle(String payload) {
     JsonNode node = getPayloadAsNode(payload);
     boolean isNewInstall = node.get("action").asText().equals("created");
     String installationId = node.get("installation").get("id").asText();
+    if (installationId == null)
+      return false;
     if (!isNewInstall) {
       database.deleteInstallation(installationId);
-      return;
+      return true;
     }
 
     database.addInstallation(installationId);
+    return true;
   }
 
 }

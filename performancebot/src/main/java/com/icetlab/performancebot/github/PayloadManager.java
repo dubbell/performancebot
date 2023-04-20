@@ -20,8 +20,9 @@ public class PayloadManager {
    * 
    * @param payload the payload received from BenchmarkWorker
    */
-  public void handleResults(String payload) {
-    resultsHandler.handle(payload);
+  public boolean handleResults(String payload) {
+    boolean handled = resultsHandler.handle(payload);
+    return handled;
   }
 
   /**
@@ -29,8 +30,9 @@ public class PayloadManager {
    *
    * @param payload the payload received from GitHub
    */
-  public void handleInstall(String payload) {
-    installationHandler.handle(payload);
+  public boolean handleInstall(String payload) {
+    boolean handled = installationHandler.handle(payload);
+    return handled;
   }
 
   /**
@@ -41,8 +43,9 @@ public class PayloadManager {
    * @param payload the payload received from GitHub
    */
 
-  public void handlePullRequest(String payload) {
-    pullRequestHandler.handle(payload);
+  public boolean handlePullRequest(String payload) {
+    boolean handled = pullRequestHandler.handle(payload);
+    return handled;
   }
 
 }

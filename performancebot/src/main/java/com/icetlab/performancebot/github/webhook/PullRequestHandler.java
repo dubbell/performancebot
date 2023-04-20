@@ -1,8 +1,14 @@
 package com.icetlab.performancebot.github.webhook;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -23,27 +29,30 @@ public class PullRequestHandler extends WebhookHandler {
    * @param payload the payload received from GitHub
    */
   @Override
-  public void handle(String payload) {
+  public boolean handle(String payload) {
     JsonNode node = getPayloadAsNode(payload);
-    boolean pullRequestWasOpened = node.get("action").asText().equals("opened");
-    boolean pullRequestReceivedComment = !node.get("issue").isNull();
+    boolean pullRequestWasOpened = node.get("action").asText().endsWith("opened");
+    boolean pullRequestReceivedComment = node.get("issue") != null && !node.get("issue").isNull();
     if (!pullRequestWasOpened && !pullRequestReceivedComment) {
-      return;
+      return false;
     }
 
     if (!containsPing(node, pullRequestReceivedComment)) {
-      return;
+      return false;
     }
 
     Map<String, Object> requestBody =
         createRequestBodyForBenchmarkWorker(node, pullRequestReceivedComment);
+    if (requestBody.isEmpty())
+      return false;
 
     sendRequestToBenchmarkWorker(requestBody);
+    return true;
   }
 
   /**
    * Builds a request body for the benchmark-worker service.
-   * 
+   *
    * @param node the payload received from GitHub
    * @param pullRequestReceivedComment whether the pull request received a comment
    * @return the request body
@@ -56,8 +65,7 @@ public class PullRequestHandler extends WebhookHandler {
     String repoId = node.get("repository").get("id").asText();
     String name = node.get("repository").get("name").asText();
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
-    String repoUrl = pullRequestReceivedComment ? node.get("repository").get("clone_url").asText()
-        : node.get("pull_request").get("head").get("repo").get("clone_url").asText();
+    String repoUrl = node.get("repository").get("clone_url").asText();
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("url", repoUrl);
@@ -72,7 +80,7 @@ public class PullRequestHandler extends WebhookHandler {
 
   /**
    * Sends a request to the benchmark-worker service with the given request body.
-   * 
+   *
    * @param requestBody the request body to send
    */
   private void sendRequestToBenchmarkWorker(Map<String, Object> requestBody) {
@@ -100,7 +108,7 @@ public class PullRequestHandler extends WebhookHandler {
 
   /**
    * Checks if the pull request contains the ping <code>[performancebot]</code> in the message body
-   * 
+   *
    * @param node
    * @param pullRequestReceivedComment
    * @return true if the ping is found, false otherwise
