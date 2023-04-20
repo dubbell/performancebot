@@ -1,19 +1,21 @@
 package com.icetlab.performancebot.github.webhook;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
+
+import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.database.service.InstallationService;
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import com.icetlab.performancebot.database.model.Installation;
-import com.icetlab.performancebot.database.service.InstallationService;
 
 @SpringBootTest
 public class InstallationHandlerTest {
+
   @InjectMocks
   @Autowired
   private InstallationHandler installationHandler;
@@ -32,16 +34,18 @@ public class InstallationHandlerTest {
 
   @Test
   public void testHandleNewInstall() {
-    installationHandler.handle(WebhookMocks.INSTALL_EVENT);
+    boolean handled = installationHandler.handle(WebhookMocks.INSTALL_EVENT);
     Installation inst = installationController.getInstallationById("123456");
-    assertNotNull(inst);
+    Assertions.assertNotNull(inst);
+    Assertions.assertTrue(handled);
   }
 
   @Test
   public void testHandleUninstall() {
-    installationHandler.handle(WebhookMocks.UNINSTALL_EVEMT);
+    boolean handled = installationHandler.handle(WebhookMocks.UNINSTALL_EVENT);
     assertThrows(NoSuchElementException.class, () -> {
       installationController.getInstallationById("123456");
     });
+    Assertions.assertTrue(handled);
   }
 }
