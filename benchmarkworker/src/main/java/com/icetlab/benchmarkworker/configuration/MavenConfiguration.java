@@ -31,7 +31,7 @@ public class MavenConfiguration extends JMHConfiguration {
     if(configData.getBuildTasks() == null) {
       InvocationRequest request = new DefaultInvocationRequest();
       request.setPomFile(new File("benchmark_directory/pom.xml"));
-      request.setGoals(Collections.singletonList("package"));
+      request.setGoals(Collections.singletonList("install"));
       request.setQuiet(true);
       request.setInputStream(InputStream.nullInputStream());
       mavenInvocations.add(request);
