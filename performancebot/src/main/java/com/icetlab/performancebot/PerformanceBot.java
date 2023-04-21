@@ -1,11 +1,11 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.GitHubIssueManager;
-import com.icetlab.performancebot.github.GitHubWebhookHandler;
+import com.icetlab.performancebot.github.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @EnableMongoRepositories
+@EnableMongoAuditing
 public class PerformanceBot {
 
   @Autowired
-  private GitHubWebhookHandler webhookHandler;
+  private PayloadManager payloadHandler;
   @Autowired
   private InstallationController database;
 
@@ -52,8 +53,16 @@ public class PerformanceBot {
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
-      @RequestBody String payload) {
-    webhookHandler.handlePayload(eventType, payload);
+    @RequestBody String payload) {
+    boolean handled;
+    switch (eventType) {
+      case "installation" -> handled = payloadHandler.handleInstall(payload);
+      case "pull_request", "issue_comment" -> handled = payloadHandler.handlePullRequest(payload);
+      default -> handled = false;
+    }
+    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled",
+      eventType);
+    System.out.println(statusMessage);
   }
 
   /**
@@ -64,8 +73,7 @@ public class PerformanceBot {
    */
   @PostMapping("/benchmark")
   public void addRun(@RequestBody String payload) {
-    System.out.println("Adding run results to database...");
     database.addRun(payload);
-    webhookHandler.handleResults(payload);
+    payloadHandler.handleResults(payload);
   }
 }

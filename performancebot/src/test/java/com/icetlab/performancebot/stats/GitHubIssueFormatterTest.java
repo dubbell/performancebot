@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +21,7 @@ import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.GitHubWebhookHandler;
+import com.icetlab.performancebot.github.PayloadManager;
 
 @SpringBootTest
 public class GitHubIssueFormatterTest {
@@ -211,11 +210,11 @@ public class GitHubIssueFormatterTest {
           """;
 
   @InjectMocks
-  private GitHubWebhookHandler payloadHandler;
+  private PayloadManager payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new GitHubWebhookHandler());
+    payloadHandler = spy(new PayloadManager());
   }
 
   @InjectMocks

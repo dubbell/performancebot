@@ -8,7 +8,7 @@ import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.GitHubWebhookHandler;
+import com.icetlab.performancebot.github.PayloadManager;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -60,11 +60,11 @@ public class InstallationServiceTest {
           """;
 
   @InjectMocks
-  private GitHubWebhookHandler payloadHandler;
+  private PayloadManager payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new GitHubWebhookHandler());
+    payloadHandler = spy(new PayloadManager());
   }
 
   @InjectMocks
