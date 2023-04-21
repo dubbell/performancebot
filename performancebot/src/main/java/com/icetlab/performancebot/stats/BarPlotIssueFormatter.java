@@ -1,5 +1,6 @@
 package com.icetlab.performancebot.stats;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -23,9 +24,14 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
 
   @Autowired
   InstallationService installationService;
+  String imagesFolderPath;
 
   /**
-   * Returns a markdown formatted issue with bar plots which come in images.
+   * Takes a jmh results and creates a markdown string containing bar plot that compares the results
+   * to historical benchmark data
+   *
+   * @param jmhResults json formatted jmh results
+   * @return a markdown formatted issue of the jmh results compared to historical data in bar plots
    */
   @Override
   public String formatBenchmarkIssue(String jmhResults) {
@@ -38,8 +44,10 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
       Set<Method> methods = FormatterUtils.filterMethodsFromCurrentRun(
           installationService.getMethodsFromRepo(installationId, repoId), methodNames);
       Map<String, List<Method>> classes = FormatterUtils.groupMethodsByClassName(methods);
-      String issueBody = formatIssueBody(classes);
-      return issueBody;
+      imagesFolderPath = repoId.replaceAll("\\s+", "");
+      File imagesFolder = new File(imagesFolderPath);
+      imagesFolder.mkdir();
+      return formatIssueBody(classes);
     } catch (JsonProcessingException e) {
       return e.toString();
     }
@@ -76,10 +84,11 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
   }
 
   /**
-   * Takes a method and returns a markdown String containing method header, run results plot and
-   * configuration results
+   * Takes a method and returns a markdown string containing method header, run results plot and
+   * configuration data
    *
-   * @return
+   * @param method the method to be formatted
+   * @return a formatted md string of the method
    */
   private String formatMethodBody(Method method) {
     StringBuilder sb = new StringBuilder();
@@ -87,13 +96,12 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
         FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName())));
     String path;
     try {
-      path = createImageFromResults(method.getRunResults(),
-          FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName()));
+      path = createBarPlotPng(method);
     } catch (IOException e) {
       path =
           "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
     }
-    sb.append(String.format("![%s](%s)\n", method.getMethodName(), uploadImageAndGetPath(path)));
+    sb.append(String.format("![%s](%s)\n", method.getMethodName(), path));
     sb.append("TODO: implement additional info\n");
     return sb.toString();
   }
@@ -103,17 +111,30 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
    * @return
    */
   private String uploadImageAndGetPath(String path) {
-    // TODO:
+    // TODO: Should take the created image, upload it somewhere, and get a public URL back to be added to md
     return path;
   }
 
-  /*
-   * private void createCategoryChartFromMap(String className, List<Method> methods) { List<Result>
-   * results = new ArrayList<>(); for (Method method : methods) {
-   * results.addAll(method.getRunResults()); createImageFromResults(results,
-   * method.getMethodName()); results.clear(); } }
+  /**
+   * @param method the method which results should be visualized as bar plot png
+   * @return path of the bar plot png
+   * @throws IOException if png image cannot be created
    */
+  private String createBarPlotPng(Method method) throws IOException {
+    CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
+        .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
+    List<Result> results = method.getRunResults();
+    List<String> timestamps = results.stream()
+        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:MM").format(x.getAddedAt())).toList();
+    List<Double> scores = results.stream()
+        .map((x) -> Double.parseDouble(FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
+        .toList();
+    String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
+    barPlot.addSeries(header, timestamps, scores);
+    return writeChartToPng(barPlot, method.getMethodName());
+  }
 
+  /*
   private String createImageFromResults(List<Result> results, String header) throws IOException {
     CategoryChart chart = new CategoryChartBuilder().width(600).height(600).title(header)
         .xAxisTitle("Date").yAxisTitle("Score").build();
@@ -124,10 +145,10 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
         .toList();
     chart.addSeries(header, timestamps, score);
     return writeChartToPng(chart, header);
-  }
+  }*/
 
   /**
-   * Converts the chart to a PNG image and returns the path to it.
+   * Converts the bar chart to a PNG image, stores it in repo folder and returns the path.
    *
    * @param chart    the chart to be converted to an PNG image
    * @param fileName the name of the PNG file
@@ -135,8 +156,9 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
    * @throws IOException if png file cannot be created
    */
   private String writeChartToPng(CategoryChart chart, String fileName) throws IOException {
-    // TODO: add png to folder named after repo
-    BitmapEncoder.saveBitmapWithDPI(chart, fileName, BitmapFormat.PNG, 300);
-    return fileName + ".png";
+    String pngPath = imagesFolderPath + "/" + fileName;
+    BitmapEncoder.saveBitmapWithDPI(chart, pngPath, BitmapFormat.PNG,
+        300);
+    return pngPath + ".png";
   }
 }
