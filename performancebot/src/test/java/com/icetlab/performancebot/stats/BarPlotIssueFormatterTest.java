@@ -2,6 +2,10 @@ package com.icetlab.performancebot.stats;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +25,7 @@ import com.icetlab.performancebot.github.Payload;
 
 @SpringBootTest
 public class BarPlotIssueFormatterTest {
+
   @InjectMocks
   private Payload payloadHandler;
 
@@ -57,10 +62,13 @@ public class BarPlotIssueFormatterTest {
     old = new ArrayList<>();
     neew = new ArrayList<>();
     another = new ArrayList<>();
-    old.add(new Result(Constants.res_oldWay));
+
     old.add(new Result(Constants.res_oldWay));
     neew.add(new Result(Constants.res_newWay));
     another.add(new Result(Constants.res_newWay_AnotherClassName));
+
+    neew.add(new Result(Constants.EXAMPLE_RESULT_new));
+    old.add(new Result(Constants.EXAMPLE_RESULT_old));
 
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", old));
@@ -69,8 +77,15 @@ public class BarPlotIssueFormatterTest {
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.AnotherClassName.newWay", another));
 
-    formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
+    String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
+    // Write to file
+    try {
+      Files.writeString(Path.of("test.md"), md);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     assertTrue(true);
   }
+
 
 }

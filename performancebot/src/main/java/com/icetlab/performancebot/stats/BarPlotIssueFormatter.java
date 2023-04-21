@@ -20,6 +20,7 @@ import com.icetlab.performancebot.database.service.InstallationService;
 
 @Component
 public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
+
   @Autowired
   InstallationService installationService;
 
@@ -48,7 +49,7 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
    * <p>
    * Builds an issue based on the structure of the classes map
    * </p>
-   * 
+   *
    * <pre>
    * <code>
    * for class in classes:
@@ -77,26 +78,32 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
   /**
    * Takes a method and returns a markdown String containing method header, run results plot and
    * configuration results
-   * 
+   *
    * @return
    */
   private String formatMethodBody(Method method) {
     StringBuilder sb = new StringBuilder();
-    sb.append(String.format("## %s\n", method.getMethodName()));
+    sb.append(String.format("## %s\n",
+        FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName())));
     String path;
     try {
-      path = createImageFromResults(method.getRunResults(), method.getMethodName());
+      path = createImageFromResults(method.getRunResults(),
+          FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName()));
     } catch (IOException e) {
       path =
           "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
     }
-    sb.append(String.format("![%s](%s)\n", method.getMethodName(), uploadImageAndGetUrl(path)));
+    sb.append(String.format("![%s](%s)\n", method.getMethodName(), uploadImageAndGetPath(path)));
     sb.append("TODO: implement additional info\n");
     return sb.toString();
   }
 
-  private String uploadImageAndGetUrl(String path) {
-    // TODO: upload to imagekit and get url
+  /**
+   * @param path
+   * @return
+   */
+  private String uploadImageAndGetPath(String path) {
+    // TODO:
     return path;
   }
 
@@ -121,14 +128,15 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
 
   /**
    * Converts the chart to a PNG image and returns the path to it.
-   * 
-   * @param chart the chart to be converted to an PNG image
+   *
+   * @param chart    the chart to be converted to an PNG image
    * @param fileName the name of the PNG file
    * @return the path of the PNG image of the bar chart
+   * @throws IOException if png file cannot be created
    */
   private String writeChartToPng(CategoryChart chart, String fileName) throws IOException {
+    // TODO: add png to folder named after repo
     BitmapEncoder.saveBitmapWithDPI(chart, fileName, BitmapFormat.PNG, 300);
     return fileName + ".png";
-
   }
 }
