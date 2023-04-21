@@ -2,6 +2,7 @@ package com.icetlab.performancebot.database.model;
 
 import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Represents a method entry in the database. It contains all the benchmark runs for the method. Use
@@ -10,7 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "methods")
 public class Method {
 
+  @Field("methodName")
   private final String methodName;
+  @Field("runResults")
   private final List<Result> runResults;
 
   /**
