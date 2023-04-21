@@ -1,4 +1,4 @@
-FROM maven:3.9.0
+FROM maven:latest
 VOLUME /tmp
 ADD target/*.jar /app.jar
 ADD target/classes/dummy.pem /
