@@ -73,7 +73,7 @@ public class InstallationController {
 
       boolean methodExists;
       if (results.isArray()) {
-        for (JsonNode methodNode : results.get(0)) {
+        for (JsonNode methodNode : results) {
           methodExists = service.getMethodsFromRepo(installationId, repoId).stream().anyMatch(
               method -> method.getMethodName().equals(methodNode.get("benchmark").asText()));
           if (!methodExists) {
