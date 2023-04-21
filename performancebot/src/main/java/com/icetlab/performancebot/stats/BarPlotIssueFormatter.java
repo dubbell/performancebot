@@ -131,6 +131,7 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
         .toList();
     String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
     barPlot.addSeries(header, timestamps, scores);
+    barPlot.getStyler().setLegendVisible(false);
     return writeChartToPng(barPlot, method.getMethodName());
   }
 
