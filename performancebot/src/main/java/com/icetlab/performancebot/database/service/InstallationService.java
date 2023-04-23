@@ -177,6 +177,20 @@ public class InstallationService {
     // remove it otherwise
     repo.deleteById(installationId);
   }
+  
+  /**
+   * Deletes a Github repository from the database
+   * Throws NoSuchElementException if the Github repository does not exist in the database
+   * @param installationId the id of the installation where the Github repository is stored
+   * @param repoId the id of the Github repository to be deleted
+   */
+  public void deleteGitHubRepo(String installationId, String repoId) {
+    if (!repoExists(installationId, repoId)) {
+      throw new NoSuchElementException("No such Github repository")
+    }
+    // remove it otherwise
+    repo.deleteGitHubRepoByInstallationIdAndRepoId(installationId, repoId);
+  }
 
   /**
    * Checks if an installation exists
