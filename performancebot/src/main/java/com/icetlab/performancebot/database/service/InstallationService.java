@@ -186,7 +186,7 @@ public class InstallationService {
    */
   public void deleteGitHubRepo(String installationId, String repoId) {
     if (!repoExists(installationId, repoId)) {
-      throw new NoSuchElementException("No such Github repository")
+      throw new NoSuchElementException("No such Github repository");
     }
     // remove it otherwise
     repo.deleteGitHubRepoByInstallationIdAndRepoId(installationId, repoId);
