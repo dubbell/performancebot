@@ -177,6 +177,7 @@ public class InstallationService {
     // remove it otherwise
     repo.deleteById(installationId);
   }
+  
   /**
    * Deletes a Github repository from the database
    * Throws NoSuchElementException if the installation or the Github repository do not exist in the database
