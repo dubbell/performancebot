@@ -296,6 +296,23 @@ public class InstallationServiceTest {
       installationService.deleteInstallationById(invalidId);
     });
   }
+  
+  @Test
+  public void testDeleteGitHubRepo(){
+    String installation = "id for installation";
+    GitHubRepo repository = new GitHubRepo("id for reoo", new HashSet<Method>(), "name");
+
+    installationService.addInstallation(installation);
+    installationService.addRepoToInstallation(installation, repository);
+
+    // delete the repo
+    installationService.deleteGitHubRepo(installation, repository.getRepoId());
+    
+    Query q = Query.query(where("_id").is(installation));
+    List<Installation> installations = mongoTemplate.find(q, Installation.class);
+    
+    assertEquals(0, installations.get(0).getRepos().size());
+  }
 
   @BeforeEach
   public void tearDown() {
