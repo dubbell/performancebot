@@ -2,11 +2,20 @@ package com.icetlab.performancebot.stats;
 
 import io.imagekit.sdk.ImageKit;
 import io.imagekit.sdk.config.Configuration;
+import io.imagekit.sdk.exceptions.BadRequestException;
+import io.imagekit.sdk.exceptions.ForbiddenException;
+import io.imagekit.sdk.exceptions.InternalServerException;
+import io.imagekit.sdk.exceptions.TooManyRequestsException;
+import io.imagekit.sdk.exceptions.UnauthorizedException;
+import io.imagekit.sdk.exceptions.UnknownException;
+import io.imagekit.sdk.models.FileCreateRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -99,17 +108,16 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
     StringBuilder sb = new StringBuilder();
     sb.append(String.format("## %s\n",
         FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName())));
-    String path;
+    String url;
     try {
-      // TODO: Change return type of createBarPlotPng so we don't have to save pngs locally?
-      // File pngFile = createBarPlotPng(method)
-      // path = uploadImageOnImageKit(pngFile)
-      path = createBarPlotPng(method);
-    } catch (IOException e) {
-      path =
+      CategoryChart methodBarPlot = createBarPlotPng(method);
+      String encodedBarPlot = encodeChartToBase64(methodBarPlot);
+      url = uploadImage(encodedBarPlot);
+    } catch (Exception e) {
+      url =
           "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
     }
-    sb.append(String.format("![%s](%s)\n", method.getMethodName(), path));
+    sb.append(String.format("![%s](%s)\n", method.getMethodName(), url));
     sb.append("TODO: implement additional info\n");
     return sb.toString();
   }
@@ -128,7 +136,7 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
    * @return path of the bar plot png
    * @throws IOException if png image cannot be created
    */
-  private String createBarPlotPng(Method method) throws IOException {
+  private CategoryChart createBarPlotPng(Method method) throws IOException {
     CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
         .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
     List<Result> results = method.getRunResults();
@@ -140,7 +148,8 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
     String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
     barPlot.addSeries(header, timestamps, scores);
     barPlot.getStyler().setLegendVisible(false);
-    return writeChartToPng(barPlot, method.getMethodName());
+    return barPlot;
+    //return writeChartToPng(barPlot, method.getMethodName());
   }
 
   /*
@@ -171,6 +180,20 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
     return pngPath + ".png";
   }
 
+  /**
+   * Takes a Category chart and encodes it as a base64 string
+   *
+   * @param categoryChart the chart to be encoded
+   * @return a base64 string
+   * @throws IOException
+   */
+  private String encodeChartToBase64(CategoryChart categoryChart) throws IOException {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    BitmapEncoder.saveBitmap(categoryChart, outputStream, BitmapEncoder.BitmapFormat.PNG);
+    byte[] imageBytes = outputStream.toByteArray();
+    return Base64.getEncoder().encodeToString(imageBytes);
+  }
+
   // TODO: Should move this method somewhere else
   private void authenticateImageKit() throws IOException {
     Properties prop = new Properties();
@@ -185,5 +208,22 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
     imageKit.setConfig(config);
   }
 
-
+  /**
+   * Takes an encoded image string , uploads it to imagekit and returns the url of the image
+   *
+   * @param encodedImage
+   * @return url of the image
+   * @throws ForbiddenException
+   * @throws TooManyRequestsException
+   * @throws InternalServerException
+   * @throws UnauthorizedException
+   * @throws BadRequestException
+   * @throws UnknownException
+   */
+  public static String uploadImage(String encodedImage)
+      throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException {
+    FileCreateRequest fileCreateRequest = new FileCreateRequest(encodedImage, "TODO.jpg");
+    io.imagekit.sdk.models.results.Result result = ImageKit.getInstance().upload(fileCreateRequest);
+    return result.getUrl();
+  }
 }
