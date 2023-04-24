@@ -19,7 +19,12 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
   </properties>
-
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -77,7 +82,11 @@
       <artifactId>xchart</artifactId>
       <version>3.8.3</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.github.imagekit-developer</groupId>
+      <artifactId>imagekit-java</artifactId>
+      <version>2.0.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

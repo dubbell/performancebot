@@ -1,10 +1,15 @@
 package com.icetlab.performancebot.stats;
 
+import io.imagekit.sdk.ImageKit;
+import io.imagekit.sdk.config.Configuration;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.CategoryChart;
@@ -96,6 +101,9 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
         FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName())));
     String path;
     try {
+      // TODO: Change return type of createBarPlotPng so we don't have to save pngs locally?
+      // File pngFile = createBarPlotPng(method)
+      // path = uploadImageOnImageKit(pngFile)
       path = createBarPlotPng(method);
     } catch (IOException e) {
       path =
@@ -108,7 +116,7 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
 
   /**
    * @param path
-   * @return
+   * @return url
    */
   private String uploadImageAndGetPath(String path) {
     // TODO: Should take the created image, upload it somewhere, and get a public URL back to be added to md
@@ -162,4 +170,20 @@ public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
         300);
     return pngPath + ".png";
   }
+
+  // TODO: Should move this method somewhere else
+  private void authenticateImageKit() throws IOException {
+    Properties prop = new Properties();
+    FileInputStream properties = new FileInputStream(
+        "src\\main\\resources\\application.properties");
+    prop.load(properties);
+    String publicKey = prop.getProperty("imagekit.publickey");
+    String privateKey = prop.getProperty("imagekit.privatekey");
+    String URL = prop.getProperty("imagekit.urlendpoint");
+    ImageKit imageKit = ImageKit.getInstance();
+    Configuration config = new Configuration(publicKey, privateKey, URL);
+    imageKit.setConfig(config);
+  }
+
+
 }
