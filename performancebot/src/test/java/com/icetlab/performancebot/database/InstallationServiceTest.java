@@ -313,6 +313,32 @@ public class InstallationServiceTest {
     
     assertEquals(0, installations.get(0).getRepos().size());
   }
+  
+  @Test
+  public void testDeleteGitHubRepoNotFoundInstallation(){
+    String nonExistingInstallationId = "non existing id";
+    GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
+
+    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteGitHubRepo(nonExistingInstallationId, nonExistingRepo.getRepoId());
+    });
+
+    assertEquals(e.getMessage(), "No such installation");
+  }
+
+  @Test
+  public void testDeleteGitHubRepoNotFoundRepo(){
+    String installationId = "installation id";
+    GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
+
+    installationService.addInstallation(installationId);
+
+    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteGitHubRepo(installationId, nonExistingRepo.getRepoId());
+    });
+
+    assertEquals(e.getMessage(), "No such GitHub repo");
+  }
 
   @BeforeEach
   public void tearDown() {
