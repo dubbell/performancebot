@@ -63,7 +63,7 @@ public class BenchmarkWorker {
     String accessToken = (String) parser.parseMap(task).get("token");
     String branch = (String) parser.parseMap(task).get("branch");
 
-    String result = "";
+    String result = "[]";
 
     // if one thing fails, the benchmark is cancelled
     try {
