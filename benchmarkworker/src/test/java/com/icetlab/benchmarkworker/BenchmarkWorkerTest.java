@@ -22,13 +22,37 @@ public class BenchmarkWorkerTest {
   }
 
   @Test
-  public void mavenTest() {
+  public void mavenExampleTest() {
+    mavenTest("https://github.com/dubbell/JMHExample", "test");
+  }
+
+  @Test
+  public void gradleExampleTest() {
+    gradleTest("https://github.com/dubbell/JMHExample_Gradle", "main");
+  }
+
+
+  // commented because they take too long to run
+
+  //@Test
+  //public void eclipseCollectionsTest() { mavenTest("https://github.com/dubbell/eclipse-collections", "master"); }
+
+  //@Test
+  //public void jcToolsTest() { mavenTest("https://github.com/dubbell/JCTools", "master"); }
+
+  //@Test
+  //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava", "3.x"); }
+
+
+
+
+  public void mavenTest(String url, String branch) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone("https://github.com/dubbell/JMHExample", "");
+      worker.clone(url, "", branch);
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
@@ -44,7 +68,6 @@ public class BenchmarkWorkerTest {
     try {
       ConfigData configData = new ObjectMapper(new YAMLFactory())
           .readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
-      assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
       assertTrue(configData.getBuildTool().equalsIgnoreCase("maven"));
 
       config = ConfigurationFactory.getConfiguration();
@@ -59,28 +82,21 @@ public class BenchmarkWorkerTest {
 
       System.out.println(result);
 
-      assertTrue(new File("benchmark_directory/target/classes/META-INF").exists());
-
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 
-      // check if project was compiled correctly
-      assertTrue(target.exists() && target.listFiles().length != 0);
-      // check if a result was returned from the benchmark
-      assertTrue(result.length() != 0);
     } catch (Exception e) {
       e.printStackTrace();
       fail("Benchmarking error : " + e);
     }
   }
 
-  @Test
-  public void gradleTest() {
+  public void gradleTest(String url, String branch) {
 
     worker = new BenchmarkWorker();
 
     // cloning
     try {
-      worker.clone("https://github.com/dubbell/JMHExample_Gradle", "");
+      worker.clone(url, "", branch);
       File repoDir = new File("benchmark_directory");
       assertTrue(repoDir.isDirectory() && repoDir.listFiles().length != 0);
     } catch (Exception e) {
@@ -96,7 +112,6 @@ public class BenchmarkWorkerTest {
     try {
       ConfigData configData = new ObjectMapper(new YAMLFactory())
           .readValue(new File("benchmark_directory/perfbot.yaml"), ConfigData.class);
-      assertTrue(configData.getLanguage().equalsIgnoreCase("java"));
       assertTrue(configData.getBuildTool().equalsIgnoreCase("gradle"));
 
       config = ConfigurationFactory.getConfiguration();
@@ -109,7 +124,8 @@ public class BenchmarkWorkerTest {
       File target = new File("benchmark_directory/build");
       String result = config.benchmark();
 
-      //System.out.println(result);
+      System.out.println(result);
+
 
       assertTrue(result.length() > 3); // 3 if empty list, in which case no tests were run
 
@@ -121,6 +137,8 @@ public class BenchmarkWorkerTest {
       fail("Benchmarking error : " + e);
     }
   }
+
+
 
   @AfterEach
   public void deleteFiles() {

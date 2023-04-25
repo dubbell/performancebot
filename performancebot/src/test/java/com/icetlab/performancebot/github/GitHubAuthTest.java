@@ -12,10 +12,10 @@ import org.springframework.web.client.RestTemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class AuthTest {
+public class GitHubAuthTest {
   ResponseEntity<String> res;
   @InjectMocks
-  private Auth auth;
+  private GitHubAuth auth;
   @Mock
   RestTemplate restTemplate;
 

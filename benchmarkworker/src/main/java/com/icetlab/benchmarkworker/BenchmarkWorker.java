@@ -61,11 +61,12 @@ public class BenchmarkWorker {
 
     String repoURL = (String) parser.parseMap(task).get("url");
     String accessToken = (String) parser.parseMap(task).get("token");
+    String branch = (String) parser.parseMap(task).get("branch");
 
     // if one thing fails, the benchmark is cancelled
     try {
       // clone repo
-      clone(repoURL, accessToken);
+      clone(repoURL, accessToken, branch);
 
       // reads configuration from .yaml file
       Configuration configuration = ConfigurationFactory.getConfiguration();
@@ -95,7 +96,7 @@ public class BenchmarkWorker {
    * @param repoURL repository url
    * @param accessToken repository access token for authentication
    */
-  public void clone(String repoURL, String accessToken) throws Exception {
+  public void clone(String repoURL, String accessToken, String branch) throws Exception {
     System.out.println("Cloning started.");
 
     // creates directory
@@ -107,7 +108,7 @@ public class BenchmarkWorker {
     Git.cloneRepository().setCredentialsProvider(credentials) // if the repository is private, the
                                                               // access token should authorize the
                                                               // request
-        .setURI(repoURL).setDirectory(dir).call().close();
+        .setURI(repoURL).setDirectory(dir).setBranch(branch).call().close();
 
     System.out.println("Cloning finished.");
   }

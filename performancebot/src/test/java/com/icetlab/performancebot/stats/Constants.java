@@ -1,7 +1,6 @@
 package com.icetlab.performancebot.stats;
 
 class Constants {
-
   static String EXAMPLE_RESULT = """
       {
           "issue_url": "an url",
@@ -317,5 +316,4 @@ class Constants {
           }
       }
           """;
-
 }

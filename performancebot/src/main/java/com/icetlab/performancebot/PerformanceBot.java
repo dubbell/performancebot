@@ -1,11 +1,11 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.Issue;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @EnableMongoRepositories
+@EnableMongoAuditing
 public class PerformanceBot {
 
-  private static final Issue issue = new Issue();
   @Autowired
-  private Payload payloadHandler;
+  private PayloadManager payloadHandler;
   @Autowired
   private InstallationController database;
 
@@ -53,23 +53,27 @@ public class PerformanceBot {
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
-      @RequestBody String payload) {
-    payloadHandler.handlePayload(eventType, payload);
+    @RequestBody String payload) {
+    boolean handled;
+    switch (eventType) {
+      case "installation" -> handled = payloadHandler.handleInstall(payload);
+      case "pull_request", "issue_comment" -> handled = payloadHandler.handlePullRequest(payload);
+      default -> handled = false;
+    }
+    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled",
+      eventType);
+    System.out.println(statusMessage);
   }
 
   /**
-   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the results to the database.
+   * POST route that listens for finished benchmark runs from the BenchmarkWorker and adds the
+   * results to the database.
    *
    * @param payload JSON string with run results
    */
   @PostMapping("/benchmark")
   public void addRun(@RequestBody String payload) {
-    System.out.println("Adding run results to database...");
     database.addRun(payload);
     payloadHandler.handleResults(payload);
-  }
-
-  public static Issue getIssue() {
-    return issue;
   }
 }

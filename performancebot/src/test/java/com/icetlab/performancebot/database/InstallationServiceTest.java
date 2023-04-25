@@ -8,7 +8,9 @@ import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.PayloadManager;
+import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -58,11 +60,11 @@ public class InstallationServiceTest {
           """;
 
   @InjectMocks
-  private Payload payloadHandler;
+  private PayloadManager payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new Payload());
+    payloadHandler = spy(new PayloadManager());
   }
 
   @InjectMocks
@@ -235,6 +237,64 @@ public class InstallationServiceTest {
     Set<Method> methods = installationService.getMethodsFromRepo("an id", "a repo id");
     assertEquals(methods.size(), 2);
     assertEquals(methods.iterator().next().getRunResults().size(), 1);
+  }
+
+  @Test
+  public void testDeleteInstallationById() {
+    // Add an installation
+    String installationId = "an id";
+    installationService.addInstallation(installationId);
+
+    // Delete it using the deleteInstallationById()
+    installationService.deleteInstallationById(installationId);
+
+    Query q = Query.query(where("_id").is(installationId));
+    assertEquals(mongoTemplate.find(q, Installation.class).size(), 0);
+  }
+
+  @Test
+  public void testDeleteInstallationByIdMultipleInstalltions() {
+    // Add multiple installations
+    String id1 = "id 1";
+    String id2 = "id 2";
+    String id3 = "id 3";
+    installationService.addInstallation(id1);
+    installationService.addInstallation(id2);
+    installationService.addInstallation(id3);
+
+    // Add all the ids to be able to include them in the query
+    List<String> ids = Arrays.asList(id1, id2, id3);
+
+    // Delete all installations using the deleteInstallationById()
+    installationService.deleteInstallationById(id1);
+    installationService.deleteInstallationById(id2);
+    installationService.deleteInstallationById(id3);
+
+    Query q = Query.query(where("_id").in(ids));
+    assertEquals(mongoTemplate.find(q, Installation.class).size(), 0);
+  }
+
+  @Test
+  public void testDeleteInstallationByIdNoSuchElementException() {
+    // Some invalid id
+    String installationId = "invalid id";
+
+    assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteInstallationById(installationId);
+    });
+  }
+
+  @Test
+  public void testDeleteInstallationByIdThrowsExceptionWhenGivenMultipleIdsWithOneInvalid() {
+    String validId = "valid id";
+    String invalidId = "invalid id";
+    installationService.addInstallation(validId);
+
+    // Delete both IDs at the same time
+    assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteInstallationById(validId);
+      installationService.deleteInstallationById(invalidId);
+    });
   }
 
   @BeforeEach

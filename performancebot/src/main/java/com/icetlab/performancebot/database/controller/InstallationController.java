@@ -73,8 +73,7 @@ public class InstallationController {
 
       boolean methodExists;
       if (results.isArray()) {
-        for (JsonNode methodNode : results) {
-          // check if method exists, otherwise add it.
+        for (JsonNode methodNode : results.get(0)) {
           methodExists = service.getMethodsFromRepo(installationId, repoId).stream().anyMatch(
               method -> method.getMethodName().equals(methodNode.get("benchmark").asText()));
           if (!methodExists) {
@@ -193,6 +192,20 @@ public class InstallationController {
       return service.getMethodsFromRepo(installationId, repoId);
     } catch (NoSuchElementException e) {
       return null;
+    }
+  }
+  
+  /**
+   * Deletes an installation from the database with all its repos
+   * @param installationId the installation to be deleted
+   * @return true if successful, otherwise false
+   */
+  public boolean deleteInstallation(String installationId) {
+    try {
+      service.deleteInstallationById(installationId);
+      return true;
+    } catch (NoSuchElementException e) {
+      return false;
     }
   }
 

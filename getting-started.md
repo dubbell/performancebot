@@ -38,7 +38,7 @@ This step covers generating private keys to sign access token requests, as well 
 ### The App ID
 
 1. Go to your bot settings and copy the App ID under the About section.
-2. Go to `src/main/resources/application.properties` and replace `<your app id>` with your app ID.
+2. Go to `performancebot/src/main/resources/application.properties` and replace `<your app id>` with your app ID.
 
 ### Generating a private key
 
@@ -47,9 +47,9 @@ When you have finished creating your app, it is time to generate a private key i
 1. On GitHub, go to `Settings / Developer Settings` and select `Edit` on your GitHub App.
 2. Scroll down to `Private keys`, and press generate.
 3. You will get a file looking like `<username.date>.private-key.pem` in your downloads folder. 
-4. Move it to this repo, and *do not* push or commit it, it contains sensitive information! 
+4. Move it to this to the `performancebot/src/main/resources` directory, and *do not* push or commit it, it contains sensitive information! 
    - If you happen to do it, simply remove it and go back to your account settings and press `Delete`.
-5. Go to `src/main/resources/application.properties` and replace `dummy.pem` with what your file is called.
+5. Go to `performancebot/src/main/resources/application.properties` and replace `dummy.pem` with what your file is called.
 
 ### The webhook URL
 
@@ -77,12 +77,75 @@ Web Interface                 http://127.0.0.1:4040
 3. Paste it in the `Webhook URL` field and **ADD** `/payload` to the end of it. It should look like this: `https://b9b9-33-22-11-000.eu.ngrok.io/payload`.
 4. In `src/main/resources/application.properties`, add `server.port=7000`. It has to be the same as the one used in the ngrok command! This is because your computer is listening on that port and since ngrok is pointing the tunnel to that port, we need it to receive updates as webhooks from GitHub.
 
+### Connecting to MongoDB
+
+For the PerformanceBot to connect to the MongoDB instance running on your computer, 
+the following entries needs to be added to `performancebot/src/main/resources/application.properties`:
+- `spring.data.mongodb.database=perfbot`
+- `spring.data.mongodb.host=<mongodb-ip-address>`
+- `spring.data.mongodb.port=27017 # default port`
+
+### Deploying to Kubernetes
+For the application to be deployed to Kubernetes, first images have to be created of the 
+PerformanceBot and the BenchmarkWorker and uploaded to DockerHub. 
+If you have created a DockerHub account, then the next step is to edit `k8s-perfbot.yaml` 
+and change the image URLs in the `perfbot` and `benchmark-worker` deployments to `docker.io/<your-dockerhub-username>/perfbot:latest` 
+and `docker.io/<your-dockerhub-username>/benchmark-worker:latest`. Also make sure that the port number in the `perfbot-ingress` is set to the same port
+specified in `performancebot/src/main/resources/application.properties`.
+
+Once this is done, you can then run the `build_images.sh` shell script which will ask for your
+DockerHub username, after which it will compile the `performancebot` and 
+`benchmarkworker` modules, build images, and finally push the images to 
+your DockerHub account.
+
+The final step is to create a Kubernetes cluster (you can use Minikube for testing) and install kubectl, which is a 
+command-line tool used to execute this command: `kubectl apply -f k8s-perfbot.yaml`. This
+command will create the pods, services, etc., specified in the `k8s-perfbot.yaml` file.
+To change the number of `benchmark-worker` or `perfbot` pods running in the cluster,
+you can simply change the value `spec.replicas` in their deployments in `k8s-perfbot.yaml`.
+
 ### Using it
 
-Once all of the above steps are finished, you can create pull requests in your own repositiories and you will receive webhook payloads if you are running ngrok and the PerformanceBot with the right config.
+To use the Performance Bot, you first need to install the GitHub app in your 
+repository. Once this is done, you need to add a file called `perfbot.yaml` in
+the root of your repository. This file will tell the bot how to run the benchmarks.
+
+The only required configuration that needs to be in `perfbot.yaml` is the 
+`buildTool` of the project, which can be either Maven or Gradle. Other than that, there are 
+an additional three optional configurations: `options`, `buildTasks` and `jmhJar`.
+- `options`
+  - Is a string that should look like this: `[regexp*] [additional JMH options]`, where the
+  regular expressions specify which benchmarks to run, and the additional options can be any
+  configuration allowed by the [JMH CLI](https://github.com/guozheng/jmh-tutorial/blob/master/README.md).
+  Is empty by default.
+- `buildTasks`
+  - A list of tasks that needs to be executed to compile the project into a 
+  jar file which can execute the benchmarks. Each item should contain a `path`, which is the path to the `pom.xml`file for Maven 
+  projects or the `build.gradle` file for Gradle projects. It should also contain a list of
+  `tasks`, where each item is a string, representing either a Maven goal or a Gradle task
+  to be executed. By default this is set to the root of the repository, with either the Gradle task `jmhJar` or the Maven goal `package`. 
+- `jmhJar`
+  - The path to the JMH jar file which should be created after all the tasks in 
+  `buildTasks` are completed. By default this is set to `target/benchmarks.jar` for Maven projects
+  and `build/libs/<file-name-containing-jmh>.jar` for Gradle projects.
+
+Example `perfbot.yaml` file:
+```
+buildTool: maven
+options: "JMHTestClass.test1 AnotherJMHTestClass.test3 -i 1"
+buildTasks:
+- path: pom.xml
+  tasks:
+  - package
+- path: jmh-tests/pom.xml
+  tasks:
+  - package
+jmhJar: jmh-tests/target/benchmarks.jar
+```
+----
+Once a `perfbot.yaml` file is added to a branch, then the benchmarks should be run as soon as a 
+pull request is opened with the title `[performancebot]`. And then, once the benchmarks
+have been executed, the results will be sent back to the repository as a GitHub issue.
 
 >**Tip**: if you don't want to spam new PRs all the time, use the replay button to resend a payload in ngrok's web interface! 
 
-## 2. BenchmarkWorker 
-
-Remember to start the worker by running it in your IDE or from the command line so you can run jobs. Nothing else to be done here, don't close the window once started.
