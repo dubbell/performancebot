@@ -1,18 +1,7 @@
 package com.icetlab.performancebot.stats;
 
-import io.imagekit.sdk.ImageKit;
-import io.imagekit.sdk.config.Configuration;
-import io.imagekit.sdk.exceptions.BadRequestException;
-import io.imagekit.sdk.exceptions.ForbiddenException;
-import io.imagekit.sdk.exceptions.InternalServerException;
-import io.imagekit.sdk.exceptions.TooManyRequestsException;
-import io.imagekit.sdk.exceptions.UnauthorizedException;
-import io.imagekit.sdk.exceptions.UnknownException;
-import io.imagekit.sdk.models.FileCreateRequest;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -20,13 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import org.knowm.xchart.BitmapEncoder;
+import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.model.Method;
@@ -36,194 +35,211 @@ import com.icetlab.performancebot.database.service.InstallationService;
 @Component
 public class BarPlotIssueFormatter implements BenchmarkIssueFormatter {
 
-  @Autowired
-  InstallationService installationService;
-  String imagesFolderPath;
+    @Autowired
+    InstallationService installationService;
 
-  /**
-   * Takes a jmh results and creates a markdown string containing bar plot that compares the results
-   * to historical benchmark data
-   *
-   * @param jmhResults json formatted jmh results
-   * @return a markdown formatted issue of the jmh results compared to historical data in bar plots
-   */
-  @Override
-  public String formatBenchmarkIssue(String jmhResults) {
-    JsonNode node;
-    try {
-      node = new ObjectMapper().readTree(jmhResults);
-      String installationId = node.get("installation_id").asText();
-      String repoId = node.get("repo_id").asText();
-      List<String> methodNames = FormatterUtils.getMethodNamesFromCurrentRun(jmhResults);
-      Set<Method> methods = FormatterUtils.filterMethodsFromCurrentRun(
-          installationService.getMethodsFromRepo(installationId, repoId), methodNames);
-      Map<String, List<Method>> classes = FormatterUtils.groupMethodsByClassName(methods);
-      imagesFolderPath = repoId.replaceAll("\\s+", "");
-      File imagesFolder = new File(imagesFolderPath);
-      imagesFolder.mkdir();
-      return formatIssueBody(classes);
-    } catch (JsonProcessingException e) {
-      return e.toString();
+    /**
+     * Takes a jmh results and creates a markdown string containing bar plot
+     * that compares the results to historical benchmark data
+     *
+     * @param jmhResults json formatted jmh results
+     * @return a markdown formatted issue of the jmh results compared to
+     * historical data in bar plots
+     */
+    @Override
+    public String formatBenchmarkIssue(String jmhResults) {
+        JsonNode node;
+        try {
+            node = new ObjectMapper().readTree(jmhResults);
+            String installationId = node.get("installation_id").asText();
+            String repoId = node.get("repo_id").asText();
+            List<String> methodNames
+                    = FormatterUtils.getMethodNamesFromCurrentRun(jmhResults);
+            Set<Method> methods = FormatterUtils.filterMethodsFromCurrentRun(
+                    installationService.getMethodsFromRepo(installationId, repoId),
+                    methodNames);
+            Map<String, List<Method>> classes
+                    = FormatterUtils.groupMethodsByClassName(methods);
+            return formatIssueBody(classes);
+        } catch (JsonProcessingException e) {
+            return e.toString();
+        }
     }
-  }
 
-  /**
-   * <p>
-   * Builds an issue based on the structure of the classes map
-   * </p>
-   *
-   * <pre>
-   * <code>
-   * for class in classes:
-   *   # ClassName
-   *   for method in methods:
-   *     ## MethodName
-   *     ![methodName](url)
-   *     other run information
-   * </code>
-   * </pre>
-   *
-   * @param classes the classes and their methods to be formatted
-   * @return the classes
-   */
-  private String formatIssueBody(Map<String, List<Method>> classes) {
-    StringBuilder sb = new StringBuilder();
-    for (String className : classes.keySet()) {
-      sb.append(String.format("# %s\n", className));
-      for (Method method : classes.get(className)) {
-        sb.append(formatMethodBody(method));
-      }
+    /**
+     * <p>
+     * Builds an issue based on the structure of the classes map
+     * </p>
+     *
+     * <pre>
+     * <code>
+     * for class in classes:
+     * # ClassName
+     * for method in methods:
+     * ## MethodName
+     * ![methodName](imageUrl)
+     * other run information
+     * </code>
+     * </pre>
+     *
+     * @param classes the classes and their methods to be formatted
+     * @return the classes
+     */
+    private String formatIssueBody(Map<String, List<Method>> classes) {
+        StringBuilder sb = new StringBuilder();
+        for (String className : classes.keySet()) {
+            sb.append(String.format("# %s\n", className));
+            for (Method method : classes.get(className)) {
+                sb.append(formatMethodBody(method));
+            }
+        }
+        return sb.toString();
     }
-    return sb.toString();
-  }
 
-  /**
-   * Takes a method and returns a markdown string containing method header, run results plot and
-   * configuration data
-   *
-   * @param method the method to be formatted
-   * @return a formatted md string of the method
-   */
-  private String formatMethodBody(Method method) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(String.format("## %s\n",
-        FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName())));
-    String url;
-    try {
-      CategoryChart methodBarPlot = createBarPlotPng(method);
-      String encodedBarPlot = encodeChartToBase64(methodBarPlot);
-      url = uploadImage(encodedBarPlot);
-    } catch (Exception e) {
-      url =
-          "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
+    /**
+     * Takes a method and returns a markdown string containing method header,
+     * run results plot and configuration data
+     *
+     * @param method the method to be formatted
+     * @return a formatted md string of the method
+     */
+    private String formatMethodBody(Method method) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(
+                String.format("## %s\n", FormatterUtils.getMethodNameFromBenchmarkField(
+                        method.getMethodName())));
+        String url;
+        try {
+            CategoryChart methodBarPlot = buildBarplot(method);
+            String encodedBarPlot = encodeChartToBase64(methodBarPlot);
+            url = uploadImage(writeChartToPng(methodBarPlot, method.getMethodName()),
+                    encodedBarPlot);
+        } catch (Exception e) {
+            url = "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
+        }
+        sb.append(String.format("![%s](%s)\n", method.getMethodName(), url));
+        sb.append("\nTODO: implement additional info\n");
+        return sb.toString();
     }
-    sb.append(String.format("![%s](%s)\n", method.getMethodName(), url));
-    sb.append("TODO: implement additional info\n");
-    return sb.toString();
-  }
 
-  /**
-   * @param path
-   * @return url
-   */
-  private String uploadImageAndGetPath(String path) {
-    // TODO: Should take the created image, upload it somewhere, and get a public URL back to be added to md
-    return path;
-  }
+    /**
+     * @param method the method which results should be visualized as bar plot
+     * png
+     * @return path of the bar plot png
+     * @throws IOException if png image cannot be created
+     */
+    private CategoryChart buildBarplot(Method method) throws IOException {
+        // FIXME: Loops through all results, it should be the 10 latest
+        CategoryChart barPlot = new CategoryChartBuilder()
+                .width(600)
+                .height(600)
+                .title(method.getMethodName())
+                .xAxisTitle("Date")
+                .yAxisTitle("Score")
+                .build();
+        List<Result> results = method.getRunResults();
+        List<String> timestamps
+                = results.stream()
+                        .map((x)
+                                -> new SimpleDateFormat("dd/MM/yyyy HH:MM")
+                                .format(x.getAddedAt()))
+                        .toList();
+        List<Double> scores
+                = results.stream()
+                        .map((x)
+                                -> Double.parseDouble(
+                                FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
+                        .toList();
+        String header
+                = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
+        barPlot.addSeries(header, timestamps, scores);
+        barPlot.getStyler().setLegendVisible(false);
+        return barPlot;
+    }
 
-  /**
-   * @param method the method which results should be visualized as bar plot png
-   * @return path of the bar plot png
-   * @throws IOException if png image cannot be created
-   */
-  private CategoryChart createBarPlotPng(Method method) throws IOException {
-    CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
-        .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
-    List<Result> results = method.getRunResults();
-    List<String> timestamps = results.stream()
-        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:MM").format(x.getAddedAt())).toList();
-    List<Double> scores = results.stream()
-        .map((x) -> Double.parseDouble(FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
-        .toList();
-    String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
-    barPlot.addSeries(header, timestamps, scores);
-    barPlot.getStyler().setLegendVisible(false);
-    return barPlot;
-    //return writeChartToPng(barPlot, method.getMethodName());
-  }
+    /**
+     * Takes a Category chart and encodes it as a base64 string
+     *
+     * @param categoryChart the chart to be encoded
+     * @return a base64 string
+     * @throws IOException
+     */
+    private String encodeChartToBase64(CategoryChart categoryChart)
+            throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BitmapEncoder.saveBitmap(categoryChart, outputStream,
+                BitmapEncoder.BitmapFormat.PNG);
+        byte[] imageBytes = outputStream.toByteArray();
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
 
-  /*
-  private String createImageFromResults(List<Result> results, String header) throws IOException {
-    CategoryChart chart = new CategoryChartBuilder().width(600).height(600).title(header)
-        .xAxisTitle("Date").yAxisTitle("Score").build();
-    List<String> timestamps = results.stream()
-        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:MM").format(x.getAddedAt())).toList();
-    List<Double> score = results.stream()
-        .map((x) -> Double.parseDouble(FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
-        .toList();
-    chart.addSeries(header, timestamps, score);
-    return writeChartToPng(chart, header);
-  }*/
+    private String writeChartToPng(CategoryChart chart, String fileName)
+            throws IOException {
+        BitmapEncoder.saveBitmapWithDPI(chart, fileName, BitmapFormat.PNG, 300);
+        return fileName + ".png";
+    }
 
-  /**
-   * Converts the bar chart to a PNG image, stores it in repo folder and returns the path.
-   *
-   * @param chart    the chart to be converted to an PNG image
-   * @param fileName the name of the PNG file
-   * @return the path of the PNG image of the bar chart
-   * @throws IOException if png file cannot be created
-   */
-  private String writeChartToPng(CategoryChart chart, String fileName) throws IOException {
-    String pngPath = imagesFolderPath + "/" + fileName;
-    BitmapEncoder.saveBitmapWithDPI(chart, pngPath, BitmapFormat.PNG,
-        300);
-    return pngPath + ".png";
-  }
+    /**
+     * Uploads an image to imagekit and returns the imageUrl if successful.
+     *
+     * @throws IOException if prviate key cannot be loaded
+     */
+    private String uploadImage(String fileName, String base64Img) throws IOException {
+        HttpHeaders headers = generateHeaders();
+        MultiValueMap<String, Object> body = generateRequestBodyFromFile(fileName, base64Img);
+        ResponseEntity<String> response = postToImageKit(body, headers);
+        String imageUrl = getUrlFromResponse(response.getBody());
+        return imageUrl;
+    }
 
-  /**
-   * Takes a Category chart and encodes it as a base64 string
-   *
-   * @param categoryChart the chart to be encoded
-   * @return a base64 string
-   * @throws IOException
-   */
-  private String encodeChartToBase64(CategoryChart categoryChart) throws IOException {
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    BitmapEncoder.saveBitmap(categoryChart, outputStream, BitmapEncoder.BitmapFormat.PNG);
-    byte[] imageBytes = outputStream.toByteArray();
-    return Base64.getEncoder().encodeToString(imageBytes);
-  }
+    /**
+     * Generates headers for sending POST request to imagekit upload file
+     * endpoint
+     *
+     * @return HttpHeaders
+     * @throws IOException if private key cannot be loaded from properties file
+     */
+    private HttpHeaders generateHeaders() throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        String encodedPrivateKey = Base64.getEncoder().encodeToString(readKeyFromProps().getBytes());
+        headers.setBasicAuth(encodedPrivateKey);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        return headers;
+    }
 
-  // TODO: Should move this method somewhere else
-  private void authenticateImageKit() throws IOException {
-    Properties prop = new Properties();
-    FileInputStream properties = new FileInputStream(
-        "src\\main\\resources\\application.properties");
-    prop.load(properties);
-    String publicKey = prop.getProperty("imagekit.publickey");
-    String privateKey = prop.getProperty("imagekit.privatekey");
-    String URL = prop.getProperty("imagekit.urlendpoint");
-    ImageKit imageKit = ImageKit.getInstance();
-    Configuration config = new Configuration(publicKey, privateKey, URL);
-    imageKit.setConfig(config);
-  }
+    /**
+     * @param base64Img the image (encoded as base64 string) to be uploaded to
+     * imagekit
+     * @param fileName the name of the file when uploaded to imagekit
+     */
+    private MultiValueMap<String, Object> generateRequestBodyFromFile(String fileName, String base64Img) {
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", base64Img);
+        body.add("fileName", fileName);
+        return body;
+    }
 
-  /**
-   * Takes an encoded image string , uploads it to imagekit and returns the url of the image
-   *
-   * @param encodedImage
-   * @return url of the image
-   * @throws ForbiddenException
-   * @throws TooManyRequestsException
-   * @throws InternalServerException
-   * @throws UnauthorizedException
-   * @throws BadRequestException
-   * @throws UnknownException
-   */
-  public static String uploadImage(String encodedImage)
-      throws ForbiddenException, TooManyRequestsException, InternalServerException, UnauthorizedException, BadRequestException, UnknownException {
-    FileCreateRequest fileCreateRequest = new FileCreateRequest(encodedImage, "TODO.jpg");
-    io.imagekit.sdk.models.results.Result result = ImageKit.getInstance().upload(fileCreateRequest);
-    return result.getUrl();
-  }
+    private ResponseEntity<String> postToImageKit(MultiValueMap<String, Object> body, HttpHeaders headers) {
+        String endpoint = "https://upload.imagekit.io/api/v1/files/upload/";
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.postForEntity(endpoint, requestEntity, String.class);
+        return response;
+    }
+
+    private String getUrlFromResponse(String body)
+            throws JsonMappingException, JsonProcessingException {
+        JsonNode node = new ObjectMapper().readTree(body);
+        String url = node.get("url").asText();
+        return url;
+    }
+
+    private String readKeyFromProps() throws IOException {
+        Properties prop = new Properties();
+        FileInputStream properties
+                = new FileInputStream("src/main/resources/application.properties");
+        prop.load(properties);
+        String privateKey = prop.getProperty("imagekit.privatekey");
+        return privateKey;
+    }
 }
