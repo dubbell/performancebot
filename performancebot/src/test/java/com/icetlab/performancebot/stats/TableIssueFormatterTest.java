@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-// import org.junit.Test;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,17 +25,17 @@ import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.PayloadManager;
 
 @SpringBootTest
 public class TableIssueFormatterTest {
 
   @InjectMocks
-  private Payload payloadHandler;
+  private PayloadManager payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new Payload());
+    payloadHandler = spy(new PayloadManager());
   }
 
   @InjectMocks

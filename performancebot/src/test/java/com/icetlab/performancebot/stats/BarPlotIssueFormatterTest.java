@@ -21,17 +21,17 @@ import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.Payload;
+import com.icetlab.performancebot.github.PayloadManager;
 
 @SpringBootTest
 public class BarPlotIssueFormatterTest {
 
   @InjectMocks
-  private Payload payloadHandler;
+  private PayloadManager payloadHandler;
 
   @BeforeEach
   public void setUp() {
-    payloadHandler = spy(new Payload());
+    payloadHandler = spy(new PayloadManager());
   }
 
   @InjectMocks
