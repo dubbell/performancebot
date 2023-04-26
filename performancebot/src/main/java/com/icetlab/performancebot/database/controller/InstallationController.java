@@ -208,5 +208,20 @@ public class InstallationController {
       return false;
     }
   }
+  
+  /**
+   * Deletes a Github repository from the database with all its repos
+   * @param installationId the installation where the Github repository is placed
+   * @param repoId the Github repository to be deleted
+   * @return true if successful, otherwise false
+   */
+  public boolean deleteGitHubRepo(String installationId, String repoId) {
+    try {
+      service.deleteGitHubRepo(installationId, repoId);
+      return true;
+    } catch (NoSuchElementException e) {
+      return false;
+    }
+  }
 
 }
