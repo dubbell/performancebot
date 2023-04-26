@@ -53,15 +53,16 @@ public class PerformanceBot {
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
-    @RequestBody String payload) {
+      @RequestBody String payload) {
     boolean handled;
     switch (eventType) {
       case "installation" -> handled = payloadHandler.handleInstall(payload);
       case "pull_request", "issue_comment" -> handled = payloadHandler.handlePullRequest(payload);
+      case "installation_repositories" -> handled = payloadHandler.handleRepo(payload);
       default -> handled = false;
     }
-    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled",
-      eventType);
+    String statusMessage =
+        String.format("%s event of type %s", handled ? "Ignored" : "Handled", eventType);
     System.out.println(statusMessage);
   }
 
