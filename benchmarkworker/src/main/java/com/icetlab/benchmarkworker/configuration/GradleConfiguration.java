@@ -51,8 +51,10 @@ public class GradleConfiguration extends JMHConfiguration {
       e.printStackTrace();
     }
     finally {
-      if (connection != null)
-        connection.close();
+      try {
+        if (connection != null)
+          connection.close();
+      } catch (Exception ignored) {}
       System.out.println("Compilation finished.");
     }
   }

@@ -51,7 +51,7 @@ public abstract class JMHConfiguration implements Configuration {
     // compile project
     compile();
 
-    String result;
+    String result = "";
 
     try {
 
@@ -64,13 +64,17 @@ public abstract class JMHConfiguration implements Configuration {
 
       // reads everything from result file
       result = new String(Files.readAllBytes(Paths.get("jmh-result.json")));
-
-      System.out.println("Benchmarking finished.");
-
-    } finally {
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    finally {
       new File("jmh-result.json").delete();
+      System.out.println("Benchmarking finished.");
     }
 
+    if (result.equals(""))
+      return "[]";
     return result.trim();
   }
 

@@ -34,6 +34,11 @@ public class MavenConfiguration extends JMHConfiguration {
       request.setGoals(Collections.singletonList("install"));
       request.setQuiet(true);
       request.setInputStream(InputStream.nullInputStream());
+
+      Properties properties = new Properties();
+      properties.setProperty("skipTests", "true"); // skip tests as they take too much time
+      request.setProperties(properties);
+
       mavenInvocations.add(request);
     }
     else {
