@@ -80,13 +80,6 @@ public class TableIssueFormatterTest {
     System.out.println("Actual result:");
     System.out.println(md);
 
-    // Write to file
-    try {
-      Files.writeString(Path.of("test.md"), md);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
     Pattern pattern = Pattern.compile(classNameHeader);
     Matcher matcher = pattern.matcher(md);
     assertTrue((matcher.find() && !matcher.find()));
@@ -118,13 +111,6 @@ public class TableIssueFormatterTest {
     String methodDuplicate = "## newWay";
 
     String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT).strip();
-
-    // Write to file
-    try {
-      Files.writeString(Path.of("test.md"), md);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
     int firstMethodPos = md.indexOf(methodDuplicate);
     int lastMethodPos = md.indexOf(methodDuplicate, firstMethodPos + 1);
