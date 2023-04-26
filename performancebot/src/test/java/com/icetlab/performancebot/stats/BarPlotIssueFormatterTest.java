@@ -21,7 +21,7 @@ import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.PayloadManager;
+import com.icetlab.performancebot.webhook.PayloadManager;
 
 @SpringBootTest
 public class BarPlotIssueFormatterTest {

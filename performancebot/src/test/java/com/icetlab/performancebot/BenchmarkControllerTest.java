@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
-public class PerformanceBotTest {
+public class BenchmarkControllerTest {
 
   @Value(value = "${local.server.port}")
   private int port;
