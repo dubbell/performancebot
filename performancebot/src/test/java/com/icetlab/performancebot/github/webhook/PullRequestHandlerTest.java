@@ -38,9 +38,6 @@ public class PullRequestHandlerTest {
 
   @Test
   public void testHandlePullRequestWithPing() {
-    // If we get to the handling part, we are dependent on a working k8s connection.
-    // If we get there, it means all checks have passed!
-    Assertions.assertThrows(KubernetesClientException.class,
-      () -> pullRequestHandler.handle(WebhookMocks.PR_WITH_PING));
+    Assertions.assertTrue(pullRequestHandler.handle(WebhookMocks.PR_WITH_PING));
   }
 }

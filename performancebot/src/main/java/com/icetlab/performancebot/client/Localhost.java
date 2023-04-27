@@ -36,9 +36,9 @@ public class Localhost implements BenchmarkWorkerClient {
 
   private static String tryGetPortFromProperties(Config conf) {
     try {
-      return conf.getServerIp();
+      return conf.getServerPort();
     } catch (BeanCreationException e) {
-      return "localhost";
+      return "8080";
     }
   }
 
