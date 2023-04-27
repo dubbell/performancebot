@@ -3,7 +3,7 @@ package com.icetlab.benchmarkworker.configuration;
 import java.util.List;
 
 /**
- * Class representing the contents of a .yaml configuration file.
+ * Class representing the contents of a perfbot.yaml configuration file.
  */
 public class ConfigData {
 

@@ -26,7 +26,7 @@ public class GradleConfiguration extends JMHConfiguration {
     ProjectConnection connection = null;
 
     try {
-      if (configData.getBuildTasks() == null) {
+      if (configData.getBuildTasks() == null) { // default build task
         connection = GradleConnector.newConnector()
             .forProjectDirectory(new File("benchmark_directory")).connect();
 

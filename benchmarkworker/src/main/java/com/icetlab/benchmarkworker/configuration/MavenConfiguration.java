@@ -61,7 +61,7 @@ public class MavenConfiguration extends JMHConfiguration {
     if (System.getProperty("os.name").toLowerCase().contains("win")) // if windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
-
+    // execute all build tasks
     for(InvocationRequest request : mavenInvocations) {
       int exitCode = invoker.execute(request).getExitCode();
       System.out.println("Maven task executed with exit code: " + exitCode);

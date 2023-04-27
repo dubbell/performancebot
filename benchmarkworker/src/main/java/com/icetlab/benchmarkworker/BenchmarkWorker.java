@@ -36,9 +36,9 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Spring boot application to be run in containers.
 
- * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
+ * Is given tasks to complete by the benchmark-controller, which consists of: 1. Cloning the given
  * repository into a local directory. 2. Compiling and running all specified benchmarks in the
- * cloned repository. 3. Sending the results back to the performancebot.
+ * cloned repository. 3. Sending the results back to the benchmark-controller.
  */
 @RestController
 @SpringBootApplication
@@ -122,7 +122,7 @@ public class BenchmarkWorker {
 
 
   /**
-   * Sends results back to perfbot process.
+   * Sends results back to benchmark-controller process.
    */
   public void sendResult(String results, String installationId, String repoId,
       String name, String endpoint) throws Exception {
@@ -144,7 +144,7 @@ public class BenchmarkWorker {
   }
 
   /**
-   * Finds the ip and port of the perfbot kubernetes service.
+   * Finds the ip and port of the benchmark-controller-svc kubernetes service.
    */
   private String getPerfbotServiceAddress() {
     Service service = kubernetesClient.services().withName("perfbot-svc").get();

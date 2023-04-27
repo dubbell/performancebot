@@ -48,12 +48,10 @@ public abstract class JMHConfiguration implements Configuration {
   @Override
   public String benchmark() throws Exception {
 
-    // compile project
-    compile();
-
     String result = "";
 
     try {
+      compile(); // compile project
 
       System.out.println("Benchmarking started.");
 
@@ -69,7 +67,7 @@ public abstract class JMHConfiguration implements Configuration {
       e.printStackTrace();
     }
     finally {
-      new File("jmh-result.json").delete();
+      new File("jmh-result.json").delete(); // delete result file
       System.out.println("Benchmarking finished.");
     }
 
