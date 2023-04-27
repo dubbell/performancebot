@@ -1,14 +1,12 @@
 package com.icetlab.benchmarkworker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.benchmarkworker.client.Client;
+import com.icetlab.benchmarkworker.client.Localhost;
 import com.icetlab.benchmarkworker.configuration.Configuration;
 import com.icetlab.benchmarkworker.configuration.ConfigurationFactory;
 import java.io.IOException;
 import java.net.URI;
-
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -20,6 +18,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,11 +44,12 @@ import org.springframework.web.client.RestTemplate;
 public class BenchmarkWorker {
 
   Logger logger = LoggerFactory.getLogger(BenchmarkWorker.class);
-
-  private final static KubernetesClient kubernetesClient = new KubernetesClientBuilder().build();
+  Client client = new Localhost(); // Change to Kubernetes() to run on kubernetes
 
   public static void main(String[] args) {
-    SpringApplication.run(BenchmarkWorker.class, args);
+    SpringApplication app = new SpringApplication(BenchmarkWorker.class);
+    app.setDefaultProperties(Collections.singletonMap("server.port", "8081"));
+    app.run(args);
   }
 
   /**
@@ -77,8 +77,7 @@ public class BenchmarkWorker {
       System.out.println(result);
 
       // send result back to the performance bot
-      sendResult(result,
-          parser.parseMap(task).get("installation_id").toString(),
+      sendResult(result, parser.parseMap(task).get("installation_id").toString(),
           parser.parseMap(task).get("repo_id").toString(),
           parser.parseMap(task).get("name").toString(),
           parser.parseMap(task).get("issue_url").toString());
@@ -117,8 +116,8 @@ public class BenchmarkWorker {
   /**
    * Sends results back to perfbot process.
    */
-  public void sendResult(String results, String installationId, String repoId,
-      String name, String endpoint) throws Exception {
+  public void sendResult(String results, String installationId, String repoId, String name,
+      String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
@@ -132,18 +131,8 @@ public class BenchmarkWorker {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create("http://" + getPerfbotServiceAddress() + "/benchmark"), requestEntity,
-        String.class);
-  }
-
-  /**
-   * Finds the ip and port of the perfbot kubernetes service.
-   */
-  private String getPerfbotServiceAddress() {
-    Service service = kubernetesClient.services().withName("perfbot-svc").get();
-    int port = service.getSpec().getPorts().get(0).getNodePort();
-    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0).getAddress();
-    return ip + ":" + port;
+    restTemplate.postForEntity(URI.create(client.getServerIpWithPort() + "/benchmark"),
+        requestEntity, String.class);
   }
 
   /**
