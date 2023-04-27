@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.github.webhook;
+package com.icetlab.performancebot.webhook.handlers;
 
 import java.util.Objects;
 import java.util.stream.Stream;

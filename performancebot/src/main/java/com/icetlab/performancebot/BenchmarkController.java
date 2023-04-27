@@ -1,7 +1,7 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.PayloadManager;
+import com.icetlab.performancebot.webhook.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableMongoRepositories
 @EnableMongoAuditing
-public class PerformanceBot {
+public class BenchmarkController {
 
   @Autowired
   private PayloadManager payloadHandler;
@@ -32,7 +32,7 @@ public class PerformanceBot {
    * The main entry of the application.
    */
   public static void main(String[] args) {
-    SpringApplication.run(PerformanceBot.class, args);
+    SpringApplication.run(BenchmarkController.class, args);
   }
 
   /**

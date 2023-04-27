@@ -5,6 +5,8 @@ import static org.junit.Assert.assertThrows;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.service.InstallationService;
 import java.util.NoSuchElementException;
+
+import com.icetlab.performancebot.webhook.handlers.InstallationHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,6 @@
 package com.icetlab.performancebot.github.webhook;
 
+import com.icetlab.performancebot.webhook.handlers.RepoHandler;
 import org.junit.jupiter.api.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

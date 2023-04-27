@@ -1,6 +1,7 @@
 package com.icetlab.performancebot.github.webhook;
 
 import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.webhook.handlers.PullRequestHandler;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

@@ -6,6 +6,8 @@ import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import java.util.HashSet;
+
+import com.icetlab.performancebot.webhook.handlers.ResultsHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

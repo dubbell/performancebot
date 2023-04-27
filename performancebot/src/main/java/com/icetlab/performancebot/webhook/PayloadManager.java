@@ -1,9 +1,9 @@
-package com.icetlab.performancebot.github;
+package com.icetlab.performancebot.webhook;
 
-import com.icetlab.performancebot.github.webhook.InstallationHandler;
-import com.icetlab.performancebot.github.webhook.PullRequestHandler;
-import com.icetlab.performancebot.github.webhook.RepoHandler;
-import com.icetlab.performancebot.github.webhook.ResultsHandler;
+import com.icetlab.performancebot.webhook.handlers.InstallationHandler;
+import com.icetlab.performancebot.webhook.handlers.PullRequestHandler;
+import com.icetlab.performancebot.webhook.handlers.RepoHandler;
+import com.icetlab.performancebot.webhook.handlers.ResultsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
