@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.github.webhook;
+package com.icetlab.performancebot.webhook.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

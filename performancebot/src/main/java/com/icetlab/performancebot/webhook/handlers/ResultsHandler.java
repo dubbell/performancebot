@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.github.webhook;
+package com.icetlab.performancebot.webhook.handlers;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.icetlab.performancebot.github.GitHubIssueManager;
-import com.icetlab.performancebot.stats.GitHubIssueFormatter;
+import com.icetlab.performancebot.stats.TableIssueFormatter;
 
 @Component
 public class ResultsHandler extends WebhookHandler {
   @Autowired
-  GitHubIssueFormatter gitHubIssueFormatter;
+  TableIssueFormatter issueFormatter;
 
   /**
    * Handles the payload received from GitHub when the results of a performance test are ready.
@@ -26,7 +26,7 @@ public class ResultsHandler extends WebhookHandler {
     String name = node.get("name").asText();
     if (Stream.of(installationId, issueUrl, name).anyMatch(Objects::isNull))
       return false;
-    String formattedResults = gitHubIssueFormatter.formatBenchmarkIssue(payload);
+    String formattedResults = issueFormatter.formatBenchmarkIssue(payload);
     GitHubIssueManager.getInstance().createIssue(issueUrl, "Results for " + name, formattedResults,
         installationId);
     return true;

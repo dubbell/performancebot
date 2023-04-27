@@ -1,8 +1,9 @@
-package com.icetlab.performancebot.github;
+package com.icetlab.performancebot.webhook;
 
-import com.icetlab.performancebot.github.webhook.InstallationHandler;
-import com.icetlab.performancebot.github.webhook.PullRequestHandler;
-import com.icetlab.performancebot.github.webhook.ResultsHandler;
+import com.icetlab.performancebot.webhook.handlers.InstallationHandler;
+import com.icetlab.performancebot.webhook.handlers.PullRequestHandler;
+import com.icetlab.performancebot.webhook.handlers.RepoHandler;
+import com.icetlab.performancebot.webhook.handlers.ResultsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,8 @@ public class PayloadManager {
   private InstallationHandler installationHandler;
   @Autowired
   private PullRequestHandler pullRequestHandler;
+  @Autowired
+  private RepoHandler repoHandler;
 
   /**
    * Handles the payload received from GitHub when the results of a performance test are ready.
@@ -45,6 +48,11 @@ public class PayloadManager {
 
   public boolean handlePullRequest(String payload) {
     boolean handled = pullRequestHandler.handle(payload);
+    return handled;
+  }
+
+  public boolean handleRepo(String payload) {
+    boolean handled = repoHandler.handle(payload);
     return handled;
   }
 
