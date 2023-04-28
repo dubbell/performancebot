@@ -16,8 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MethodByClassFormatter implements BenchmarkIssueFormatter {
 
-  @Autowired
-  VisualizationStrategy visualizationStrategy;
+  VisualizationStrategy visualizationStrategy = new BenchmarkBarPlot(); // Change statistical analysis strategy here
   @Autowired
   InstallationService installationService;
 
@@ -60,7 +59,7 @@ public class MethodByClassFormatter implements BenchmarkIssueFormatter {
     for (String className : classes.keySet()) {
       sb.append(String.format("# %s\n", className));
       for (Method method : classes.get(className)) {
-        String runResultsVisualization = benchmarkBarPlot.visualizeBenchmarkResults(method);
+        String runResultsVisualization = visualizationStrategy.visualizeBenchmarkResults(method);
         sb.append(runResultsVisualization);
       }
     }
