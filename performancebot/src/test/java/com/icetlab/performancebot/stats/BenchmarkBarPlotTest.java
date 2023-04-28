@@ -2,6 +2,7 @@ package com.icetlab.performancebot.stats;
 
 import static org.junit.Assert.assertTrue;
 
+import com.icetlab.performancebot.stats.visualization.BenchmarkBarPlot;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;

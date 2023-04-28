@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.visualization;
 
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.List;
+
+import com.icetlab.performancebot.stats.FormatterUtils;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
-import org.springframework.stereotype.Component;
 
 public class BenchmarkBarPlot implements VisualizationStrategy {
 

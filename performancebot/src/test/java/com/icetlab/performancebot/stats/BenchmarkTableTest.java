@@ -7,7 +7,7 @@ import com.icetlab.performancebot.database.model.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.icetlab.performancebot.database.model.Method;
+import com.icetlab.performancebot.stats.visualization.BenchmarkTable;
 import org.junit.jupiter.api.Test;
 
 public class BenchmarkTableTest {

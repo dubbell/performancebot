@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.visualization;
 
 import com.icetlab.performancebot.database.model.Method;
 

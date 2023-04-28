@@ -3,13 +3,15 @@ package com.icetlab.performancebot.stats;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.icetlab.performancebot.stats.visualization.BenchmarkBarPlot;
+import com.icetlab.performancebot.stats.visualization.VisualizationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

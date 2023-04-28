@@ -46,9 +46,6 @@ public class BarPlotIssueFormatterTest {
   MongoTemplate mongoTemplate;
 
   @Autowired
-  BarPlotIssueFormatter formatter;
-
-  @Autowired
   MethodByClassFormatter methodByClassFormatter;
 
 

@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.visualization;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
+import com.icetlab.performancebot.stats.FormatterUtils;
 import org.springframework.stereotype.Component;
 
 @Component
