@@ -53,7 +53,7 @@ public class MavenConfiguration extends JMHConfiguration {
     }
 
     Invoker invoker = new DefaultInvoker();
-    if (System.getProperty("os.name").toLowerCase().contains("win")) // if windows
+    if (System.getProperty("os.name").toLowerCase().contains("win") || System.getProperty("os.name").toLowerCase().contains("mac")) // if windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
 
