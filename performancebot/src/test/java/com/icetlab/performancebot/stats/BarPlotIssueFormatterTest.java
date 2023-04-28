@@ -48,6 +48,10 @@ public class BarPlotIssueFormatterTest {
   @Autowired
   BarPlotIssueFormatter formatter;
 
+  @Autowired
+  MethodByClassFormatter methodByClassFormatter;
+
+
   @BeforeEach
   public void resetDatabase() {
     mongoTemplate.dropCollection(Installation.class);
@@ -77,7 +81,8 @@ public class BarPlotIssueFormatterTest {
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.AnotherClassName.newWay", another));
 
-    String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
+    //String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
+    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
     // Write to file
     try {
       Files.writeString(Path.of("test.md"), md);
