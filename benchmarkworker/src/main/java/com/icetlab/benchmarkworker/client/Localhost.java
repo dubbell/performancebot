@@ -12,10 +12,10 @@ public class Localhost implements Client {
   }
 
   /**
-   * Uses localhost with default port 8081
+   * Uses localhost IP to performancebot
    */
   public Localhost() {
-    hostIp = "localhost:8081";
+    hostIp = "localhost:8080";
   }
 
   @Override
