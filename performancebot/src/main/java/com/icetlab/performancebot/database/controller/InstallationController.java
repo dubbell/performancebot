@@ -73,7 +73,7 @@ public class InstallationController {
 
       boolean methodExists;
       if (results.isArray()) {
-        for (JsonNode methodNode : results.get(0)) {
+        for (JsonNode methodNode : results) {
           methodExists = service.getMethodsFromRepo(installationId, repoId).stream().anyMatch(
               method -> method.getMethodName().equals(methodNode.get("benchmark").asText()));
           if (!methodExists) {
@@ -194,9 +194,10 @@ public class InstallationController {
       return null;
     }
   }
-  
+
   /**
    * Deletes an installation from the database with all its repos
+   * 
    * @param installationId the installation to be deleted
    * @return true if successful, otherwise false
    */
@@ -208,9 +209,10 @@ public class InstallationController {
       return false;
     }
   }
-  
+
   /**
    * Deletes a Github repository from the database with all its repos
+   * 
    * @param installationId the installation where the Github repository is placed
    * @param repoId the Github repository to be deleted
    * @return true if successful, otherwise false

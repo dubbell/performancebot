@@ -5,9 +5,12 @@ import com.icetlab.benchmarkworker.client.Client;
 import com.icetlab.benchmarkworker.client.Localhost;
 import com.icetlab.benchmarkworker.configuration.Configuration;
 import com.icetlab.benchmarkworker.configuration.ConfigurationFactory;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -16,35 +19,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-
 /**
  * Spring boot application to be run in containers.
- * 
- * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
- * repository into a local directory. 2. Compiling and running all specified benchmarks in the
- * cloned repository. 3. Sending the results back to the performancebot.
+ *
+ * Is given tasks to complete by the performancebot, which consists of: 1.
+ * Cloning the given repository into a local directory. 2. Compiling and running
+ * all specified benchmarks in the cloned repository. 3. Sending the results
+ * back to the performancebot.
  */
 @RestController
 @SpringBootApplication
 public class BenchmarkWorker {
 
   Logger logger = LoggerFactory.getLogger(BenchmarkWorker.class);
-  Client client = new Localhost(); // Change to Kubernetes() to run on kubernetes
+  Client client =
+      new Localhost(); // Change to Kubernetes() to run on kubernetes
 
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(BenchmarkWorker.class);
@@ -55,13 +52,15 @@ public class BenchmarkWorker {
   /**
    * Listens for new tasks from the performancebot.
    */
-  @PostMapping(name = "/task", value = "task", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void startTask(@RequestBody String task) {
+  @PostMapping(name = "/task", value = "task",
+               consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void
+  startTask(@RequestBody String task) {
     JacksonJsonParser parser = new JacksonJsonParser();
 
-    String repoURL = (String) parser.parseMap(task).get("url");
-    String accessToken = (String) parser.parseMap(task).get("token");
-    String branch = (String) parser.parseMap(task).get("branch");
+    String repoURL = (String)parser.parseMap(task).get("url");
+    String accessToken = (String)parser.parseMap(task).get("token");
+    String branch = (String)parser.parseMap(task).get("branch");
 
     // if one thing fails, the benchmark is cancelled
     try {
@@ -77,10 +76,11 @@ public class BenchmarkWorker {
       System.out.println(result);
 
       // send result back to the performance bot
-      sendResult(result, parser.parseMap(task).get("installation_id").toString(),
-          parser.parseMap(task).get("repo_id").toString(),
-          parser.parseMap(task).get("name").toString(),
-          parser.parseMap(task).get("issue_url").toString());
+      sendResult(result,
+                 parser.parseMap(task).get("installation_id").toString(),
+                 parser.parseMap(task).get("repo_id").toString(),
+                 parser.parseMap(task).get("name").toString(),
+                 parser.parseMap(task).get("issue_url").toString());
     } catch (Exception e) {
       logger.error(e.toString());
     }
@@ -91,11 +91,12 @@ public class BenchmarkWorker {
 
   /**
    * Creates directory and clones repository into it.
-   * 
+   *
    * @param repoURL repository url
    * @param accessToken repository access token for authentication
    */
-  public void clone(String repoURL, String accessToken, String branch) throws Exception {
+  public void clone(String repoURL, String accessToken, String branch)
+      throws Exception {
     System.out.println("Cloning started.");
 
     // creates directory
@@ -103,21 +104,26 @@ public class BenchmarkWorker {
     if (!dir.mkdir()) // attempts to create directory
       return;
 
-    CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
-    Git.cloneRepository().setCredentialsProvider(credentials) // if the repository is private, the
-                                                              // access token should authorize the
-                                                              // request
-        .setURI(repoURL).setDirectory(dir).setBranch(branch).call().close();
+    CredentialsProvider credentials =
+        new UsernamePasswordCredentialsProvider(accessToken, "");
+    Git.cloneRepository()
+        .setCredentialsProvider(credentials) // if the repository is private,
+                                             // the access token should
+                                             // authorize the request
+        .setURI(repoURL)
+        .setDirectory(dir)
+        .setBranch(branch)
+        .call()
+        .close();
 
     System.out.println("Cloning finished.");
   }
 
-
   /**
    * Sends results back to perfbot process.
    */
-  public void sendResult(String results, String installationId, String repoId, String name,
-      String endpoint) throws Exception {
+  public void sendResult(String results, String installationId, String repoId,
+                         String name, String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
@@ -128,11 +134,13 @@ public class BenchmarkWorker {
     Object[] resultList = mapper.readValue(results.trim(), Object[].class);
     requestBody.put("results", resultList);
 
-    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
+    HttpEntity<Map<String, Object>> requestEntity =
+        new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(URI.create(client.getServerIpWithPort() + "/benchmark"),
-        requestEntity, String.class);
+    restTemplate.postForEntity(
+        URI.create(client.getServerIpWithPort() + "/benchmark"), requestEntity,
+        String.class);
   }
 
   /**

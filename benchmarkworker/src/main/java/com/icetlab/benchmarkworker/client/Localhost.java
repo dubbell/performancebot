@@ -8,14 +8,14 @@ public class Localhost implements Client {
    * Uses localhost with custom port
    */
   public Localhost(int port) {
-    hostIp = "localhost:" + port;
+    hostIp = "http://localhost:" + port;
   }
 
   /**
    * Uses localhost IP to performancebot
    */
   public Localhost() {
-    hostIp = "localhost:8080";
+    hostIp = "http://localhost:8080";
   }
 
   @Override

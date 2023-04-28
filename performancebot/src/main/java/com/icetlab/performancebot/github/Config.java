@@ -14,10 +14,10 @@ public class Config {
   @Value("${github.private_key_path}")
   private String privateKeyPath;
 
-  @Value("${server.ip}")
+  @Value("${server.bworker.ip}")
   private String serverIp;
 
-  @Value("${server.port}")
+  @Value("${server.bworker.port}")
   private String serverPort;
 
   public String getAppId() {

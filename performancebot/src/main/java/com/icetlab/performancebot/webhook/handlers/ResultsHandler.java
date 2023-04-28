@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.icetlab.performancebot.github.GitHubIssueManager;
+import com.icetlab.performancebot.stats.BarPlotIssueFormatter;
 import com.icetlab.performancebot.stats.TableIssueFormatter;
 
 @Component
 public class ResultsHandler extends WebhookHandler {
   @Autowired
-  TableIssueFormatter issueFormatter;
+  BarPlotIssueFormatter issueFormatter;
 
   /**
    * Handles the payload received from GitHub when the results of a performance test are ready.
