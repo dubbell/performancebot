@@ -47,7 +47,7 @@ public class TableIssueFormatterTest {
   MongoTemplate mongoTemplate;
 
   @Autowired
-  TableIssueFormatter formatter;
+  MethodByClassFormatter formatter;
 
   @BeforeEach
   public void resetDatabase() {
