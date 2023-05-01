@@ -61,6 +61,7 @@ public class PullRequestHandler extends WebhookHandler {
     String name = node.get("repository").get("name").asText();
     issuesUrl = issuesUrl.substring(0, issuesUrl.lastIndexOf("/"));
     String repoUrl = node.get("repository").get("clone_url").asText();
+    String branch = node.get("pull_request").get("head").get("ref").asText();
 
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("url", repoUrl);
@@ -69,6 +70,7 @@ public class PullRequestHandler extends WebhookHandler {
     requestBody.put("repo_id", repoId);
     requestBody.put("issue_url", issuesUrl);
     requestBody.put("name", name);
+    requestBody.put("branch", branch);
 
     return requestBody;
   }
