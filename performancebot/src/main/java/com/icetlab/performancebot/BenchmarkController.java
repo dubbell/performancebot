@@ -1,7 +1,7 @@
 package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.github.PayloadManager;
+import com.icetlab.performancebot.webhook.PayloadManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableMongoRepositories
 @EnableMongoAuditing
-public class PerformanceBot {
+public class BenchmarkController {
 
   @Autowired
   private PayloadManager payloadHandler;
@@ -32,7 +32,7 @@ public class PerformanceBot {
    * The main entry of the application.
    */
   public static void main(String[] args) {
-    SpringApplication.run(PerformanceBot.class, args);
+    SpringApplication.run(BenchmarkController.class, args);
   }
 
   /**
@@ -53,15 +53,16 @@ public class PerformanceBot {
    */
   @PostMapping(name = "/payload", value = "payload", consumes = MediaType.APPLICATION_JSON_VALUE)
   public void payload(@RequestHeader(value = "X-Github-Event") String eventType,
-    @RequestBody String payload) {
+      @RequestBody String payload) {
     boolean handled;
     switch (eventType) {
       case "installation" -> handled = payloadHandler.handleInstall(payload);
       case "pull_request", "issue_comment" -> handled = payloadHandler.handlePullRequest(payload);
+      case "installation_repositories" -> handled = payloadHandler.handleRepo(payload);
       default -> handled = false;
     }
-    String statusMessage = String.format("%s event of type %s", handled ? "Ignored" : "Handled",
-      eventType);
+    String statusMessage =
+        String.format("%s event of type %s", handled ? "Ignored" : "Handled", eventType);
     System.out.println(statusMessage);
   }
 

@@ -1,14 +1,9 @@
-package com.icetlab.performancebot.github.webhook;
+package com.icetlab.performancebot.webhook.handlers;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.Objects;
-import java.util.stream.Stream;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;

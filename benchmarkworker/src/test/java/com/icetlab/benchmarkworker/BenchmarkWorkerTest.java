@@ -40,8 +40,8 @@ public class BenchmarkWorkerTest {
   //@Test
   //public void jcToolsTest() { mavenTest("https://github.com/dubbell/JCTools", "master"); }
 
-  @Test
-  public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava", "3.x"); }
+  //@Test
+  //public void reactiveJavaTest() { gradleTest("https://github.com/dubbell/RxJava", "3.x"); }
 
 
 

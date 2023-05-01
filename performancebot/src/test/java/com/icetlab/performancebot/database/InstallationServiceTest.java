@@ -8,7 +8,7 @@ import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
-import com.icetlab.performancebot.github.PayloadManager;
+import com.icetlab.performancebot.webhook.PayloadManager;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -295,6 +295,49 @@ public class InstallationServiceTest {
       installationService.deleteInstallationById(validId);
       installationService.deleteInstallationById(invalidId);
     });
+  }
+  
+  @Test
+  public void testDeleteGitHubRepo(){
+    String installation = "id for installation";
+    GitHubRepo repository = new GitHubRepo("id for reoo", new HashSet<Method>(), "name");
+
+    installationService.addInstallation(installation);
+    installationService.addRepoToInstallation(installation, repository);
+
+    // delete the repo
+    installationService.deleteGitHubRepo(installation, repository.getRepoId());
+    
+    Query q = Query.query(where("_id").is(installation));
+    List<Installation> installations = mongoTemplate.find(q, Installation.class);
+    
+    assertEquals(0, installations.get(0).getRepos().size());
+  }
+  
+  @Test
+  public void testDeleteGitHubRepoNotFoundInstallation(){
+    String nonExistingInstallationId = "non existing id";
+    GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
+
+    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteGitHubRepo(nonExistingInstallationId, nonExistingRepo.getRepoId());
+    });
+
+    assertEquals(e.getMessage(), "No such installation");
+  }
+
+  @Test
+  public void testDeleteGitHubRepoNotFoundRepo(){
+    String installationId = "installation id";
+    GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
+
+    installationService.addInstallation(installationId);
+
+    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+      installationService.deleteGitHubRepo(installationId, nonExistingRepo.getRepoId());
+    });
+
+    assertEquals(e.getMessage(), "No such GitHub repo");
   }
 
   @BeforeEach

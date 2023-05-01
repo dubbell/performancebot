@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.github.webhook;
+package com.icetlab.performancebot.webhook.handlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
