@@ -63,7 +63,7 @@ public class BenchmarkWorker {
     String accessToken = (String) parser.parseMap(task).get("token");
     String branch = (String) parser.parseMap(task).get("branch");
 
-    String result = "[]";
+    String results = "";
 
     // if one thing fails, the benchmark is cancelled
     try {
@@ -74,9 +74,9 @@ public class BenchmarkWorker {
       Configuration configuration = ConfigurationFactory.getConfiguration();
 
       // compile and get result of benchmark
-      result = configuration.benchmark(); // saves result to json file
+      results = configuration.benchmark(); // saves result to json file
 
-      System.out.println(result);
+      System.out.println(results);
 
     } catch (Exception e) {
       logger.error(e.toString());
@@ -85,7 +85,7 @@ public class BenchmarkWorker {
     // send result back to the performance bot
     // if benchmark failed, then result is just an empty string
     try {
-      sendResult(result,
+      sendResults(results,
               parser.parseMap(task).get("installation_id").toString(),
               parser.parseMap(task).get("repo_id").toString(),
               parser.parseMap(task).get("name").toString(),
@@ -124,7 +124,7 @@ public class BenchmarkWorker {
   /**
    * Sends results back to benchmark-controller process.
    */
-  public void sendResult(String results, String installationId, String repoId,
+  public void sendResults(String results, String installationId, String repoId,
       String name, String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
@@ -132,9 +132,12 @@ public class BenchmarkWorker {
     requestBody.put("name", name);
     requestBody.put("issue_url", endpoint);
 
-    ObjectMapper mapper = new ObjectMapper();
-    Object[] resultList = mapper.readValue(results.trim(), Object[].class);
-    requestBody.put("results", resultList);
+    // if an error occurred and a result wasn't calculated, don't add the results to the body
+    if (results.equals("")) {
+      ObjectMapper mapper = new ObjectMapper();
+      Object[] resultList = mapper.readValue(results.trim(), Object[].class);
+      requestBody.put("results", resultList);
+    }
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();

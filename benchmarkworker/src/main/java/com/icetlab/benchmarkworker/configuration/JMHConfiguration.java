@@ -71,8 +71,6 @@ public abstract class JMHConfiguration implements Configuration {
       System.out.println("Benchmarking finished.");
     }
 
-    if (result.equals(""))
-      return "[]";
     return result.trim();
   }
 

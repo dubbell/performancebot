@@ -58,6 +58,7 @@ public class MavenConfiguration extends JMHConfiguration {
     }
 
     Invoker invoker = new DefaultInvoker();
+    
     if (System.getProperty("os.name").toLowerCase().contains("win")) // if windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
@@ -74,6 +75,5 @@ public class MavenConfiguration extends JMHConfiguration {
   String getJmhJar() {
     return "benchmark_directory/target/benchmarks.jar";
   }
-
 
 }
