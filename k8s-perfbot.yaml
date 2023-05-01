@@ -1,7 +1,7 @@
 
-# PERFORMANCE BOT ------------------------------------
+# BENCHMARK CONTROLLER ------------------------------------
 
-# perfbot deployment:
+# controller deployment:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,7 +28,7 @@ spec:
 
 ---
 
-# perfbot service:
+# controller service:
 apiVersion: v1
 kind: Service
 metadata:
@@ -44,7 +44,7 @@ spec:
 
 ---
 
-# perfbot ingress:
+# controller ingress:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
