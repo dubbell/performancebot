@@ -25,7 +25,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     try {
       CategoryChart methodBarPlot = buildBarplot(method);
       String encodedBarPlot = encodeChartToBase64(methodBarPlot);
-      url = ImageKitUploader.uploadImage(writeChartToPng(methodBarPlot, method.getMethodName()),
+      url = ImageKitUploader.uploadImage(method.getMethodName() + ".png",
           encodedBarPlot);
     } catch (Exception e) {
       url =
@@ -70,10 +70,6 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     byte[] imageBytes = outputStream.toByteArray();
     return Base64.getEncoder().encodeToString(imageBytes);
   }
-
-  private String writeChartToPng(CategoryChart chart, String fileName) throws IOException {
-    BitmapEncoder.saveBitmapWithDPI(chart, fileName, BitmapFormat.PNG, 300);
-    return fileName + ".png";
-  }
+  
 
 }
