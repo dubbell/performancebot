@@ -13,13 +13,14 @@ import com.icetlab.performancebot.database.model.Result;
 public class BenchmarkBarPlotTest {
 
   @Test
-  public void test() {
+  public void testVisualizeBenchmarkResults() {
     BenchmarkBarPlot benchmarkBarPlot = new BenchmarkBarPlot();
     List<Result> results = new ArrayList<>();
     results.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
     Method method = new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results);
-    String barPlot = benchmarkBarPlot.visualizeBenchmarkResults(method);
-    System.out.println(barPlot);
-    assertTrue(true);
+    String mdBarPlot = benchmarkBarPlot.visualizeBenchmarkResults(method);
+    System.out.println(mdBarPlot);
+    assertTrue(mdBarPlot.startsWith("## newWay"));
+    assertTrue(mdBarPlot.contains("![com.szatmary.peter.SampleBenchmarkTest.newWay](https://"));
   }
 }
