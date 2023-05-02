@@ -16,7 +16,7 @@ public class BenchmarkTableTest {
   public void test() {
     BenchmarkTable benchmarkTable = new BenchmarkTable();
     List<Result> results = new ArrayList<>();
-    results.add(new Result(Constants.res_newWay));
+    results.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
     Method method = new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results);
     String table = benchmarkTable.visualizeBenchmarkResults(method);
     System.out.println(table);

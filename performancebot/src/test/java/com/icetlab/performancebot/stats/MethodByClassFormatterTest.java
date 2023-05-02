@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -57,37 +58,66 @@ public class MethodByClassFormatterTest {
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
   }
 
-  // Test that
+  /*
+    Test that markdown string contains one class name header, i.e. SampleBenchmarkTest
+    and not AnotherClassName
+   */
   @Test
   public void testFormatResultsOneClass() {
-    List<Result> old, neew, another;
-    old = new ArrayList<>();
-    neew = new ArrayList<>();
-    another = new ArrayList<>();
+    List<Result> oldWayResults = new ArrayList<>();
+    oldWayResults.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
+    oldWayResults.add(new Result(
+        Constants.bmResultSampleBenchmarkOldWay)); // Manually add result from new benchmark
 
-    old.add(new Result(Constants.res_oldWay));
-    neew.add(new Result(Constants.res_newWay));
-    another.add(new Result(Constants.res_newWay_AnotherClassName));
+    List<Result> newWayResults = new ArrayList<>();
+    newWayResults.add(new Result(Constants.exampleResultSampleBenchmarkNewWay));
+    newWayResults.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
 
-    neew.add(new Result(Constants.EXAMPLE_RESULT_new));
-    old.add(new Result(Constants.EXAMPLE_RESULT_old));
+    List<Result> anotherClassResults = new ArrayList<>();
+    anotherClassResults.add(new Result(Constants.exampleResultAnotherClassNameNewWay));
 
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", old));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", oldWayResults));
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", neew));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", newWayResults));
     installationService.addMethodToRepo("an id", "a repo id",
-        new Method("com.szatmary.peter.AnotherClassName.newWay", another));
+        new Method("com.szatmary.peter.AnotherClassName.newWay", anotherClassResults));
 
-    //String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
-    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT);
-    // Write to file
-    try {
-      Files.writeString(Path.of("test.md"), md);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    assertTrue(true);
+    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.bmResultOneClass);
+
+    Assert.assertTrue(md.contains("# SampleBenchmarkTest"));
+    Assert.assertFalse(md.contains("# AnotherClassName"));
+  }
+
+  /*
+    Test that markdown string only contains exactly two class name headers, SampleBenchmarkTest
+    and AnotherClassName
+   */
+  @Test
+  public void testFormatResultsMultipleClasses() {
+    List<Result> oldWayResults = new ArrayList<>();
+    oldWayResults.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
+    oldWayResults.add(new Result(
+        Constants.bmResultSampleBenchmarkOldWay)); // Manually add result from new benchmark
+
+    List<Result> newWayResults = new ArrayList<>();
+    newWayResults.add(new Result(Constants.exampleResultSampleBenchmarkNewWay));
+    newWayResults.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
+
+    List<Result> anotherClassResults = new ArrayList<>();
+    anotherClassResults.add(new Result(Constants.exampleResultAnotherClassNameNewWay));
+
+    installationService.addMethodToRepo("an id", "a repo id",
+        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", oldWayResults));
+    installationService.addMethodToRepo("an id", "a repo id",
+        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", newWayResults));
+    installationService.addMethodToRepo("an id", "a repo id",
+        new Method("com.szatmary.peter.AnotherClassName.newWay", anotherClassResults));
+
+    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.bmResultMultipleClasses);
+
+    Assert.assertTrue(md.contains("# SampleBenchmarkTest"));
+    Assert.assertTrue(md.contains("# AnotherClassName"));
   }
 
 

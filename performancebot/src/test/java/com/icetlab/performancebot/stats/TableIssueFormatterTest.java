@@ -64,8 +64,8 @@ public class TableIssueFormatterTest {
   public void testFormatResultsOneClass() {
     // Populate database
     List<Result> results = new ArrayList<>();
-    results.add(new Result(Constants.res_newWay));
-    results.add(new Result(Constants.res_oldWay));
+    results.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
+    results.add(new Result(Constants.bmResultSampleBenchmarkOldWay));
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", results));
     installationService.addMethodToRepo("an id", "a repo id",
@@ -73,7 +73,7 @@ public class TableIssueFormatterTest {
 
     String classNameHeader = "# SampleBenchmarkTest";
 
-    String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT).strip();
+    String md = formatter.formatBenchmarkIssue(Constants.bmResultMultipleClasses).strip();
     System.out.println("Actual result:");
     System.out.println(md);
 
@@ -91,10 +91,10 @@ public class TableIssueFormatterTest {
     old = new ArrayList<>();
     neew = new ArrayList<>();
     another = new ArrayList<>();
-    old.add(new Result(Constants.res_oldWay));
-    old.add(new Result(Constants.res_oldWay));
-    neew.add(new Result(Constants.res_newWay));
-    another.add(new Result(Constants.res_newWay_AnotherClassName));
+    old.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
+    old.add(new Result(Constants.bmResultSampleBenchmarkOldWay));
+    neew.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
+    another.add(new Result(Constants.bmResultAnotherClassNameNewWay));
 
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", old));
@@ -107,7 +107,7 @@ public class TableIssueFormatterTest {
     String lastClassNameHeader = "# AnotherClassName";
     String methodDuplicate = "## newWay";
 
-    String md = formatter.formatBenchmarkIssue(Constants.EXAMPLE_RESULT).strip();
+    String md = formatter.formatBenchmarkIssue(Constants.bmResultMultipleClasses).strip();
 
     int firstMethodPos = md.indexOf(methodDuplicate);
     int lastMethodPos = md.indexOf(methodDuplicate, firstMethodPos + 1);

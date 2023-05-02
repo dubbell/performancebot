@@ -16,7 +16,7 @@ public class BenchmarkBarPlotTest {
   public void test() {
     BenchmarkBarPlot benchmarkBarPlot = new BenchmarkBarPlot();
     List<Result> results = new ArrayList<>();
-    results.add(new Result(Constants.res_newWay));
+    results.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
     Method method = new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results);
     String barPlot = benchmarkBarPlot.visualizeBenchmarkResults(method);
     System.out.println(barPlot);
