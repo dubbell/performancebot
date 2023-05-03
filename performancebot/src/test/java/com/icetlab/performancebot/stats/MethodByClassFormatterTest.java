@@ -1,24 +1,16 @@
 package com.icetlab.performancebot.stats;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.spy;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.database.model.GitHubRepo;
@@ -27,7 +19,7 @@ import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
 import com.icetlab.performancebot.webhook.PayloadManager;
-import org.springframework.stereotype.Component;
+
 
 @SpringBootTest
 public class MethodByClassFormatterTest {
