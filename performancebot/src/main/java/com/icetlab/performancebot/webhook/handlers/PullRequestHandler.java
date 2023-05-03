@@ -3,6 +3,8 @@ package com.icetlab.performancebot.webhook.handlers;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.icetlab.performancebot.client.Kubernetes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,7 @@ import com.icetlab.performancebot.client.Localhost;
 @Component
 public class PullRequestHandler extends WebhookHandler {
 
-  private BenchmarkWorkerClient benchmarkWorkerClient = new Localhost();
+  private BenchmarkWorkerClient benchmarkWorkerClient = new Kubernetes();
 
   /**
    * Handles the payload received from GitHub when a pull request event is received. If it does not

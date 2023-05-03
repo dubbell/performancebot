@@ -92,7 +92,7 @@ spec:
         - name: benchmark-worker
           image: docker.io/linulun/benchmark-worker:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
 
 ---
 
@@ -108,7 +108,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 8080
+      targetPort: 8081
 
 ---
 
