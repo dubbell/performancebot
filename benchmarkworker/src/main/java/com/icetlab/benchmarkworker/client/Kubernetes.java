@@ -17,9 +17,8 @@ public class Kubernetes implements PerformanceBotClient {
   @Override
   public String getServerIpWithPort() {
     Service service = kubernetesClient.services().withName("perfbot-svc").get();
-    int port = service.getSpec().getPorts().get(0).getNodePort();
-    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0)
-        .getAddress();
+    String ip = service.getSpec().getClusterIP();
+    int port = service.getSpec().getPorts().get(0).getPort();
     return ip + ":" + port;
   }
 }
