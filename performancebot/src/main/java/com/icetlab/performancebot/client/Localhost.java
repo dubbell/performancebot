@@ -2,7 +2,7 @@ package com.icetlab.performancebot.client;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import com.icetlab.performancebot.github.Config;
+import com.icetlab.performancebot.Config;
 
 /**
  * Client for benchmarkworker that uses localhost as the server address

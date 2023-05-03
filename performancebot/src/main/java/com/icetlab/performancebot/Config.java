@@ -1,9 +1,14 @@
-package com.icetlab.performancebot.github;
+package com.icetlab.performancebot;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+/**
+ * Configuration class for performancebot, which is used to load properties from application.properties.
+ * These properties are used to configure the authentication key and app ID for the GitHub app as well
+ * as the server IP and port of benchmarkworker.
+ */
 @Configuration
 @PropertySource("classpath:application.properties")
 public class Config {
