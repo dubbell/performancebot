@@ -1,7 +1,7 @@
 package com.icetlab.benchmarkworker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icetlab.benchmarkworker.client.Client;
+import com.icetlab.benchmarkworker.client.PerformanceBotClient;
 import com.icetlab.benchmarkworker.client.Localhost;
 import com.icetlab.benchmarkworker.configuration.Configuration;
 import com.icetlab.benchmarkworker.configuration.ConfigurationFactory;
@@ -40,7 +40,7 @@ import org.springframework.web.client.RestTemplate;
 public class BenchmarkWorker {
 
   Logger logger = LoggerFactory.getLogger(BenchmarkWorker.class);
-  Client client =
+  PerformanceBotClient client =
       new Localhost(); // Change to Kubernetes() to run on kubernetes
 
   public static void main(String[] args) {
