@@ -1,5 +1,8 @@
 package com.icetlab.benchmarkworker.client;
 
+/**
+ * Client for performancebot that uses localhost as the server address
+ */
 public class Localhost implements PerformanceBotClient {
 
   private String benchmarkControllerAddress;
@@ -12,7 +15,7 @@ public class Localhost implements PerformanceBotClient {
   }
 
   /**
-   * Uses localhost IP to performancebot
+   * Uses localhost with default port
    */
   public Localhost() {
     benchmarkControllerAddress = "http://localhost:8080";

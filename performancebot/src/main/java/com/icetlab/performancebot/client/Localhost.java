@@ -4,6 +4,9 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.icetlab.performancebot.github.Config;
 
+/**
+ * Client for benchmarkworker that uses localhost as the server address
+ */
 public class Localhost implements BenchmarkWorkerClient {
 
   private String hostIp;

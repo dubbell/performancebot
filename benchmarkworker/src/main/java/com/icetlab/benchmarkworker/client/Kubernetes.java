@@ -5,7 +5,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 /**
- * Uses kubernetes to find the server ip
+ * Uses kubernetes to find the server ip of performancebot
  */
 public class Kubernetes implements PerformanceBotClient {
   private KubernetesClient kubernetesClient;
