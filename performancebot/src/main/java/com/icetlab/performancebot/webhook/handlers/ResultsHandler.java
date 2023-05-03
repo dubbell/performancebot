@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.icetlab.performancebot.github.GitHubIssueManager;
 import com.icetlab.performancebot.stats.BarPlotIssueFormatter;
-import com.icetlab.performancebot.stats.TableIssueFormatter;
 
 @Component
 public class ResultsHandler extends WebhookHandler {
@@ -25,6 +24,9 @@ public class ResultsHandler extends WebhookHandler {
     String installationId = node.get("installation_id").asText();
     String issueUrl = node.get("issue_url").asText();
     String name = node.get("name").asText();
+    JsonNode results = node.get("results");
+    if (results == null)
+      return false;
     if (Stream.of(installationId, issueUrl, name).anyMatch(Objects::isNull))
       return false;
     String formattedResults = issueFormatter.formatBenchmarkIssue(payload);
