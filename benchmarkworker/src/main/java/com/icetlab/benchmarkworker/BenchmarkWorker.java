@@ -35,10 +35,10 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Spring boot application to be run in containers.
- * 
- * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
+
+ * Is given tasks to complete by the benchmark-controller, which consists of: 1. Cloning the given
  * repository into a local directory. 2. Compiling and running all specified benchmarks in the
- * cloned repository. 3. Sending the results back to the performancebot.
+ * cloned repository. 3. Sending the results back to the benchmark-controller.
  */
 @RestController
 @SpringBootApplication
@@ -56,12 +56,14 @@ public class BenchmarkWorker {
    * Listens for new tasks from the performancebot.
    */
   @PostMapping(name = "/task", value = "task", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void startTask(@RequestBody String task) {
+  public synchronized void startTask(@RequestBody String task) {
     JacksonJsonParser parser = new JacksonJsonParser();
 
     String repoURL = (String) parser.parseMap(task).get("url");
     String accessToken = (String) parser.parseMap(task).get("token");
     String branch = (String) parser.parseMap(task).get("branch");
+
+    String results = "";
 
     // if one thing fails, the benchmark is cancelled
     try {
@@ -72,20 +74,25 @@ public class BenchmarkWorker {
       Configuration configuration = ConfigurationFactory.getConfiguration();
 
       // compile and get result of benchmark
-      String result = configuration.benchmark(); // saves result to json file
+      results = configuration.benchmark(); // saves result to json file
 
-      System.out.println(result);
+      System.out.println(results);
 
-      // send result back to the performance bot
-      sendResult(result,
-          parser.parseMap(task).get("installation_id").toString(),
-          parser.parseMap(task).get("repo_id").toString(),
-          parser.parseMap(task).get("name").toString(),
-          parser.parseMap(task).get("issue_url").toString());
     } catch (Exception e) {
       logger.error(e.toString());
     }
 
+    // send result back to the performance bot
+    // if benchmark failed, then result is just an empty string
+    try {
+      sendResults(results,
+              parser.parseMap(task).get("installation_id").toString(),
+              parser.parseMap(task).get("repo_id").toString(),
+              parser.parseMap(task).get("name").toString(),
+              parser.parseMap(task).get("issue_url").toString());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     // delete local installation of repository
     delete();
   }
@@ -115,9 +122,9 @@ public class BenchmarkWorker {
 
 
   /**
-   * Sends results back to perfbot process.
+   * Sends results back to benchmark-controller process.
    */
-  public void sendResult(String results, String installationId, String repoId,
+  public void sendResults(String results, String installationId, String repoId,
       String name, String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
@@ -125,9 +132,12 @@ public class BenchmarkWorker {
     requestBody.put("name", name);
     requestBody.put("issue_url", endpoint);
 
-    ObjectMapper mapper = new ObjectMapper();
-    Object[] resultList = mapper.readValue(results.trim(), Object[].class);
-    requestBody.put("results", resultList);
+    // if an error occurred and a result wasn't calculated, don't add the results to the body
+    if (results.equals("")) {
+      ObjectMapper mapper = new ObjectMapper();
+      Object[] resultList = mapper.readValue(results.trim(), Object[].class);
+      requestBody.put("results", resultList);
+    }
 
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
@@ -137,7 +147,7 @@ public class BenchmarkWorker {
   }
 
   /**
-   * Finds the ip and port of the perfbot kubernetes service.
+   * Finds the ip and port of the benchmark-controller-svc kubernetes service.
    */
   private String getPerfbotServiceAddress() {
     Service service = kubernetesClient.services().withName("perfbot-svc").get();

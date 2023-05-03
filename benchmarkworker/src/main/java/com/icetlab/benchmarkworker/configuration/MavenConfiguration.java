@@ -31,9 +31,14 @@ public class MavenConfiguration extends JMHConfiguration {
     if(configData.getBuildTasks() == null) {
       InvocationRequest request = new DefaultInvocationRequest();
       request.setPomFile(new File("benchmark_directory/pom.xml"));
-      request.setGoals(Collections.singletonList("package"));
+      request.setGoals(Collections.singletonList("install"));
       request.setQuiet(true);
       request.setInputStream(InputStream.nullInputStream());
+
+      Properties properties = new Properties();
+      properties.setProperty("skipTests", "true"); // skip tests as they take too much time
+      request.setProperties(properties);
+
       mavenInvocations.add(request);
     }
     else {
@@ -53,10 +58,11 @@ public class MavenConfiguration extends JMHConfiguration {
     }
 
     Invoker invoker = new DefaultInvoker();
+    
     if (System.getProperty("os.name").toLowerCase().contains("win")) // if windows
       invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
 
-
+    // execute all build tasks
     for(InvocationRequest request : mavenInvocations) {
       int exitCode = invoker.execute(request).getExitCode();
       System.out.println("Maven task executed with exit code: " + exitCode);
@@ -69,6 +75,5 @@ public class MavenConfiguration extends JMHConfiguration {
   String getJmhJar() {
     return "benchmark_directory/target/benchmarks.jar";
   }
-
 
 }

@@ -1,4 +1,4 @@
-FROM maven:3.9.0
+FROM maven:3-eclipse-temurin-17
 VOLUME /tmp
 ADD target/*.jar /app.jar
 ADD target/classes/dummy.pem /
