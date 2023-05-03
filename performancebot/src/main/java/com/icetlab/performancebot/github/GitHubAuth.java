@@ -3,6 +3,7 @@ package com.icetlab.performancebot.github;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.Config;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
@@ -49,8 +50,8 @@ public class GitHubAuth {
     installationIds = new HashMap<>();
     java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     try (AnnotationConfigApplicationContext context =
-        new AnnotationConfigApplicationContext(GitHubConfig.class)) {
-      GitHubConfig gitHubConfig = context.getBean(GitHubConfig.class);
+        new AnnotationConfigApplicationContext(Config.class)) {
+      Config gitHubConfig = context.getBean(Config.class);
       appId = gitHubConfig.getAppId();
       privateKeyPath = gitHubConfig.getPrivateKeyPath();
     }
