@@ -120,7 +120,7 @@ public class MethodByClassFormatterTest {
   /*
     Test that two classes containing a method with the same name formats correctly
    */
-  /*@Test
+  @Test
   public void testNoDuplicateMethods() {
     List<Result> oldWayResults, newWayResults, otherResults;
     oldWayResults = new ArrayList<>();
@@ -132,17 +132,18 @@ public class MethodByClassFormatterTest {
     otherResults.add(new Result(Constants.bmResultAnotherClassNameNewWay));
 
     installationService.addMethodToRepo("an id", "a repo id",
-            new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", oldWayResults));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.oldWay", oldWayResults));
     installationService.addMethodToRepo("an id", "a repo id",
-            new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", newWayResults));
+        new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", newWayResults));
     installationService.addMethodToRepo("an id", "a repo id",
-            new Method("com.szatmary.peter.AnotherClassName.newWay", otherResults));
+        new Method("com.szatmary.peter.AnotherClassName.newWay", otherResults));
 
     String firstClassNameHeader = "# SampleBenchmarkTest";
     String lastClassNameHeader = "# AnotherClassName";
     String methodDuplicate = "## newWay";
 
-    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.bmResultMultipleClasses).strip();
+    String md = methodByClassFormatter.formatBenchmarkIssue(Constants.bmResultMultipleClasses)
+        .strip();
 
     int firstMethodPos = md.indexOf(methodDuplicate);
     int lastMethodPos = md.indexOf(methodDuplicate, firstMethodPos + 1);
@@ -150,15 +151,15 @@ public class MethodByClassFormatterTest {
     int lastClassPos = md.indexOf(lastClassNameHeader);
 
     // check that duplicate method is in markdown exactly two times
-    Assertions.assertTrue(firstMethodPos < lastMethodPos);
-    assertNotEquals(lastMethodPos, -1);
-    assertEquals(md.indexOf(methodDuplicate, lastMethodPos + 1), -1);
+    Assert.assertTrue(firstMethodPos < lastMethodPos);
+    Assert.assertNotEquals(lastMethodPos, -1);
+    Assert.assertEquals(md.indexOf(methodDuplicate, lastMethodPos + 1), -1);
 
     // check that the first one is sub header of first class
-    Assertions.assertTrue((firstMethodPos > firstClassPos) && (firstMethodPos < lastClassPos));
+    Assert.assertTrue((firstMethodPos > firstClassPos) && (firstMethodPos < lastClassPos));
 
     // check that the last one is sub header of the second class
-    Assertions.assertTrue((lastMethodPos > firstClassPos) && (lastMethodPos > lastClassPos));
+    Assert.assertTrue((lastMethodPos > firstClassPos) && (lastMethodPos > lastClassPos));
 
-  }*/
+  }
 }
