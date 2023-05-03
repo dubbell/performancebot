@@ -180,3 +180,60 @@ roleRef:
   kind: ClusterRole
   name: perfbot-sa-role
 
+---
+
+
+
+
+# MONGODB ATLAS -----------------------------------
+
+# atlas project
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasProject
+metadata:
+  name: perfbot-atlas
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  name: Perfbot Atlas Operator Project
+  projectIpAccessList:
+    - ipAddress: "0.0.0.0/0"
+      comment: "Allowing access to database from everywhere (only for Demo!)"
+
+---
+
+# atlas deployment
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDeployment
+metadata:
+  name: perfbot-atlas-cluster
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  projectRef:
+    name: perfbot-atlas
+  deploymentSpec:
+    name: "perfbot-atlas-cluster"
+    providerSettings:
+      instanceSizeName: M10
+      providerName: AWS
+      regionName: EU_NORTH_1
+
+---
+
+# atlas user
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDatabaseUser
+metadata:
+  name: perfbot-admin
+  labels:
+    app.kubernetes.io/version: 1.6.0
+spec:
+  roles:
+    - roleName: "readWriteAnyDatabase"
+      databaseName: "admin"
+  projectRef:
+    name: perfbot-atlas
+  username: admin
+  passwordSecretRef:
+    name: user-password
