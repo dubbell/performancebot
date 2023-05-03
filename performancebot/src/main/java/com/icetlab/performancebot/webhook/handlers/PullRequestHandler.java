@@ -18,6 +18,16 @@ public class PullRequestHandler extends WebhookHandler {
 
   private BenchmarkWorkerClient benchmarkWorkerClient = new Kubernetes();
 
+  public PullRequestHandler() {
+    benchmarkWorkerClient = new Kubernetes();
+  }
+
+  public PullRequestHandler(BenchmarkWorkerClient client) {
+    benchmarkWorkerClient = client;
+  }
+
+
+
   /**
    * Handles the payload received from GitHub when a pull request event is received. If it does not
    * contain the ping <code>[performancebot]</code> in the message body or title, the request is
