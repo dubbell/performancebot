@@ -10,7 +10,6 @@ import java.util.List;
 
 import com.icetlab.performancebot.stats.FormatterUtils;
 import org.knowm.xchart.BitmapEncoder;
-import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
 
@@ -32,7 +31,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
           "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
     }
     sb.append(String.format("![%s](%s)\n", method.getMethodName(), url));
-    sb.append("\nTODO: implement additional info\n");
+    sb.append("\n").append(formatRunConfigurations(method)).append("\n");
     return sb.toString();
   }
 
@@ -70,6 +69,27 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     byte[] imageBytes = outputStream.toByteArray();
     return Base64.getEncoder().encodeToString(imageBytes);
   }
-  
+
+  private String formatRunConfigurations(Method method) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("""
+        <details>
+          <summary>Run configurations</summary>
+          
+        """);
+    List<Result> runResults = method.getRunResults();
+    for (Result runResult : runResults) {
+      String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:MM").format(runResult.getAddedAt());
+      String mode = FormatterUtils.getMode(runResult.getData());
+      String measurementIterations = FormatterUtils.getMeasurementIterations(runResult.getData());
+      String unit = FormatterUtils.getUnitFromPrimaryMetric(runResult.getData());
+      sb.append("* ").append(timestamp).append("\n\t");
+      sb.append("* Mode: ").append(mode).append("\n\t");
+      sb.append("* Score unit: ").append(unit).append("\n\t");
+      sb.append("* Measurement Iterations: ").append(measurementIterations).append("\n\n");
+    }
+    sb.append("</details>");
+    return sb.toString();
+  }
 
 }

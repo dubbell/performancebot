@@ -12,9 +12,10 @@ import com.icetlab.performancebot.database.model.Method;
 import java.util.stream.Collectors;
 
 public class FormatterUtils {
+
   /**
    * Groups methods by class name. The class name is the second to last part of the method name.
-   * 
+   *
    * @param methods the methods to group
    * @return a map with the class name as key and a list of methods as value
    */
@@ -36,7 +37,7 @@ public class FormatterUtils {
 
   /**
    * Gets the method name from a benchmark field.
-   * 
+   *
    * @param benchmarkField the benchmark field
    * @return the method name
    */
@@ -87,6 +88,26 @@ public class FormatterUtils {
     }
   }
 
+  public static String getMeasurementIterations(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      String mIterations = node.get("measurementIterations").asText();
+      return mIterations;
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getMode(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      String mode = node.get("mode").asText();
+      return mode;
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
   public static List<String> getMethodNamesFromCurrentRun(String jmhResults) {
     JsonNode node;
     try {
@@ -99,9 +120,10 @@ public class FormatterUtils {
     }
   }
 
-  public static Set<Method> filterMethodsFromCurrentRun(Set<Method> allMethods, List<String> methodNamesToFilterBy) {
+  public static Set<Method> filterMethodsFromCurrentRun(Set<Method> allMethods,
+      List<String> methodNamesToFilterBy) {
     return allMethods.stream()
-      .filter(method -> methodNamesToFilterBy.contains(method.getMethodName()))
-      .collect(Collectors.toSet());
+        .filter(method -> methodNamesToFilterBy.contains(method.getMethodName()))
+        .collect(Collectors.toSet());
   }
 }
