@@ -17,7 +17,7 @@ public class Kubernetes implements BenchmarkWorkerClient {
 
   @Override
   public String getServerIp() {
-    Service service = kubernetesClient.services().withName("benchmark-worker").get();
+    Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
     String ip = service.getSpec().getClusterIP();
     int port = service.getSpec().getPorts().get(0).getPort();
     return String.format("%s:%d", ip, port);
