@@ -1,42 +1,42 @@
 
-# PERFORMANCE BOT ------------------------------------
+# BENCHMARK CONTROLLER ------------------------------------
 
-# perfbot deployment:
+# controller deployment:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: perfbot
+  name: benchmark-controller
   labels:
-    app: perfbot
+    app: benchmark-controller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: perfbot
+      app: benchmark-controller
   template:
     metadata:
       labels:
-        app: perfbot
+        app: benchmark-controller
     spec:
       serviceAccountName: perfbot-sa
       containers:
-        - name: perfbot
-          image: docker.io/linulun/perfbot:latest
+        - name: benchmark-controller
+          image: docker.io/linulun/benchmark-controller:latest
           ports:
             - containerPort: 1337
 
 
 ---
 
-# perfbot service:
+# controller service:
 apiVersion: v1
 kind: Service
 metadata:
-  name: perfbot-svc
+  name: benchmark-controller-svc
 spec:
   type: LoadBalancer
   selector:
-    app: perfbot
+    app: benchmark-controller
   ports:
     - protocol: TCP
       port: 80
@@ -44,11 +44,11 @@ spec:
 
 ---
 
-# perfbot ingress:
+# controller ingress:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: perfbot-ingress
+  name: benchmark-controller-ingress
   namespace: default
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -60,7 +60,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: perfbot-svc
+                name: benchmark-controller-svc
                 port:
                   number: 80
 
@@ -78,7 +78,7 @@ metadata:
   labels:
     app: benchmark-worker
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: benchmark-worker
