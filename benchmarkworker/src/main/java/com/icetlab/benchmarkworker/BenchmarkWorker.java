@@ -83,7 +83,7 @@ public class BenchmarkWorker {
     // send result back to the performance bot
     // if benchmark failed, then result is just an empty string
     try {
-      sendResults(results,
+      sendResult(results,
               parser.parseMap(task).get("installation_id").toString(),
               parser.parseMap(task).get("repo_id").toString(),
               parser.parseMap(task).get("name").toString(),
