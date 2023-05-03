@@ -2,6 +2,7 @@ package com.icetlab.performancebot;
 
 import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.webhook.PayloadManager;
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,7 +33,9 @@ public class BenchmarkController {
    * The main entry of the application.
    */
   public static void main(String[] args) {
-    SpringApplication.run(BenchmarkController.class, args);
+    SpringApplication app = new SpringApplication(BenchmarkController.class);
+    app.setDefaultProperties(Collections.singletonMap("server.port", "8080"));
+    app.run(args);
   }
 
   /**
