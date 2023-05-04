@@ -91,8 +91,16 @@ public class FormatterUtils {
   public static String getMeasurementIterations(String runResult) {
     try {
       JsonNode node = new ObjectMapper().readTree(runResult);
-      String mIterations = node.get("measurementIterations").asText();
-      return mIterations;
+      return node.get("measurementIterations").asText();
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getMeasurementTime(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      return node.get("measurementTime").asText();
     } catch (JsonProcessingException e) {
       return "N/A";
     }
@@ -101,8 +109,34 @@ public class FormatterUtils {
   public static String getMode(String runResult) {
     try {
       JsonNode node = new ObjectMapper().readTree(runResult);
-      String mode = node.get("mode").asText();
-      return mode;
+      return node.get("mode").asText();
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getForks(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      return node.get("forks").asText();
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getWarmUpIterations(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      return node.get("warmupIterations").asText();
+    } catch (JsonProcessingException e) {
+      return "N/A";
+    }
+  }
+
+  public static String getWarmUpTime(String runResult) {
+    try {
+      JsonNode node = new ObjectMapper().readTree(runResult);
+      return node.get("warmupTime").asText();
     } catch (JsonProcessingException e) {
       return "N/A";
     }

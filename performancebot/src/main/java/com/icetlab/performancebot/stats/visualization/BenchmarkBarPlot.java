@@ -82,18 +82,33 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     List<Result> runResults = getNMostRecentRunResults(method, 10);
     for (Result runResult : runResults) {
       String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(runResult.getAddedAt());
-      String mode = FormatterUtils.getMode(runResult.getData());
-      String measurementIterations = FormatterUtils.getMeasurementIterations(runResult.getData());
       String unit = FormatterUtils.getUnitFromPrimaryMetric(runResult.getData());
+      String mode = FormatterUtils.getMode(runResult.getData());
+      String forks = FormatterUtils.getForks(runResult.getData());
+      String warmupIterations = FormatterUtils.getWarmUpIterations(runResult.getData());
+      String warmupTime = FormatterUtils.getWarmUpTime(runResult.getData());
+      String measurementIterations = FormatterUtils.getMeasurementIterations(runResult.getData());
+      String measurementTime = FormatterUtils.getMeasurementTime(runResult.getData());
       sb.append("* ").append(timestamp).append("\n\t");
-      sb.append("* Mode: ").append(mode).append("\n\t");
       sb.append("* Score unit: ").append(unit).append("\n\t");
-      sb.append("* Measurement Iterations: ").append(measurementIterations).append("\n\n");
+      sb.append("* Mode: ").append(mode).append("\n\t");
+      sb.append("* Forks: ").append(forks).append("\n\t");
+      sb.append("* Warmup Iterations: ").append(warmupIterations).append("\n\t");
+      sb.append("* Warmup time: ").append(warmupTime).append("\n\t");
+      sb.append("* Measurement Iterations: ").append(measurementIterations).append("\n\t");
+      sb.append("* Measurement Time: ").append(measurementTime).append("\n\n");
     }
-    sb.append("</details>");
+    sb.append("</details>\n\n");
     return sb.toString();
   }
 
+  /**
+   * Returns the n most recently added run results of method
+   *
+   * @param method the method which run results should be returned
+   * @param n      the number of run results to be returned
+   * @return a list of the n most recently added run results
+   */
   public static List<Result> getNMostRecentRunResults(Method method, int n) {
     List<Result> allResults = method.getRunResults();
     return allResults.subList(Math.max(allResults.size() - n, 0), allResults.size());
