@@ -5,6 +5,7 @@ import com.icetlab.performancebot.database.model.Result;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     try {
       CategoryChart methodBarPlot = buildBarplot(method);
       String encodedBarPlot = encodeChartToBase64(methodBarPlot);
+      System.out.println(encodedBarPlot);
       url = ImageKitUploader.uploadImage(method.getMethodName() + ".png",
           encodedBarPlot);
     } catch (Exception e) {
@@ -36,17 +38,15 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
   }
 
   /**
-   * @param method the method which results should be visualized as bar plot png
-   * @return path of the bar plot png
-   * @throws IOException if png image cannot be created
+   * @param method the method which results should be visualized as bar plot
+   * @return the CategoryChart visualizing methods run results
    */
-  private CategoryChart buildBarplot(Method method) throws IOException {
-    // FIXME: Loops through all results, it should be the 10 latest
+  private CategoryChart buildBarplot(Method method) {
     CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
         .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
-    List<Result> results = method.getRunResults();
+    List<Result> results = getNMostRecentRunResults(method, 10);
     List<String> timestamps = results.stream()
-        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:MM").format(x.getAddedAt())).toList();
+        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:mm").format(x.getAddedAt())).toList();
     List<Double> scores = results.stream()
         .map((x) -> Double.parseDouble(FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
         .toList();
@@ -61,7 +61,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
    *
    * @param categoryChart the chart to be encoded
    * @return a base64 string
-   * @throws IOException
+   * @throws IOException if categoryChart cannot be encoded as base64
    */
   private String encodeChartToBase64(CategoryChart categoryChart) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -77,9 +77,9 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
           <summary>Run configurations</summary>
           
         """);
-    List<Result> runResults = method.getRunResults();
+    List<Result> runResults = getNMostRecentRunResults(method, 10);
     for (Result runResult : runResults) {
-      String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:MM").format(runResult.getAddedAt());
+      String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(runResult.getAddedAt());
       String mode = FormatterUtils.getMode(runResult.getData());
       String measurementIterations = FormatterUtils.getMeasurementIterations(runResult.getData());
       String unit = FormatterUtils.getUnitFromPrimaryMetric(runResult.getData());
@@ -90,6 +90,11 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     }
     sb.append("</details>");
     return sb.toString();
+  }
+
+  public static List<Result> getNMostRecentRunResults(Method method, int n) {
+    List<Result> allResults = method.getRunResults();
+    return allResults.subList(Math.max(allResults.size() - n, 0), allResults.size());
   }
 
 }
