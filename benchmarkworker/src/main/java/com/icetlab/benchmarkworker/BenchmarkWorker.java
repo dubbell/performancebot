@@ -55,8 +55,7 @@ public class BenchmarkWorker {
    */
   @PostMapping(name = "/task", value = "task",
                consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void
-  startTask(@RequestBody String task) {
+  public void startTask(@RequestBody String task) {
     JacksonJsonParser parser = new JacksonJsonParser();
 
     String repoURL = (String)parser.parseMap(task).get("url");
