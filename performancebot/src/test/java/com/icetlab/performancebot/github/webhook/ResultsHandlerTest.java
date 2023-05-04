@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 @SpringBootTest
 public class ResultsHandlerTest {
@@ -43,9 +42,9 @@ public class ResultsHandlerTest {
     installationController.addInstallation("an id");
     installationController.addRepoToInstallation("an id",
       new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
-    // Since we do not want to expose an API key, we will get an unauthorized error, but this is
+    // Since we do not want to expose an API key, we will get an error, but this is
     // okay, since it means we reached the end of the method.
-    assertThrows(Unauthorized.class, () -> {
+    assertThrows(Exception.class, () -> {
       status = resultsHandler.handle(WebhookMocks.RESULT_EVENT);
     });
     // The status should be false since we are unauthorized

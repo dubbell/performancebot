@@ -16,6 +16,13 @@ This document covers the steps required for running the worker and webserver.
 
 To run the performancebot on GitHub repositories, you have to create a GitHub app to act on behalf of it when communicating with the GitHub API.
 
+### Connecting the Worker with the Client
+
+Connecting the controller and the worker should work automatically if you use localhost as client. The Controller is configured to run at `localhost:8080` and expects the Worker to run at `localhost:8081`. If you want to use other ports, you have to change two things:
+
+1. In the BenchmarkController: Go to `application.properties` and set the `server.bworker.port` to the new port.
+2. In the BenchmarkWorker: Initialising the client is done above the main function in the BenchmarkWorker class, add the new port (same as in step 1) as a constructor parameter when initialising the client as a LocalHost object. 
+
 ### Creating the App
 
 If these steps are unclear, you can also follow this [tutorial](https://docs.github.com/en/apps/creating-github-apps/creating-github-apps/creating-a-github-app). It has more steps, and the ones below are based on the bare minimum requirements to create the app.
@@ -86,6 +93,7 @@ the following entries needs to be added to `performancebot/src/main/resources/ap
 - `spring.data.mongodb.port=27017 # default port`
 
 ### Deploying to Kubernetes
+
 For the application to be deployed to Kubernetes, first images have to be created of the 
 PerformanceBot and the BenchmarkWorker and uploaded to DockerHub. 
 If you have created a DockerHub account, then the next step is to edit `k8s-perfbot.yaml` 

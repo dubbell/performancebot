@@ -3,18 +3,18 @@ package com.icetlab.performancebot.webhook.handlers;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import com.icetlab.performancebot.client.BenchmarkWorkerClient;
+import com.icetlab.performancebot.client.Localhost;
 
 @Component
 public class PullRequestHandler extends WebhookHandler {
-  private KubernetesClient kubernetesClient;
+
+  private BenchmarkWorkerClient benchmarkWorkerClient = new Localhost();
 
   /**
    * Handles the payload received from GitHub when a pull request event is received. If it does not
@@ -84,23 +84,9 @@ public class PullRequestHandler extends WebhookHandler {
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
-    String containerIp = "http://" + getWorkerServiceAddress();
-    System.out.println("Sending request to " + containerIp + "/task");
-    restTemplate.postForEntity(URI.create(containerIp + "/task"), requestEntity, String.class);
-  }
-
-  /**
-   * Finds the ip and port of the benchmark-worker kubernetes service.
-   */
-  private String getWorkerServiceAddress() {
-    if (kubernetesClient == null)
-      kubernetesClient = new KubernetesClientBuilder().build();
-
-    Service service = kubernetesClient.services().withName("benchmark-worker-svc").get();
-    int port = service.getSpec().getPorts().get(0).getNodePort();
-    String ip = kubernetesClient.nodes().list().getItems().get(0).getStatus().getAddresses().get(0)
-        .getAddress();
-    return ip + ":" + port;
+    String containerIp = "http://" + benchmarkWorkerClient.getServerIp() + "/task";
+    System.out.println("Sending request to " + containerIp);
+    restTemplate.postForEntity(URI.create(containerIp), requestEntity, String.class);
   }
 
   /**
