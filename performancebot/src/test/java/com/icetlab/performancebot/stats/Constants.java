@@ -543,6 +543,50 @@ class Constants {
       }
           """;
 
+  static String exampleResultSampleBenchmarknewWay2 = """
+      {
+          "benchmark" : "com.szatmary.peter.SampleBenchmarkTest.newWay",
+          "mode" : "avgt",
+          "threads" : 4,
+          "forks" : 1,
+          "warmupIterations" : 2,
+          "warmupTime" : "1 s",
+          "warmupBatchSize" : 1,
+          "measurementIterations" : 2,
+          "measurementTime" : "1 ms",
+          "measurementBatchSize" : 1,
+          "primaryMetric" : {
+              "score" : 17.3596125,
+              "scoreError" : "NaN",
+              "scoreConfidence" : [
+                  "NaN",
+                  "NaN"
+              ],
+              "scorePercentiles" : {
+                  "0.0" : 14.2345123,
+                  "50.0" : 18.3596125,
+                  "90.0" : 22.92065025,
+                  "95.0" : 22.92065025,
+                  "99.0" : 22.92065025,
+                  "99.9" : 22.92065025,
+                  "99.99" : 22.92065025,
+                  "99.999" : 22.92065025,
+                  "99.9999" : 22.92065025,
+                  "100.0" : 24.1234554
+              },
+              "scoreUnit" : "ms/op",
+              "rawData" : [
+                  [
+                      13.79857475,
+                      22.92065025
+                  ]
+              ]
+          },
+          "secondaryMetrics" : {
+          }
+      }
+          """;
+
   static String exampleResultNewWayRunConfigs = """
       {
           "benchmark" : "com.szatmary.peter.SampleBenchmarkTest.newWay",

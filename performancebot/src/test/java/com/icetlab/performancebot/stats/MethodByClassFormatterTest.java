@@ -63,8 +63,7 @@ public class MethodByClassFormatterTest {
   public void testFormatResultsOneClass() {
     List<Result> oldWayResults = new ArrayList<>();
     oldWayResults.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
-    oldWayResults.add(new Result(
-        Constants.bmResultSampleBenchmarkOldWay)); // Manually add result from new benchmark
+    oldWayResults.add(new Result(Constants.bmResultSampleBenchmarkOldWay)); // Manually add result from new benchmark
 
     List<Result> newWayResults = new ArrayList<>();
     newWayResults.add(new Result(Constants.exampleResultSampleBenchmarkNewWay));
