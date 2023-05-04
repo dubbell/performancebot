@@ -29,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-
 /**
  * Authorizes and authenticates the bot to access the target repository.
  */
@@ -48,9 +47,10 @@ public class GitHubAuth {
   public GitHubAuth() {
     restTemplate = new RestTemplate();
     installationIds = new HashMap<>();
-    java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    java.security.Security.addProvider(
+        new org.bouncycastle.jce.provider.BouncyCastleProvider());
     try (AnnotationConfigApplicationContext context =
-        new AnnotationConfigApplicationContext(Config.class)) {
+             new AnnotationConfigApplicationContext(Config.class)) {
       Config gitHubConfig = context.getBean(Config.class);
       appId = gitHubConfig.getAppId();
       privateKeyPath = gitHubConfig.getPrivateKeyPath();
@@ -64,21 +64,21 @@ public class GitHubAuth {
   }
 
   /**
-   * Fetches the installation IDs and their corresponding access token URLs from the GitHub API and
-   * returns them as a Map.
+   * Fetches the installation IDs and their corresponding access token URLs from
+   * the GitHub API and returns them as a Map.
    */
   private void fetchAndPopulateInstallationIds() {
     HttpHeaders headers = createHeaders();
 
     HttpEntity<String> request = new HttpEntity<>(headers);
-    ResponseEntity<String> response = restTemplate.exchange(
-        "https://api.github.com/app/installations", HttpMethod.GET, request, String.class);
+    ResponseEntity<String> response =
+        restTemplate.exchange("https://api.github.com/app/installations",
+                              HttpMethod.GET, request, String.class);
 
     validateResponse(response);
 
     JsonNode jsonNode = convertResponseToJSONNode(response.getBody());
     populateInstallationIds(jsonNode);
-
   }
 
   /**
@@ -112,8 +112,8 @@ public class GitHubAuth {
   }
 
   /**
-   * Populates the installationIds map with the installation IDs and their corresponding access
-   * token.
+   * Populates the installationIds map with the installation IDs and their
+   * corresponding access token.
    *
    * @param jsonNode The JsonNode to populate the map from
    */
@@ -134,15 +134,20 @@ public class GitHubAuth {
   private String createWebToken() {
     Date now = new Date(System.currentTimeMillis());
     expiresAt = getTimeIn10Minutes();
-    return Jwts.builder().setIssuedAt(now).setExpiration(expiresAt).setIssuer(appId)
-        .signWith(generatePrivateKey(), SignatureAlgorithm.RS256).compact();
+    return Jwts.builder()
+        .setIssuedAt(now)
+        .setExpiration(expiresAt)
+        .setIssuer(appId)
+        .signWith(generatePrivateKey(), SignatureAlgorithm.RS256)
+        .compact();
   }
 
   /**
-   * Retrieves an access token from the GitHub API for a specific installation identified by the
-   * given ID.
+   * Retrieves an access token from the GitHub API for a specific installation
+   * identified by the given ID.
    *
-   * @param id The ID of the GitHub installation to retrieve the access token for
+   * @param id The ID of the GitHub installation to retrieve the access token
+   *     for
    * @return The access token as a String
    */
   public String getAccessTokenFromId(String id) {
@@ -152,9 +157,13 @@ public class GitHubAuth {
 
     HttpEntity<String> request = new HttpEntity<>(headers);
     ResponseEntity<String> res = restTemplate.exchange(
-        String.format("https://api.github.com/app/installations/%s/access_tokens", id.trim()),
+        String.format(
+            "https://api.github.com/app/installations/%s/access_tokens",
+            id.trim()),
         HttpMethod.POST, request, String.class);
-    return (String) new JacksonJsonParser().parseMap(res.getBody()).get("token");
+    return (String) new JacksonJsonParser()
+        .parseMap(res.getBody())
+        .get("token");
   }
 
   /**
@@ -163,26 +172,30 @@ public class GitHubAuth {
    * @return the JWT as a String
    */
   private String getJwt() {
-    if (expiresAt == null || expiresAt.after(new Date(System.currentTimeMillis()))) {
+    if (expiresAt == null ||
+        expiresAt.after(new Date(System.currentTimeMillis()))) {
       jwt = createWebToken();
     }
     return jwt;
   }
 
   /**
-   * Generates a private key from the private key PEM file specified in `application.properties`.
+   * Generates a private key from the private key PEM file specified in
+   * `application.properties`.
    *
    * @return PrivateKey
    */
   private PrivateKey generatePrivateKey() {
     String key = null;
     try {
-      key = Files.readString(Paths.get(privateKeyPath), Charset.defaultCharset());
+      key =
+          Files.readString(Paths.get(privateKeyPath), Charset.defaultCharset());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "").replaceAll("\\r?\\n", "")
-        .replace("-----END RSA PRIVATE KEY-----", "");
+    String privateKey = key.replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                            .replaceAll("\\r?\\n", "")
+                            .replace("-----END RSA PRIVATE KEY-----", "");
     byte[] decoded = Base64.getDecoder().decode(privateKey);
     KeyFactory kf = null;
     try {
