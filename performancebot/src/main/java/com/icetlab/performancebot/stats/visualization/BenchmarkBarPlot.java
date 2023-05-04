@@ -13,6 +13,8 @@ import com.icetlab.performancebot.stats.FormatterUtils;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XChartPanel;
 
 public class BenchmarkBarPlot implements VisualizationStrategy {
 
@@ -25,7 +27,6 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     try {
       CategoryChart methodBarPlot = buildBarplot(method);
       String encodedBarPlot = encodeChartToBase64(methodBarPlot);
-      System.out.println(encodedBarPlot);
       url = ImageKitUploader.uploadImage(method.getMethodName() + ".png",
           encodedBarPlot);
     } catch (Exception e) {
@@ -53,6 +54,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
     barPlot.addSeries(header, timestamps, scores);
     barPlot.getStyler().setLegendVisible(false);
+    barPlot.getStyler().setXAxisLabelRotation(45);
     return barPlot;
   }
 

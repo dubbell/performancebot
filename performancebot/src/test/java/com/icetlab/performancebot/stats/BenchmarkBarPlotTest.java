@@ -28,11 +28,6 @@ public class BenchmarkBarPlotTest {
     }
     Method method = new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results);
     String mdBarPlot = benchmarkBarPlot.visualizeBenchmarkResults(method);
-    try {
-      Files.writeString(Path.of("test.md"), mdBarPlot);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
     Assertions.assertTrue(mdBarPlot.startsWith("## newWay"));
     Assertions.assertTrue(
         mdBarPlot.contains("![com.szatmary.peter.SampleBenchmarkTest.newWay](https://"));
