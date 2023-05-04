@@ -23,7 +23,7 @@ spec:
         - name: benchmark-controller
           image: docker.io/linulun/benchmark-controller:latest
           ports:
-            - containerPort: 1337
+            - containerPort: 8080
 
 
 ---
