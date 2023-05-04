@@ -30,18 +30,16 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Spring boot application to be run in containers.
  *
- * Is given tasks to complete by the performancebot, which consists of: 1.
- * Cloning the given repository into a local directory. 2. Compiling and running
- * all specified benchmarks in the cloned repository. 3. Sending the results
- * back to the performancebot.
+ * Is given tasks to complete by the performancebot, which consists of: 1. Cloning the given
+ * repository into a local directory. 2. Compiling and running all specified benchmarks in the
+ * cloned repository. 3. Sending the results back to the performancebot.
  */
 @RestController
 @SpringBootApplication
 public class BenchmarkWorker {
 
   Logger logger = LoggerFactory.getLogger(BenchmarkWorker.class);
-  PerformanceBotClient client =
-      new Localhost(); // Change to Kubernetes() to run on kubernetes
+  PerformanceBotClient client = new Localhost(); // Change to Kubernetes() to run on kubernetes
 
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(BenchmarkWorker.class);
@@ -52,15 +50,13 @@ public class BenchmarkWorker {
   /**
    * Listens for new tasks from the performancebot.
    */
-  @PostMapping(name = "/task", value = "task",
-               consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void
-  startTask(@RequestBody String task) {
+  @PostMapping(name = "/task", value = "task", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void startTask(@RequestBody String task) {
     JacksonJsonParser parser = new JacksonJsonParser();
 
-    String repoURL = (String)parser.parseMap(task).get("url");
-    String accessToken = (String)parser.parseMap(task).get("token");
-    String branch = (String)parser.parseMap(task).get("branch");
+    String repoURL = (String) parser.parseMap(task).get("url");
+    String accessToken = (String) parser.parseMap(task).get("token");
+    String branch = (String) parser.parseMap(task).get("branch");
 
     String results = "";
 
@@ -83,11 +79,10 @@ public class BenchmarkWorker {
     // send result back to the performance bot
     // if benchmark failed, then result is just an empty string
     try {
-      sendResult(results,
-              parser.parseMap(task).get("installation_id").toString(),
-              parser.parseMap(task).get("repo_id").toString(),
-              parser.parseMap(task).get("name").toString(),
-              parser.parseMap(task).get("issue_url").toString());
+      sendResult(results, parser.parseMap(task).get("installation_id").toString(),
+          parser.parseMap(task).get("repo_id").toString(),
+          parser.parseMap(task).get("name").toString(),
+          parser.parseMap(task).get("issue_url").toString());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -101,8 +96,7 @@ public class BenchmarkWorker {
    * @param repoURL repository url
    * @param accessToken repository access token for authentication
    */
-  public void clone(String repoURL, String accessToken, String branch)
-      throws Exception {
+  public void clone(String repoURL, String accessToken, String branch) throws Exception {
     System.out.println("Cloning started.");
 
     // creates directory
@@ -110,17 +104,11 @@ public class BenchmarkWorker {
     if (!dir.mkdir()) // attempts to create directory
       return;
 
-    CredentialsProvider credentials =
-        new UsernamePasswordCredentialsProvider(accessToken, "");
-    Git.cloneRepository()
-        .setCredentialsProvider(credentials) // if the repository is private,
-                                             // the access token should
-                                             // authorize the request
-        .setURI(repoURL)
-        .setDirectory(dir)
-        .setBranch(branch)
-        .call()
-        .close();
+    CredentialsProvider credentials = new UsernamePasswordCredentialsProvider(accessToken, "");
+    Git.cloneRepository().setCredentialsProvider(credentials) // if the repository is private,
+                                                              // the access token should
+                                                              // authorize the request
+        .setURI(repoURL).setDirectory(dir).setBranch(branch).call().close();
 
     System.out.println("Cloning finished.");
   }
@@ -128,8 +116,8 @@ public class BenchmarkWorker {
   /**
    * Sends results back to benchmark-controller process.
    */
-  public void sendResult(String results, String installationId, String repoId,
-                         String name, String endpoint) throws Exception {
+  public void sendResult(String results, String installationId, String repoId, String name,
+      String endpoint) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
@@ -137,19 +125,17 @@ public class BenchmarkWorker {
     requestBody.put("issue_url", endpoint);
 
     // if an error occurred and a result wasn't calculated, don't add the results to the body
-    if (results.equals("")) {
+    if (!results.equals("")) {
       ObjectMapper mapper = new ObjectMapper();
       Object[] resultList = mapper.readValue(results.trim(), Object[].class);
       requestBody.put("results", resultList);
     }
 
-    HttpEntity<Map<String, Object>> requestEntity =
-        new HttpEntity<>(requestBody);
+    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody);
     RestTemplate restTemplate = new RestTemplate();
 
-    restTemplate.postForEntity(
-        URI.create(client.getServerIpWithPort() + "/benchmark"), requestEntity,
-        String.class);
+    restTemplate.postForEntity(URI.create(client.getServerIpWithPort() + "/benchmark"),
+        requestEntity, String.class);
   }
 
   /**

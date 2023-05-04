@@ -1,9 +1,15 @@
 package com.icetlab.performancebot.stats.visualization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icetlab.performancebot.Config;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Properties;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,10 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 class ImageKitUploader {
   /**
@@ -74,10 +76,12 @@ class ImageKitUploader {
   }
 
   static private String readKeyFromProps() throws IOException {
-    Properties prop = new Properties();
-    FileInputStream properties = new FileInputStream("src/main/resources/application.properties");
-    prop.load(properties);
-    String privateKey = prop.getProperty("imagekit.privatekey");
+    String privateKey = "";
+    try (AnnotationConfigApplicationContext context =
+        new AnnotationConfigApplicationContext(Config.class)) {
+      Config gitHubConfig = context.getBean(Config.class);
+      privateKey = gitHubConfig.getImageKitPrivateKey();
+    }
     return privateKey;
   }
 }
