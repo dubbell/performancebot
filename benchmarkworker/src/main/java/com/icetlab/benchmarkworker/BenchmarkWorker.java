@@ -138,7 +138,7 @@ public class BenchmarkWorker {
     requestBody.put("issue_url", endpoint);
 
     // if an error occurred and a result wasn't calculated, don't add the results to the body
-    if (results.equals("")) {
+    if (!results.equals("")) {
       ObjectMapper mapper = new ObjectMapper();
       Object[] resultList = mapper.readValue(results.trim(), Object[].class);
       requestBody.put("results", resultList);

@@ -19,6 +19,6 @@ public class Kubernetes implements PerformanceBotClient {
     Service service = kubernetesClient.services().withName("benchmark-controller-svc").get();
     String ip = service.getSpec().getClusterIP();
     int port = service.getSpec().getPorts().get(0).getPort();
-    return ip + ":" + port;
+    return "http://" + ip + ":" + port;
   }
 }
