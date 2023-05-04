@@ -2,16 +2,17 @@ package com.icetlab.performancebot.webhook.handlers;
 
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import com.icetlab.performancebot.stats.MethodByClassFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.icetlab.performancebot.github.GitHubIssueManager;
-import com.icetlab.performancebot.stats.BarPlotIssueFormatter;
 
 @Component
 public class ResultsHandler extends WebhookHandler {
   @Autowired
-  BarPlotIssueFormatter issueFormatter;
+  MethodByClassFormatter issueFormatter;
 
   /**
    * Handles the payload received from GitHub when the results of a performance test are ready.

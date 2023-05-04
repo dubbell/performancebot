@@ -1,4 +1,4 @@
-package com.icetlab.performancebot.stats;
+package com.icetlab.performancebot.stats.visualization;
 
 import java.io.FileInputStream;
 import java.io.IOException;
