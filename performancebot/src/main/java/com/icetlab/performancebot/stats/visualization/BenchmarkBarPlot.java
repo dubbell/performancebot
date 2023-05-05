@@ -5,14 +5,16 @@ import com.icetlab.performancebot.database.model.Result;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
 import com.icetlab.performancebot.stats.FormatterUtils;
 import org.knowm.xchart.BitmapEncoder;
-import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XChartPanel;
 
 public class BenchmarkBarPlot implements VisualizationStrategy {
 
@@ -32,28 +34,27 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
           "https://ih1.redbubble.net/image.1539738010.3563/flat,750x,075,f-pad,750x1000,f8f8f8.u1.jpg";
     }
     sb.append(String.format("![%s](%s)\n", method.getMethodName(), url));
-    sb.append("\nTODO: implement additional info\n");
+    sb.append("\n").append(formatRunConfigurations(method)).append("\n");
     return sb.toString();
   }
 
   /**
-   * @param method the method which results should be visualized as bar plot png
-   * @return path of the bar plot png
-   * @throws IOException if png image cannot be created
+   * @param method the method which results should be visualized as bar plot
+   * @return the CategoryChart visualizing methods run results
    */
-  private CategoryChart buildBarplot(Method method) throws IOException {
-    // FIXME: Loops through all results, it should be the 10 latest
+  private CategoryChart buildBarplot(Method method) {
     CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
         .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
-    List<Result> results = method.getRunResults();
+    List<Result> results = getNMostRecentRunResults(method, 10);
     List<String> timestamps = results.stream()
-        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:MM").format(x.getAddedAt())).toList();
+        .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:mm").format(x.getAddedAt())).toList();
     List<Double> scores = results.stream()
         .map((x) -> Double.parseDouble(FormatterUtils.getScoreFromPrimaryMetric(x.getData())))
         .toList();
     String header = FormatterUtils.getMethodNameFromBenchmarkField(method.getMethodName());
     barPlot.addSeries(header, timestamps, scores);
     barPlot.getStyler().setLegendVisible(false);
+    barPlot.getStyler().setXAxisLabelRotation(45);
     return barPlot;
   }
 
@@ -62,7 +63,7 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
    *
    * @param categoryChart the chart to be encoded
    * @return a base64 string
-   * @throws IOException
+   * @throws IOException if categoryChart cannot be encoded as base64
    */
   private String encodeChartToBase64(CategoryChart categoryChart) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -70,6 +71,47 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     byte[] imageBytes = outputStream.toByteArray();
     return Base64.getEncoder().encodeToString(imageBytes);
   }
-  
+
+  private String formatRunConfigurations(Method method) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("""
+        <details>
+          <summary>Run configurations</summary>
+          
+        """);
+    List<Result> runResults = getNMostRecentRunResults(method, 10);
+    for (Result runResult : runResults) {
+      String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(runResult.getAddedAt());
+      String unit = FormatterUtils.getUnitFromPrimaryMetric(runResult.getData());
+      String mode = FormatterUtils.getMode(runResult.getData());
+      String forks = FormatterUtils.getForks(runResult.getData());
+      String warmupIterations = FormatterUtils.getWarmUpIterations(runResult.getData());
+      String warmupTime = FormatterUtils.getWarmUpTime(runResult.getData());
+      String measurementIterations = FormatterUtils.getMeasurementIterations(runResult.getData());
+      String measurementTime = FormatterUtils.getMeasurementTime(runResult.getData());
+      sb.append("* ").append(timestamp).append("\n\t");
+      sb.append("* Score unit: ").append(unit).append("\n\t");
+      sb.append("* Mode: ").append(mode).append("\n\t");
+      sb.append("* Forks: ").append(forks).append("\n\t");
+      sb.append("* Warmup Iterations: ").append(warmupIterations).append("\n\t");
+      sb.append("* Warmup time: ").append(warmupTime).append("\n\t");
+      sb.append("* Measurement Iterations: ").append(measurementIterations).append("\n\t");
+      sb.append("* Measurement Time: ").append(measurementTime).append("\n\n");
+    }
+    sb.append("</details>\n\n");
+    return sb.toString();
+  }
+
+  /**
+   * Returns the n most recently added run results of method
+   *
+   * @param method the method which run results should be returned
+   * @param n      the number of run results to be returned
+   * @return a list of the n most recently added run results
+   */
+  public static List<Result> getNMostRecentRunResults(Method method, int n) {
+    List<Result> allResults = method.getRunResults();
+    return allResults.subList(Math.max(allResults.size() - n, 0), allResults.size());
+  }
 
 }
