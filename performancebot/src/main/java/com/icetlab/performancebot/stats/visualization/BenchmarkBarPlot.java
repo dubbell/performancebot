@@ -38,14 +38,19 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     return sb.toString();
   }
 
+  
   /**
    * @param method the method which results should be visualized as bar plot
    * @return the CategoryChart visualizing methods run results
    */
   private CategoryChart buildBarplot(Method method) {
-    String unit = FormatterUtils.getUnitFromPrimaryMetric(method.getRunResults()
-        .get(method.getRunResults().size() - 1).toString());
-    
+    String unit = "";
+    if (method.getRunResults().size() > 0) {
+      unit = FormatterUtils.getUnitFromPrimaryMetric(method.getRunResults()
+              .get(method.getRunResults().size() - 1).getData());
+    }
+    else
+      unit = "N/A";
     CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
         .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score " + "(" + unit
         + ")").build();
