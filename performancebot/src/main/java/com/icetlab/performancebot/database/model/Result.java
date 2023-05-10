@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "results")
 public class Result {
   @Field("data")
-  String data;
-  Date addedAt;
+  private final String data;
+  private Date addedAt;
 
   public Result(String data) {
     this.data = data;
