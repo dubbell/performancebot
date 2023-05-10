@@ -86,11 +86,6 @@ public class InstallationService {
     }
   }
 
-  private boolean repoExists(String installationId, String repoId) {
-    Installation inst = getInstallationById(installationId);
-    return inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId));
-  }
-
   /**
    * Adds a method to a repo in an installation
    *
@@ -200,6 +195,18 @@ public class InstallationService {
     } else {
       throw new NoSuchElementException("No such GitHub repo");
     }
+  }
+  
+  /**
+   * Checks if a GitHub repository exists
+   *
+   * @param installationId the id of the installation
+   * @param repoId the id of the GitHub repository
+   * @return true if the GitHub repository exists, false otherwise
+   */
+  private boolean repoExists(String installationId, String repoId) {
+    Installation inst = getInstallationById(installationId);
+    return inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId));
   }
 
   /**
