@@ -28,20 +28,24 @@ public class InstallationService {
   private MongoTemplate mongoTemplate;
 
 
+  /**
+   * Gets all GitHub repositories that exist in an installation
+   * @param installationId id of the installation
+   * @return List of GitHub repositories
+   */
   public List<GitHubRepo> getReposByInstallationId(String installationId) {
-    if (installationExists(installationId)) {
-      return repo.findAllReposById(installationId);
+    if (!installationExists(installationId)) {
+      throw new RuntimeException("No such installation id");
     }
 
-    throw new RuntimeException("No such installation id");
+    return repo.findAllReposById(installationId);
   }
 
-
   /**
-   * Returns a GitHubRepo object by id, throws a NoSuchElementException if the repo doesn't exist
+   * Returns an Installation object by id, throws a NoSuchElementException if the installation doesn't exist
    *
    * @param installationId the id of the installation
-   * @return a GitHubRepo
+   * @return a Installation
    */
   public Installation getInstallationById(String installationId) {
     return repo.findById(installationId).orElseThrow();
@@ -54,13 +58,12 @@ public class InstallationService {
    * @throws IllegalArgumentException if the installation already exists
    */
   public void addInstallation(String installationId) {
-    if (!installationExists(installationId)) {
-      Installation inst = new Installation(installationId, new ArrayList<>());
-      repo.insert(inst);
-      return;
+    if (installationExists(installationId)) {
+      throw new IllegalArgumentException("The id already exists");
     }
 
-    throw new IllegalArgumentException("The id already exists");
+    Installation inst = new Installation(installationId, new ArrayList<>());
+    repo.insert(inst);
   }
 
   /**
