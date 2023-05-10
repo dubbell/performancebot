@@ -19,16 +19,6 @@ public interface InstallationRepository extends MongoRepository<Installation, St
   List<GitHubRepo> findAllReposById(String installationId);
 
   /**
-   * Finds a GitHub repo by id
-   * 
-   * @param installationId the id of the installation
-   * @param repoId the id of the repo
-   * @return a GitHubRepo object
-   */
-  @Query(value = "{ 'installationId' : ?0, 'repos.repoId' : ?1 }", fields = "{'repos.$' : 1 }")
-  GitHubRepo findGitHubRepo(String installationId, String repoId);
-  
-  /**
    * Deletes a GitHubRepo from an installation
    * @param installationId the installation where the GitHubRepo belongs to
    * @param repoId the id of the GitHubRepo to be deleted
