@@ -99,27 +99,26 @@ public class InstallationService {
    * @param method the method to be added
    */
   public void addMethodToRepo(String installationId, String repoId, Method method) {
-    Installation inst = getInstallationById(installationId);
-    // Check if method exists
-    if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
-      Optional<GitHubRepo> gitHubRepo =
-          inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-      if (gitHubRepo.isPresent()) {
-        if (gitHubRepo.get().getMethods().stream()
-            .anyMatch(m -> m.getMethodName().equals(method.getMethodName()))) {
-          throw new IllegalArgumentException("Method already exists");
-        }
+    Installation installation = getInstallationById(installationId);
+
+    Optional<GitHubRepo> gitHubRepo = installation.getRepos().stream()
+            .filter(r -> r.getRepoId().equals(repoId))
+            .findFirst();
+
+    if (gitHubRepo.isPresent()) {
+      if (gitHubRepo.get().getMethods().stream()
+              .anyMatch(m -> m.getMethodName().equals(method.getMethodName()))) {
+        throw new IllegalArgumentException("Method already exists");
       }
-    }
 
-    if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
+      // Add the method to the GitHub repository if it does not exist
       mongoTemplate.updateFirst(
-          Query.query(where("_id").is(installationId).and("repos.repoId").is(repoId)),
-          new Update().push("repos.$.methods", method), Installation.class);
-      return;
-    }
+              Query.query(where("_id").is(installationId).and("repos.repoId").is(repoId)),
+              new Update().push("repos.$.methods", method), Installation.class);
 
-    throw new NoSuchElementException("No such repo id");
+    } else {
+      throw new NoSuchElementException("No such repo id");
+    }
   }
 
   /**
@@ -160,13 +159,12 @@ public class InstallationService {
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
     Installation inst = getInstallationById(installationId);
-    Optional<GitHubRepo> gitHubRepo =
-        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-    if (gitHubRepo.isPresent()) {
-      return gitHubRepo.get().getMethods();
+    Optional<GitHubRepo> gitHubRepo = inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
+    if (gitHubRepo.isEmpty()) {
+      throw new NoSuchElementException("No such repo id");
     }
 
-    throw new NoSuchElementException("No such repo id");
+    return gitHubRepo.get().getMethods();
   }
   
   /**
