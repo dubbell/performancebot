@@ -27,7 +27,6 @@ public class InstallationService {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-
   /**
    * Gets all GitHub repositories that exist in an installation
    * @param installationId id of the installation
@@ -73,17 +72,18 @@ public class InstallationService {
    * @param repo the repo to be added
    */
   public void addRepoToInstallation(String installationId, GitHubRepo repo) {
-    if (installationExists(installationId)) {
+    if (!installationExists(installationId)) {
+      throw new NoSuchElementException("No such installation id");
+    }
+
+    else {
       if (repoExists(installationId, repo.getRepoId())) {
         throw new IllegalArgumentException("Repo already exists");
       }
 
       mongoTemplate.updateFirst(Query.query(where("_id").is(installationId)),
-          new Update().push("repos", repo), Installation.class);
-      return;
+              new Update().push("repos", repo), Installation.class);
     }
-
-    throw new NoSuchElementException("No such installation id");
   }
 
   private boolean repoExists(String installationId, String repoId) {
@@ -130,24 +130,25 @@ public class InstallationService {
    * @param methodName the name of the method
    * @param result the result to be added
    */
-  public void addRunResultToMethod(String installationId, String repoId, String methodName,
-      String result) {
+  public void addRunResultToMethod(String installationId, String repoId, String methodName, String result) {
     Installation inst = mongoTemplate.findById(installationId, Installation.class);
+
     if (inst == null) {
       throw new NoSuchElementException("No such installation id");
     }
 
-    Optional<GitHubRepo> gitHubRepo =
-        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-    if (gitHubRepo.isPresent()) {
-      Method method =
-          gitHubRepo.get().getMethods().stream().filter(m -> m.getMethodName().equals(methodName))
-              .findFirst().orElseThrow(NoSuchElementException::new);
-      method.addResult(new Result(result));
-      mongoTemplate.save(inst);
-      return;
-    }
-    throw new NoSuchElementException("No such repo");
+    GitHubRepo gitHubRepo = inst.getRepos().stream()
+            .filter(r -> r.getRepoId().equals(repoId))
+            .findFirst()
+            .orElseThrow(NoSuchElementException::new);
+
+    Method method = gitHubRepo.getMethods().stream()
+            .filter(m -> m.getMethodName().equals(methodName))
+            .findFirst()
+            .orElseThrow(NoSuchElementException::new);
+
+    method.addResult(new Result(result));
+    mongoTemplate.save(inst);
   }
 
   /**
