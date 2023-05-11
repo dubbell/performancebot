@@ -102,20 +102,6 @@ public class InstallationController {
   }
 
   /**
-   * Get all GitHub repositories in an installation
-   *
-   * @param installationId the id of the installation
-   * @return list of GitHub repos, or empty list if the installation id doesn't exist
-   */
-  public List<GitHubRepo> getReposByInstallationId(String installationId) {
-    try {
-      return service.getReposByInstallationId(installationId);
-    } catch (RuntimeException e) {
-      return null;
-    }
-  }
-
-  /**
    * Get a specific installation by its id
    *
    * @param installationId the id of the installation to be returned
