@@ -171,13 +171,13 @@ public class InstallationController {
    *
    * @param installationId the id of the installation
    * @param repoId the id of the repo
-   * @return a set of methods, or null if the installation or GitHub repository doesn't exist
+   * @return a set of methods, or an empty set if the installation or GitHub repository doesn't exist
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
     try {
       return service.getMethodsFromRepo(installationId, repoId);
     } catch (InstallationCollectionException e) {
-      return null;
+      return new HashSet<>();
     }
   }
 
