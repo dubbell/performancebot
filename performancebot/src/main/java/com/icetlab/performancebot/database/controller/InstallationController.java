@@ -102,7 +102,7 @@ public class InstallationController {
   }
 
   /**
-   * Get all repos in an installation
+   * Get all GitHub repositories in an installation
    *
    * @param installationId the id of the installation
    * @return list of GitHub repos, or empty list if the installation id doesn't exist
@@ -185,7 +185,7 @@ public class InstallationController {
    *
    * @param installationId the id of the installation
    * @param repoId the id of the repo
-   * @return a set of methods, or null if the installation or repo doesn't exist
+   * @return a set of methods, or null if the installation or GitHub repository doesn't exist
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
     try {
