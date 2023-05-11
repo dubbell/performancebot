@@ -29,9 +29,9 @@ public class InstallationService {
    * @param installationId id of the installation
    * @return List of GitHub repositories
    */
-  public List<GitHubRepo> getReposByInstallationId(String installationId) {
+  public List<GitHubRepo> getReposByInstallationId(String installationId) throws InstallationCollectionException {
     if (!installationExists(installationId)) {
-      throw new RuntimeException("No such installation id");
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION);
     }
 
     return repo.findAllReposById(installationId);
