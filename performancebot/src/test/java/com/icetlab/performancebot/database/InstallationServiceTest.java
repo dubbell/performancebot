@@ -3,7 +3,6 @@ package com.icetlab.performancebot.database;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
-import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.database.model.InstallationCollectionException;
@@ -71,10 +70,6 @@ public class InstallationServiceTest {
   @InjectMocks
   @Autowired
   InstallationService installationService;
-
-  @InjectMocks
-  @Autowired
-  InstallationController installationController;
 
   @Autowired
   MongoTemplate mongoTemplate;
