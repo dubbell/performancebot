@@ -52,7 +52,7 @@ class Constants {
                       },
                       "secondaryMetrics" : {
                       },
-                      "commit" : "acommit",
+                      "commit" : "acommit"
                   },
                   {
                       "benchmark" : "com.szatmary.peter.SampleBenchmarkTest.oldWay",
