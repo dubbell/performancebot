@@ -3,6 +3,7 @@ package com.icetlab.performancebot.webhook.handlers;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.icetlab.performancebot.stats.FormatterUtils;
 import com.icetlab.performancebot.stats.MethodByClassFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,13 +27,16 @@ public class ResultsHandler extends WebhookHandler {
     String issueUrl = node.get("issue_url").asText();
     String name = node.get("name").asText();
     JsonNode results = node.get("results");
+    String PRNumber = node.get("PRNumber").asText();
+    String commit = results.get("commit").asText();
     if (results == null)
       return false;
     if (Stream.of(installationId, issueUrl, name).anyMatch(Objects::isNull))
       return false;
     String formattedResults = issueFormatter.formatBenchmarkIssue(payload);
-    GitHubIssueManager.getInstance().createIssue(issueUrl, "Results for " + name, formattedResults,
-        installationId);
+    GitHubIssueManager.getInstance().createIssue(issueUrl,
+            "Results for " + name + " (PR: #" + PRNumber + ", commit: " + commit + ")",
+            formattedResults, installationId);
     return true;
   }
 

@@ -83,6 +83,7 @@ public class BenchmarkWorker {
           parser.parseMap(task).get("repo_id").toString(),
           parser.parseMap(task).get("name").toString(),
           parser.parseMap(task).get("issue_url").toString(),
+          parser.parseMap(task).get("PRNumber").toString(),
           parser.parseMap(task).get("commit").toString());
     } catch (Exception e) {
       e.printStackTrace();
@@ -118,12 +119,13 @@ public class BenchmarkWorker {
    * Sends results back to benchmark-controller process.
    */
   public void sendResult(String results, String installationId, String repoId, String name,
-      String endpoint, String commit) throws Exception {
+      String endpoint, String PRNumber, String commit) throws Exception {
     Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("installation_id", installationId);
     requestBody.put("repo_id", repoId);
     requestBody.put("name", name);
     requestBody.put("issue_url", endpoint);
+    requestBody.put("PRNumber", PRNumber);
 
     // if an error occurred and a result wasn't calculated, don't add the results to the body
     if (!results.equals("")) {

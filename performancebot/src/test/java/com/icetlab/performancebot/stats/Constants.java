@@ -9,6 +9,7 @@ class Constants {
           "repo_id": "a repo id",
           "name": "a repo name",
           "installation_id": "an id",
+          "PRNumber": "1",
           "results": [
               [
                   {
@@ -50,7 +51,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit" : "acommit",
                   },
                   {
                       "benchmark" : "com.szatmary.peter.SampleBenchmarkTest.oldWay",
@@ -91,7 +93,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   }
               ]
 
@@ -105,6 +108,7 @@ class Constants {
           "repo_id": "a repo id",
           "name": "a repo name",
           "installation_id": "an id",
+          "PRNumber": "1",
           "results": [
               [
                   {
@@ -146,7 +150,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   },
                   {
                       "benchmark" : "com.szatmary.peter.SampleBenchmarkTest.oldWay",
@@ -187,7 +192,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   },
                   {
                       "benchmark" : "com.szatmary.peter.AnotherClassName.newWay",
@@ -228,7 +234,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   }
               ]
 
@@ -276,7 +283,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   }
       """;
 
@@ -320,7 +328,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   }
       """;
 
@@ -364,7 +373,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   },
                   {
                       "benchmark" : "com.szatmary.peter.AnotherClassName.newWay",
@@ -405,7 +415,8 @@ class Constants {
                           ]
                       },
                       "secondaryMetrics" : {
-                      }
+                      },
+                      "commit:" : "acommit"
                   }
       """;
 
@@ -451,7 +462,8 @@ class Constants {
               ]
           },
           "secondaryMetrics" : {
-          }
+          },
+          "commit:" : "acommit"
       }
           """;
 
@@ -495,7 +507,8 @@ class Constants {
               ]
           },
           "secondaryMetrics" : {
-          }
+          },
+          "commit:" : "acommit"
       }
           """;
 
@@ -539,7 +552,8 @@ class Constants {
               ]
           },
           "secondaryMetrics" : {
-          }
+          },
+          "commit:" : "acommit"
       }
           """;
 
@@ -583,7 +597,8 @@ class Constants {
               ]
           },
           "secondaryMetrics" : {
-          }
+          },
+          "commit:" : "acommit"
       }
           """;
 
@@ -627,7 +642,8 @@ class Constants {
               ]
           },
           "secondaryMetrics" : {
-          }
+          },
+          "commit:" : "acommit"
       }
           """;
 
