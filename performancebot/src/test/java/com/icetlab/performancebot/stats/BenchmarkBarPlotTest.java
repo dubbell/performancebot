@@ -47,7 +47,7 @@ public class BenchmarkBarPlotTest {
     results.add(new Result(Constants.bmResultSampleBenchmarkNewWay));
     Method method = new Method("com.szatmary.peter.SampleBenchmarkTest.newWay", results);
     String mdBarPlot = benchmarkBarPlot.visualizeBenchmarkResults(method);
-    String dateRegex = "\\*\\s(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])/[0-9]{4}\\s[0-9]{2}:[0-9]{2}";
+    String dateRegex = "\\*\\s(3[01]|[12][0-9]|0[1-9])/(1[0-2]|0[1-9])/[0-9]{4}\\s[0-9]{2}:[0-9]{2}";
     Pattern pattern = Pattern.compile(dateRegex);
     Matcher matcher = pattern.matcher(mdBarPlot);
     int matchCount = 0;
