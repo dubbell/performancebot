@@ -38,13 +38,22 @@ public class BenchmarkBarPlot implements VisualizationStrategy {
     return sb.toString();
   }
 
+  
   /**
    * @param method the method which results should be visualized as bar plot
    * @return the CategoryChart visualizing methods run results
    */
   private CategoryChart buildBarplot(Method method) {
+    String unit = "";
+    if (method.getRunResults().size() > 0) {
+      unit = FormatterUtils.getUnitFromPrimaryMetric(method.getRunResults()
+              .get(method.getRunResults().size() - 1).getData());
+    }
+    else
+      unit = "N/A";
     CategoryChart barPlot = new CategoryChartBuilder().width(600).height(600)
-        .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score").build();
+        .title(method.getMethodName()).xAxisTitle("Date").yAxisTitle("Score " + "(" + unit
+        + ")").build();
     List<Result> results = getNMostRecentRunResults(method, 10);
     List<String> timestamps = results.stream()
         .map((x) -> new SimpleDateFormat("dd/MM/yyyy HH:mm").format(x.getAddedAt())).toList();
