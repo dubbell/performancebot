@@ -1,9 +1,11 @@
 package com.icetlab.performancebot.github.webhook;
 
+import com.icetlab.performancebot.client.Localhost;
 import com.icetlab.performancebot.database.model.Installation;
 import com.icetlab.performancebot.webhook.handlers.PullRequestHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,9 @@ import org.springframework.web.client.ResourceAccessException;
 @SpringBootTest
 public class PullRequestHandlerTest {
 
+  //@Autowired
   @InjectMocks
-  @Autowired
-  PullRequestHandler pullRequestHandler;
+  PullRequestHandler pullRequestHandler = new PullRequestHandler(new Localhost());
 
   @Autowired
   MongoTemplate mongoTemplate;

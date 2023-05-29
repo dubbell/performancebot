@@ -23,7 +23,7 @@ spec:
         - name: benchmark-controller
           image: docker.io/linulun/benchmark-controller:latest
           ports:
-            - containerPort: 1337
+            - containerPort: 8080
 
 
 ---
@@ -40,7 +40,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 1337
+      targetPort: 8080
 
 ---
 
@@ -92,7 +92,7 @@ spec:
         - name: benchmark-worker
           image: docker.io/linulun/benchmark-worker:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
 
 ---
 
@@ -108,7 +108,7 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
-      targetPort: 8080
+      targetPort: 8081
 
 ---
 
@@ -179,4 +179,3 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: perfbot-sa-role
-
