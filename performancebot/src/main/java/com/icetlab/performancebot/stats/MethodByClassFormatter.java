@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.model.Method;
-import com.icetlab.performancebot.database.service.InstallationService;
+import com.icetlab.performancebot.database.controller.InstallationController;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class MethodByClassFormatter implements BenchmarkIssueFormatter {
 
   VisualizationStrategy visualizationStrategy = new BenchmarkBarPlot(); // Change statistical analysis strategy here
   @Autowired
-  InstallationService installationService;
+  private InstallationController controller;
 
   @Override
   public String formatBenchmarkIssue(String jmhResults) {
@@ -31,7 +31,7 @@ public class MethodByClassFormatter implements BenchmarkIssueFormatter {
       String repoId = node.get("repo_id").asText();
       List<String> methodNames = FormatterUtils.getMethodNamesFromCurrentRun(jmhResults);
       Set<Method> methods = FormatterUtils.filterMethodsFromCurrentRun(
-          installationService.getMethodsFromRepo(installationId, repoId), methodNames);
+          controller.getMethodsFromRepo(installationId, repoId), methodNames);
       Map<String, List<Method>> classes = FormatterUtils.groupMethodsByClassName(methods);
       return formatIssueBody(classes);
     } catch (JsonProcessingException e) {

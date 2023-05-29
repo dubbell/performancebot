@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.database.model.InstallationCollectionException;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -85,7 +85,7 @@ public class InstallationController {
         }
       }
       return true;
-    } catch (JsonProcessingException e) {
+    } catch (JsonProcessingException | InstallationCollectionException e) {
       return false;
     }
   }
@@ -97,20 +97,6 @@ public class InstallationController {
       String name = node.get("name").asText();
       return new GitHubRepo(repoId, new HashSet<>(), name);
     } catch (JsonProcessingException e) {
-      return null;
-    }
-  }
-
-  /**
-   * Get all repos in an installation
-   *
-   * @param installationId the id of the installation
-   * @return list of github repos, or empty list if the installation id doesn't exist
-   */
-  public List<GitHubRepo> getReposByInstallationId(String installationId) {
-    try {
-      return service.getReposByInstallationId(installationId);
-    } catch (RuntimeException e) {
       return null;
     }
   }
@@ -140,13 +126,13 @@ public class InstallationController {
     try {
       service.addInstallation(installationId);
       return true;
-    } catch (IllegalArgumentException e) {
+    } catch (InstallationCollectionException e) {
       return false;
     }
   }
 
   /**
-   * Adds a new github repo to an existing installtion in the database. If the installation id
+   * Adds a new GitHub repository to an existing installtion in the database. If the installation id
    * doesn't exist in the database, this method will do nothing
    *
    * @param installationId the id of the installation
@@ -157,13 +143,13 @@ public class InstallationController {
     try {
       service.addRepoToInstallation(installationId, repo);
       return true;
-    } catch (RuntimeException e) {
+    } catch (InstallationCollectionException e) {
       return false;
     }
   }
 
   /**
-   * Adds a new method to an existing repo in an exsiting installation in the database If the
+   * Adds a new method to an existing repo in an existing installation in the database If the
    * installation or the repo doesn't exist, this method will do nothing
    *
    * @param installationId
@@ -175,7 +161,7 @@ public class InstallationController {
     try {
       service.addMethodToRepo(installationId, repoId, method);
       return true;
-    } catch (NoSuchElementException e) {
+    } catch (InstallationCollectionException e) {
       return false;
     }
   }
@@ -185,13 +171,13 @@ public class InstallationController {
    *
    * @param installationId the id of the installation
    * @param repoId the id of the repo
-   * @return a set of methods, or null if the installation or repo doesn't exist
+   * @return a set of methods, or an empty set if the installation or GitHub repository doesn't exist
    */
   public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
     try {
       return service.getMethodsFromRepo(installationId, repoId);
-    } catch (NoSuchElementException e) {
-      return null;
+    } catch (InstallationCollectionException e) {
+      return new HashSet<>();
     }
   }
 
@@ -205,23 +191,23 @@ public class InstallationController {
     try {
       service.deleteInstallationById(installationId);
       return true;
-    } catch (NoSuchElementException e) {
+    } catch (InstallationCollectionException e) {
       return false;
     }
   }
 
   /**
-   * Deletes a Github repository from the database with all its repos
+   * Deletes a GitHub repository from the database with all its repos
    * 
    * @param installationId the installation where the Github repository is placed
-   * @param repoId the Github repository to be deleted
+   * @param repoId the GitHub repository to be deleted
    * @return true if successful, otherwise false
    */
   public boolean deleteGitHubRepo(String installationId, String repoId) {
     try {
       service.deleteGitHubRepo(installationId, repoId);
       return true;
-    } catch (NoSuchElementException e) {
+    } catch (InstallationCollectionException e) {
       return false;
     }
   }

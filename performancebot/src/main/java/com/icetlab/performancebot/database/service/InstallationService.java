@@ -2,12 +2,9 @@ package com.icetlab.performancebot.database.service;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-import com.icetlab.performancebot.database.model.Installation;
-import com.icetlab.performancebot.database.model.Method;
-import com.icetlab.performancebot.database.model.Result;
+import com.icetlab.performancebot.database.model.*;
 import com.icetlab.performancebot.database.repository.InstallationRepository;
-import com.icetlab.performancebot.database.model.GitHubRepo;
-import java.util.NoSuchElementException;
+
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,21 +24,24 @@ public class InstallationService {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-
-  public List<GitHubRepo> getReposByInstallationId(String installationId) {
-    if (installationExists(installationId)) {
-      return repo.findAllReposById(installationId);
+  /**
+   * Gets all GitHub repositories that exist in an installation
+   * @param installationId id of the installation
+   * @return List of GitHub repositories
+   */
+  public List<GitHubRepo> getReposByInstallationId(String installationId) throws InstallationCollectionException {
+    if (!installationExists(installationId)) {
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION);
     }
 
-    throw new RuntimeException("No such installation id");
+    return repo.findAllReposById(installationId);
   }
 
-
   /**
-   * Returns a GitHubRepo object by id, throws a NoSuchElementException if the repo doesn't exist
+   * Returns an Installation object by id, throws a NoSuchElementException if the installation doesn't exist
    *
    * @param installationId the id of the installation
-   * @return a GitHubRepo
+   * @return a Installation
    */
   public Installation getInstallationById(String installationId) {
     return repo.findById(installationId).orElseThrow();
@@ -51,16 +51,15 @@ public class InstallationService {
    * Adds an installation to the database
    *
    * @param installationId the id of the installation
-   * @throws IllegalArgumentException if the installation already exists
+   * @throws InstallationCollectionException if the installation already exists
    */
-  public void addInstallation(String installationId) {
-    if (!installationExists(installationId)) {
-      Installation inst = new Installation(installationId, new ArrayList<>());
-      repo.insert(inst);
-      return;
+  public void addInstallation(String installationId) throws InstallationCollectionException {
+    if (installationExists(installationId)) {
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.INSTALLATION_EXISTS);
     }
 
-    throw new IllegalArgumentException("The id already exists");
+    Installation inst = new Installation(installationId, new ArrayList<>());
+    repo.insert(inst);
   }
 
   /**
@@ -69,23 +68,19 @@ public class InstallationService {
    * @param installationId the id of the installation where GitHub repo will be added
    * @param repo the repo to be added
    */
-  public void addRepoToInstallation(String installationId, GitHubRepo repo) {
-    if (installationExists(installationId)) {
+  public void addRepoToInstallation(String installationId, GitHubRepo repo) throws InstallationCollectionException {
+    if (!installationExists(installationId)) {
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION);
+    }
+
+    else {
       if (repoExists(installationId, repo.getRepoId())) {
-        throw new IllegalArgumentException("Repo already exists");
+        throw InstallationCollectionException.raiseException(InstallationCollectionException.REPO_EXISTS);
       }
 
       mongoTemplate.updateFirst(Query.query(where("_id").is(installationId)),
-          new Update().push("repos", repo), Installation.class);
-      return;
+              new Update().push("repos", repo), Installation.class);
     }
-
-    throw new NoSuchElementException("No such installation id");
-  }
-
-  private boolean repoExists(String installationId, String repoId) {
-    Installation inst = getInstallationById(installationId);
-    return inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId));
   }
 
   /**
@@ -95,28 +90,27 @@ public class InstallationService {
    * @param repoId the id of the repo
    * @param method the method to be added
    */
-  public void addMethodToRepo(String installationId, String repoId, Method method) {
-    Installation inst = getInstallationById(installationId);
-    // Check if method exists
-    if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
-      Optional<GitHubRepo> gitHubRepo =
-          inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-      if (gitHubRepo.isPresent()) {
-        if (gitHubRepo.get().getMethods().stream()
-            .anyMatch(m -> m.getMethodName().equals(method.getMethodName()))) {
-          throw new IllegalArgumentException("Method already exists");
-        }
+  public void addMethodToRepo(String installationId, String repoId, Method method) throws InstallationCollectionException {
+    Installation installation = getInstallationById(installationId);
+
+    Optional<GitHubRepo> gitHubRepo = installation.getRepos().stream()
+            .filter(r -> r.getRepoId().equals(repoId))
+            .findFirst();
+
+    if (gitHubRepo.isPresent()) {
+      if (gitHubRepo.get().getMethods().stream()
+              .anyMatch(m -> m.getMethodName().equals(method.getMethodName()))) {
+        throw InstallationCollectionException.raiseException(InstallationCollectionException.METHOD_EXISTS);
       }
-    }
 
-    if (inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId))) {
+      // Add the method to the GitHub repository
       mongoTemplate.updateFirst(
-          Query.query(where("_id").is(installationId).and("repos.repoId").is(repoId)),
-          new Update().push("repos.$.methods", method), Installation.class);
-      return;
-    }
+              Query.query(where("_id").is(installationId).and("repos.repoId").is(repoId)),
+              new Update().push("repos.$.methods", method), Installation.class);
 
-    throw new NoSuchElementException("No such repo id");
+    } else {
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_REPO);
+    }
   }
 
   /**
@@ -127,24 +121,25 @@ public class InstallationService {
    * @param methodName the name of the method
    * @param result the result to be added
    */
-  public void addRunResultToMethod(String installationId, String repoId, String methodName,
-      String result) {
+  public void addRunResultToMethod(String installationId, String repoId, String methodName, String result) throws InstallationCollectionException {
     Installation inst = mongoTemplate.findById(installationId, Installation.class);
+
     if (inst == null) {
-      throw new NoSuchElementException("No such installation id");
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION);
     }
 
-    Optional<GitHubRepo> gitHubRepo =
-        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-    if (gitHubRepo.isPresent()) {
-      Method method =
-          gitHubRepo.get().getMethods().stream().filter(m -> m.getMethodName().equals(methodName))
-              .findFirst().orElseThrow(NoSuchElementException::new);
-      method.addResult(new Result(result));
-      mongoTemplate.save(inst);
-      return;
-    }
-    throw new NoSuchElementException("No such repo");
+    GitHubRepo gitHubRepo = inst.getRepos().stream()
+            .filter(r -> r.getRepoId().equals(repoId))
+            .findFirst()
+            .orElseThrow(() -> InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_REPO));
+
+    Method method = gitHubRepo.getMethods().stream()
+            .filter(m -> m.getMethodName().equals(methodName))
+            .findFirst()
+            .orElseThrow(() -> InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_METHOD));
+
+    method.addResult(new Result(result));
+    mongoTemplate.save(inst);
   }
 
   /**
@@ -154,15 +149,14 @@ public class InstallationService {
    * @param repoId the id of the repo
    * @return set of methods (Method objects)
    */
-  public Set<Method> getMethodsFromRepo(String installationId, String repoId) {
+  public Set<Method> getMethodsFromRepo(String installationId, String repoId) throws InstallationCollectionException {
     Installation inst = getInstallationById(installationId);
-    Optional<GitHubRepo> gitHubRepo =
-        inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
-    if (gitHubRepo.isPresent()) {
-      return gitHubRepo.get().getMethods();
+    Optional<GitHubRepo> gitHubRepo = inst.getRepos().stream().filter(r -> r.getRepoId().equals(repoId)).findFirst();
+    if (gitHubRepo.isEmpty()) {
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_REPO);
     }
 
-    throw new NoSuchElementException("No such repo id");
+    return gitHubRepo.get().getMethods();
   }
   
   /**
@@ -170,23 +164,23 @@ public class InstallationService {
    * Throws NoSuchElementException if the installation does not exist in the database.
    * @param installationId the id of the installation to be deleted
    */
-  public void deleteInstallationById(String installationId) {
+  public void deleteInstallationById(String installationId) throws InstallationCollectionException {
     if (!installationExists(installationId)) {
-      throw new NoSuchElementException("No such installation id");
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION);
     }
     // remove it otherwise
     repo.deleteById(installationId);
   }
   
   /**
-   * Deletes a Github repository from the database
+   * Deletes a GitHub repository from the database
    * Throws NoSuchElementException if the installation or the Github repository do not exist in the database
    * @param installationId the id of the installation where the Github repository is stored
-   * @param repoId the id of the Github repository to be deleted
+   * @param repoId the id of the GitHub repository to be deleted
    */
-  public void deleteGitHubRepo(String installationId, String repoId) {
+  public void deleteGitHubRepo(String installationId, String repoId) throws InstallationCollectionException {
     Installation installation = repo.findById(installationId)
-            .orElseThrow(() -> new NoSuchElementException("No such installation"));
+            .orElseThrow(() -> InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_INSTALLATION));
 
     List<GitHubRepo> repos = installation.getRepos();
     // Delete the repo
@@ -196,8 +190,20 @@ public class InstallationService {
       // Update the installation
       repo.save(installation);
     } else {
-      throw new NoSuchElementException("No such GitHub repo");
+      throw InstallationCollectionException.raiseException(InstallationCollectionException.NO_SUCH_REPO);
     }
+  }
+
+  /**
+   * Checks if a GitHub repository exists
+   *
+   * @param installationId the id of the installation
+   * @param repoId the id of the GitHub repository
+   * @return true if the GitHub repository exists, false otherwise
+   */
+  private boolean repoExists(String installationId, String repoId) {
+    Installation inst = getInstallationById(installationId);
+    return inst.getRepos().stream().anyMatch(r -> r.getRepoId().equals(repoId));
   }
 
   /**

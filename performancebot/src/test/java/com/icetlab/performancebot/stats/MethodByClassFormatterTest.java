@@ -5,6 +5,8 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import com.icetlab.performancebot.database.model.*;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import com.icetlab.performancebot.database.controller.InstallationController;
-import com.icetlab.performancebot.database.model.GitHubRepo;
-import com.icetlab.performancebot.database.model.Installation;
-import com.icetlab.performancebot.database.model.Method;
-import com.icetlab.performancebot.database.model.Result;
 import com.icetlab.performancebot.database.service.InstallationService;
 import com.icetlab.performancebot.webhook.PayloadManager;
 
@@ -48,7 +46,7 @@ public class MethodByClassFormatterTest {
 
 
   @BeforeEach
-  public void resetDatabase() {
+  public void resetDatabase() throws InstallationCollectionException {
     mongoTemplate.dropCollection(Installation.class);
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
@@ -60,7 +58,7 @@ public class MethodByClassFormatterTest {
     and not AnotherClassName
    */
   @Test
-  public void testFormatResultsOneClass() {
+  public void testFormatResultsOneClass() throws InstallationCollectionException {
     List<Result> oldWayResults = new ArrayList<>();
     oldWayResults.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
     oldWayResults.add(new Result(
@@ -91,7 +89,7 @@ public class MethodByClassFormatterTest {
     and AnotherClassName
    */
   @Test
-  public void testFormatResultsMultipleClasses() {
+  public void testFormatResultsMultipleClasses() throws InstallationCollectionException {
     List<Result> oldWayResults = new ArrayList<>();
     oldWayResults.add(new Result(Constants.exampleResultSampleBenchmarkOldWay));
     oldWayResults.add(new Result(
@@ -121,7 +119,7 @@ public class MethodByClassFormatterTest {
     Test that two classes containing a method with the same name formats correctly
    */
   @Test
-  public void testNoDuplicateMethods() {
+  public void testNoDuplicateMethods() throws InstallationCollectionException {
     List<Result> oldWayResults, newWayResults, otherResults;
     oldWayResults = new ArrayList<>();
     newWayResults = new ArrayList<>();

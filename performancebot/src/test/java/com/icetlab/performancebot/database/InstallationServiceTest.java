@@ -3,9 +3,9 @@ package com.icetlab.performancebot.database;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
-import com.icetlab.performancebot.database.controller.InstallationController;
 import com.icetlab.performancebot.database.model.GitHubRepo;
 import com.icetlab.performancebot.database.model.Installation;
+import com.icetlab.performancebot.database.model.InstallationCollectionException;
 import com.icetlab.performancebot.database.model.Method;
 import com.icetlab.performancebot.database.service.InstallationService;
 import com.icetlab.performancebot.webhook.PayloadManager;
@@ -71,30 +71,26 @@ public class InstallationServiceTest {
   @Autowired
   InstallationService installationService;
 
-  @InjectMocks
-  @Autowired
-  InstallationController installationController;
-
   @Autowired
   MongoTemplate mongoTemplate;
 
   @Test
-  public void testAddInstallation() {
+  public void testAddInstallation() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     Query q = Query.query(where("_id").is("an id"));
     assertEquals(mongoTemplate.find(q, Installation.class).size(), 1);
   }
 
   @Test
-  public void testAddInstallationException() {
+  public void testAddInstallationException() throws InstallationCollectionException {
     installationService.addInstallation("an id");
-    assertThrows(IllegalArgumentException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.addInstallation("an id");
     });
   }
 
   @Test
-  public void testGetInstallationById() {
+  public void testGetInstallationById() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     assertEquals(installationService.getInstallationById("an id").getInstallationId(), "an id");
   }
@@ -107,7 +103,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddRepoToInstallation() {
+  public void testAddRepoToInstallation() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
@@ -116,11 +112,11 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddRepoThatAlreadyExists() {
+  public void testAddRepoThatAlreadyExists() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
-    assertThrows(IllegalArgumentException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.addRepoToInstallation("an id",
           new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
     });
@@ -128,14 +124,14 @@ public class InstallationServiceTest {
 
   @Test
   public void testAddRepoToInstallationWhenTheInstallationDoesNotExist() {
-    assertThrows(NoSuchElementException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.addRepoToInstallation("an id",
           new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
     });
   }
 
   @Test
-  public void testAddMethodToRepo() {
+  public void testAddMethodToRepo() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
@@ -147,7 +143,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddMultipleMethodsToRepo() {
+  public void testAddMultipleMethodsToRepo() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
@@ -161,20 +157,20 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddMultipleMethodsWithTheSameName() {
+  public void testAddMultipleMethodsWithTheSameName() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
     installationService.addMethodToRepo("an id", "a repo id",
         new Method("a method", new ArrayList<>()));
-    assertThrows(IllegalArgumentException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.addMethodToRepo("an id", "a repo id",
           new Method("a method", new ArrayList<>()));
     });
   }
 
   @Test
-  public void testAddMultipleMethodsWithDifferentNames() {
+  public void testAddMultipleMethodsWithDifferentNames() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
@@ -188,7 +184,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddRunResultToMethod() {
+  public void testAddRunResultToMethod() throws InstallationCollectionException {
     Method method = new Method("functionname", new ArrayList<>());
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
@@ -199,18 +195,18 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddRunResultToMethodThatDoesNotExist() {
+  public void testAddRunResultToMethodThatDoesNotExist() throws InstallationCollectionException {
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
         new GitHubRepo("a repo id", new HashSet<>(), "a repo name"));
-    assertThrows(NoSuchElementException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.addRunResultToMethod("an id", "a repo id", "functionname",
           EXAMPLE_RESULT);
     });
   }
 
   @Test
-  public void testAddMultipleResultsToMethod() {
+  public void testAddMultipleResultsToMethod() throws InstallationCollectionException {
     Method method = new Method("functionname", new ArrayList<>());
     installationService.addInstallation("an id");
     installationService.addRepoToInstallation("an id",
@@ -224,7 +220,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testAddMultipleResultsToDifferentMethods() {
+  public void testAddMultipleResultsToDifferentMethods() throws InstallationCollectionException {
     Method method = new Method("functionname", new ArrayList<>());
     Method method2 = new Method("functionname2", new ArrayList<>());
     installationService.addInstallation("an id");
@@ -240,7 +236,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testDeleteInstallationById() {
+  public void testDeleteInstallationById() throws InstallationCollectionException {
     // Add an installation
     String installationId = "an id";
     installationService.addInstallation(installationId);
@@ -253,7 +249,7 @@ public class InstallationServiceTest {
   }
 
   @Test
-  public void testDeleteInstallationByIdMultipleInstalltions() {
+  public void testDeleteInstallationByIdMultipleInstallations() throws InstallationCollectionException {
     // Add multiple installations
     String id1 = "id 1";
     String id2 = "id 2";
@@ -279,26 +275,26 @@ public class InstallationServiceTest {
     // Some invalid id
     String installationId = "invalid id";
 
-    assertThrows(NoSuchElementException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.deleteInstallationById(installationId);
     });
   }
 
   @Test
-  public void testDeleteInstallationByIdThrowsExceptionWhenGivenMultipleIdsWithOneInvalid() {
+  public void testDeleteInstallationByIdThrowsExceptionWhenGivenMultipleIdsWithOneInvalid() throws InstallationCollectionException {
     String validId = "valid id";
     String invalidId = "invalid id";
     installationService.addInstallation(validId);
 
     // Delete both IDs at the same time
-    assertThrows(NoSuchElementException.class, () -> {
+    assertThrows(InstallationCollectionException.class, () -> {
       installationService.deleteInstallationById(validId);
       installationService.deleteInstallationById(invalidId);
     });
   }
   
   @Test
-  public void testDeleteGitHubRepo(){
+  public void testDeleteGitHubRepo() throws InstallationCollectionException {
     String installation = "id for installation";
     GitHubRepo repository = new GitHubRepo("id for reoo", new HashSet<Method>(), "name");
 
@@ -319,25 +315,25 @@ public class InstallationServiceTest {
     String nonExistingInstallationId = "non existing id";
     GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
 
-    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+    final InstallationCollectionException e = assertThrows(InstallationCollectionException.class, () -> {
       installationService.deleteGitHubRepo(nonExistingInstallationId, nonExistingRepo.getRepoId());
     });
 
-    assertEquals(e.getMessage(), "No such installation");
+    assertEquals(e.getMessage(), InstallationCollectionException.NO_SUCH_INSTALLATION);
   }
 
   @Test
-  public void testDeleteGitHubRepoNotFoundRepo(){
+  public void testDeleteGitHubRepoNotFoundRepo() throws InstallationCollectionException {
     String installationId = "installation id";
     GitHubRepo nonExistingRepo = new GitHubRepo("id", new HashSet<>(), "repo1");
 
     installationService.addInstallation(installationId);
 
-    final NoSuchElementException e = assertThrows(NoSuchElementException.class, () -> {
+    final InstallationCollectionException e = assertThrows(InstallationCollectionException.class, () -> {
       installationService.deleteGitHubRepo(installationId, nonExistingRepo.getRepoId());
     });
 
-    assertEquals(e.getMessage(), "No such GitHub repo");
+    assertEquals(e.getMessage(), InstallationCollectionException.NO_SUCH_REPO);
   }
 
   @BeforeEach
